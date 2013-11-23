@@ -87,8 +87,16 @@ int process_cmdln( const int argc, char* const argv[] ) {
             wd_oper = WD_OPER_DUMP;
         } else if( 0 == strcmp( this_arg, "-a" ) ) {
             wd_oper = WD_OPER_ADD;
-            getcwd( wd_oper_dir, MAXPATHLEN );
-            /* TODO: add ability to specify dir as a parameter */
+
+            /* Check to see if there's an argument to this command */
+            if((( arg_loop + 1 ) < argc ) &&
+                ( argv[ arg_loop + 1 ][0] != '-' )) {
+                arg_loop++;
+                strcpy( wd_oper_dir, argv[ arg_loop ] );
+            } else {
+                /* No argument .. use the CWD */
+                getcwd( wd_oper_dir, MAXPATHLEN );
+            }
         } else if( 0 == strcmp( this_arg, "-l" ) ) {
             arg_loop++;
             if( arg_loop < argc ) {
