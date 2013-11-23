@@ -18,6 +18,7 @@
 #include "dir_list.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 
 int main( int argc, char* argv[] )
 {
@@ -29,11 +30,28 @@ int main( int argc, char* argv[] )
         if( wd_oper != WD_OPER_NONE ) {
             dir_list_t dir_list = load_dir_list( list_fn );
 
-            if( dir_list != NULL ) {
+            if( dir_list == NULL ) {
+                fprintf(stderr,"%s: Warning: Unable to load list file '%s'\n",
+                        argv[0], list_fn);
+                dir_list = new_dir_list();
+            }
+
+            switch( wd_oper ) {
+                case WD_OPER_ADD:
+                    if( !dir_in_list( dir_list, wd_oper_dir )) {
+                        add_dir( dir_list, wd_oper_dir );
+                        save_dir_list( dir_list, list_fn );
+                    }
+                    break;
+                case WD_OPER_DUMP:
+                    dump_dir_list( dir_list );
+                    break;
+                default:
+                    fprintf(stderr,"Unhandled operation type\n");
             }
         }
     } else {
         ret_code = EXIT_FAILURE;
     }
-    return 0;
+    return ret_code;
 }

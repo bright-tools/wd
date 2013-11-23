@@ -35,6 +35,7 @@
 
 wd_oper_t wd_oper;
 char*     list_fn = NULL;
+char      wd_oper_dir[ MAXPATHLEN ];
 
 void get_home( void )
 {
@@ -82,8 +83,12 @@ int process_cmdln( const int argc, char* const argv[] ) {
         char* this_arg = argv[ arg_loop ];
         if( 0 == strcmp( this_arg, "-v" ) ) {
             fprintf( stdout, "%s\n", VERSION_STRING );
+        } else if( 0 == strcmp( this_arg, "-d" ) ) {
+            wd_oper = WD_OPER_DUMP;
         } else if( 0 == strcmp( this_arg, "-a" ) ) {
             wd_oper = WD_OPER_ADD;
+            getcwd( wd_oper_dir, MAXPATHLEN );
+            /* TODO: add ability to specify dir as a parameter */
         } else if( 0 == strcmp( this_arg, "-l" ) ) {
             arg_loop++;
             if( arg_loop < argc ) {

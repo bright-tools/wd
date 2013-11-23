@@ -18,6 +18,12 @@
 
 typedef struct dir_list_s* dir_list_t;
 
-dir_list_t load_dir_list( const char* p_fn );
+dir_list_t new_dir_list( void );
+dir_list_t load_dir_list( const char* const p_fn );
+int        add_dir( dir_list_t p_list, const char* const p_dir );
+int        dir_in_list( dir_list_t p_list, const char* const p_dir );
+int        save_dir_list( const dir_list_t p_list, const char* p_fn );
+void       dump_dir_list( const dir_list_t p_list );
+
 
 #endif

@@ -16,13 +16,18 @@
 
 #if !defined CMDLN_H
 
+#include <sys/param.h>
+
 typedef enum {
     WD_OPER_NONE,
-    WD_OPER_ADD
+    WD_OPER_ADD,
+    WD_OPER_DUMP,
 } wd_oper_t;
 
+void init_cmdln( void );
 int process_cmdln( const int argc, char* const argv[] );
 
 extern wd_oper_t wd_oper;
 extern char*     list_fn;
+extern char      wd_oper_dir[ MAXPATHLEN ];
 #endif

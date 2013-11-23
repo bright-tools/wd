@@ -1,5 +1,5 @@
 C_SRC = cmdln.c dir_list.c wd.c
-CFLAGS = -O3
+CFLAGS = -O3 -g -Wall
 OBJS  = $(C_SRC:.c=.o)
 TGT = wd
 
