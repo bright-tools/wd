@@ -19,11 +19,18 @@
 #define FILE_HEADER_DESC_STRING "# WD directory list file"
 #define FILE_HEADER_VER_STRING "# File format: version 1"
 
+#define ANSI_COLOUR_RED     "\x1b[31m"
+#define ANSI_COLOUR_GREEN   "\x1b[32m"
+#define ANSI_COLOUR_GREY    "\x1b[37;2m"
+#define ANSI_COLOUR_RESET   "\x1b[0m"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
+#include <errno.h>
 #include <sys/param.h>
+#include <sys/stat.h>
 
 #define MIN_DIR_SIZE 100
 
@@ -139,8 +146,27 @@ void dump_dir_list( const dir_list_t p_list )
 
         for( dir_loop = 0; dir_loop < p_list->dir_count; dir_loop++ )
         {
-            fprintf( stdout, "[%d] %s\n", dir_loop, 
-                                          p_list->dir_list[ dir_loop ] );
+            char* col = ANSI_COLOUR_RESET;
+            char* dir = p_list->dir_list[ dir_loop ];
+            struct stat s;
+            int err = stat( dir , &s);
+            if(-1 == err) {
+                if(ENOENT == errno) {
+                    col = ANSI_COLOUR_RED;
+                }
+            } else {
+                if(S_ISDIR(s.st_mode)) {
+                    col = ANSI_COLOUR_GREEN;
+                } else {
+                    /* Not a directory */
+                    col = ANSI_COLOUR_GREY;
+                }
+            }
+
+            fprintf( stdout, "[%d] %s%s%s\n", dir_loop,
+                                              col,
+                                              dir,
+                                              ANSI_COLOUR_RESET );
         }
     }
 }
