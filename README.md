@@ -8,7 +8,9 @@ wd could be considered to be a system for bookmarking favourite directories
 and then quickly jumping back to those bookmarks
 
 wd is intended to be very light-weight with a minimum of dependencies - that's
-why it's implemented in C as opposed to (for example) Python.
+why it's implemented in C as opposed to (for example) Python.  It's also
+intended to be independent of the shell (so, for example, it could be used on
+the Windows command prompt as well as BASH).
 
 Usage
 =====
