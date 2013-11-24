@@ -21,6 +21,7 @@
 typedef enum {
     WD_OPER_NONE,
     WD_OPER_ADD,
+    WD_OPER_REMOVE,
     WD_OPER_DUMP,
 } wd_oper_t;
 

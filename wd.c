@@ -37,10 +37,23 @@ int main( int argc, char* argv[] )
             }
 
             switch( wd_oper ) {
+                case WD_OPER_REMOVE:
+                    if( remove_dir( dir_list, wd_oper_dir ) ) {
+                        save_dir_list( dir_list, list_fn );
+                    } else {
+                        fprintf(stderr,
+                                "%s: Warning: Directory not in list: '%s'\n",
+                                argv[0], wd_oper_dir);
+                    }
+                    break;
                 case WD_OPER_ADD:
                     if( !dir_in_list( dir_list, wd_oper_dir )) {
                         add_dir( dir_list, wd_oper_dir );
                         save_dir_list( dir_list, list_fn );
+                    } else {
+                        fprintf(stderr,
+                                "%s: Warning: Directory already in list: '%s'\n",
+                                argv[0], wd_oper_dir);
                     }
                     break;
                 case WD_OPER_DUMP:

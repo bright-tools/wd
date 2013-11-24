@@ -34,11 +34,21 @@
 
 #define MIN_DIR_SIZE 100
 
+struct dir_list_item
+{
+    char* dir_name;
+    /* TODO: Other data here?  Time added?  Meta-data such as whether it exists?
+       Shortcut name? */
+};
+
+#define DLI_SIZE (sizeof( struct dir_list_item ))
+#define DLI_PTR_SIZE (sizeof( struct dir_list_item* ))
+
 struct dir_list_s
 {
-    size_t dir_count;
-    char** dir_list;
-    int    dir_size;
+    size_t                dir_count;
+    struct dir_list_item* dir_list;
+    int                   dir_size;
 };
 
 static void increase_dir_alloc( dir_list_t p_list )
@@ -47,14 +57,16 @@ static void increase_dir_alloc( dir_list_t p_list )
         p_list->dir_size += MIN_DIR_SIZE;
     }
 
-    p_list->dir_list = (char**) realloc( p_list->dir_list,
-                                         p_list->dir_size * sizeof( char* ) );
+    p_list->dir_list = 
+        (struct dir_list_item*) realloc( p_list->dir_list,
+                                         p_list->dir_size * DLI_SIZE );
     /* TODO: deal with re-alloc failure */
 }
 
 int add_dir( dir_list_t p_list, const char* const p_dir )
 {
     int ret_val = 0;
+    char* dest;
 
     if( p_list->dir_count == p_list->dir_size )
     {
@@ -62,8 +74,9 @@ int add_dir( dir_list_t p_list, const char* const p_dir )
         /* TODO: deal with failure */
     }
 
-    p_list->dir_list[ p_list->dir_count ] = malloc( strlen( p_dir ) + 1);
-    strcpy( p_list->dir_list[ p_list->dir_count ], p_dir );
+    dest = (char*)malloc( strlen( p_dir ) + 1);
+    strcpy( dest, p_dir );
+    p_list->dir_list[ p_list->dir_count ].dir_name = dest;
 
     p_list->dir_count++;
     ret_val = 1;
@@ -119,14 +132,54 @@ dir_list_t load_dir_list( const char* const p_fn )
     return( ret_val );
 }
 
+static int find_dir_location( dir_list_t p_list, const char* const p_dir, size_t* p_loc )
+{
+    int ret_val = 0;
+    size_t dir_loop;
+    struct dir_list_item* current_item = p_list->dir_list;
+
+    for( dir_loop = 0; dir_loop < p_list->dir_count; dir_loop++, current_item++ )
+    {
+        if( 0 == strcmp( p_dir, current_item->dir_name )) {
+            ret_val = 1;
+            if( p_loc != NULL ) {
+                *p_loc = dir_loop;
+            }
+            break;
+        }
+    }
+
+    return( ret_val );
+}
+
+int        remove_dir( dir_list_t p_list, const char* const p_dir )
+{
+    int ret_val = 0;
+    size_t location;
+
+    if( find_dir_location( p_list, p_dir, &location )) {
+        p_list->dir_count--;
+
+        /* Must use memmove here not memcpy as regions overlap */
+        memmove(&(p_list->dir_list[location]), 
+                &(p_list->dir_list[location+1]),
+                (p_list->dir_count - dir_loop) * DLI_SIZE );
+
+        ret_val = 1;
+    }
+
+    return( ret_val );
+}
+
 int        dir_in_list( dir_list_t p_list, const char* const p_dir )
 {
     int ret_val = 0;
     size_t dir_loop;
+    struct dir_list_item* current_item = p_list->dir_list;
 
-    for( dir_loop = 0; dir_loop < p_list->dir_count; dir_loop++ )
+    for( dir_loop = 0; dir_loop < p_list->dir_count; dir_loop++, current_item++ )
     {
-        if( 0 == strcmp( p_dir, p_list->dir_list[ dir_loop ] )) {
+        if( 0 == strcmp( p_dir, current_item->dir_name )) {
             ret_val = 1;
             break;
         }
@@ -141,25 +194,29 @@ void dump_dir_list( const dir_list_t p_list )
         fprintf( stdout, "Empty dirlist structure\n" );
     } else {
         size_t dir_loop;
-        fprintf( stdout, "Dirlist has %d entries of %d used\n", 
+        struct dir_list_item* current_item;
+
+        fprintf( stdout, "Dirlist has %d entries of %d used\n",
                  p_list->dir_count, p_list->dir_size );
 
-        for( dir_loop = 0; dir_loop < p_list->dir_count; dir_loop++ )
+        for( dir_loop = 0, current_item = p_list->dir_list;
+             dir_loop < p_list->dir_count;
+             dir_loop++, current_item++ )
         {
             char* col = ANSI_COLOUR_RESET;
-            char* dir = p_list->dir_list[ dir_loop ];
+            char* dir = current_item->dir_name;
             struct stat s;
             int err = stat( dir , &s);
             if(-1 == err) {
                 if(ENOENT == errno) {
-                    col = ANSI_COLOUR_RED;
+                    col = ANSI_COLOUR_GREY;
                 }
             } else {
                 if(S_ISDIR(s.st_mode)) {
                     col = ANSI_COLOUR_GREEN;
                 } else {
                     /* Not a directory */
-                    col = ANSI_COLOUR_GREY;
+                    col = ANSI_COLOUR_RED;
                 }
             }
 
@@ -187,7 +244,7 @@ int save_dir_list( const dir_list_t p_list, const char* p_fn ) {
 
         for( dir_loop = 0; dir_loop < p_list->dir_count; dir_loop++ )
         {
-            fprintf( file, "%s\n", p_list->dir_list[ dir_loop ] );
+            fprintf( file, "%s\n", p_list->dir_list[ dir_loop ].dir_name );
         }
 
         fclose( file );
