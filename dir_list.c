@@ -173,19 +173,7 @@ int        remove_dir( dir_list_t p_list, const char* const p_dir )
 
 int        dir_in_list( dir_list_t p_list, const char* const p_dir )
 {
-    int ret_val = 0;
-    size_t dir_loop;
-    struct dir_list_item* current_item = p_list->dir_list;
-
-    for( dir_loop = 0; dir_loop < p_list->dir_count; dir_loop++, current_item++ )
-    {
-        if( 0 == strcmp( p_dir, current_item->dir_name )) {
-            ret_val = 1;
-            break;
-        }
-    }
-
-    return( ret_val );
+    return( find_dir_location( p_list, p_dir, NULL ) );
 }
 void dump_dir_list( const dir_list_t p_list )
 {
