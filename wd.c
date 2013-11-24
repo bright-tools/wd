@@ -20,6 +20,47 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+void do_remove( const char* cmd, dir_list_t p_dir_list )
+{
+    int success;
+    size_t index = 0;
+
+    if( wd_prompt )
+    {
+        dump_dir_list( p_dir_list );
+        fprintf(stdout,"Enter number to remove: ");
+        success = fscanf(stdin,"%u",&index);
+        if( success )
+        {
+            success = remove_dir_by_index( p_dir_list, index );
+        }
+    }
+    else
+    {
+        success = remove_dir( p_dir_list, wd_oper_dir );
+    }
+
+    if( success )
+    {
+        save_dir_list( p_dir_list, list_fn );
+    }
+    else
+    {
+        if( wd_prompt )
+        {
+            fprintf(stderr,
+                    "%s: Error: Invalid index '%d'\n",
+                    cmd, index);
+        }
+        else
+        {
+            fprintf(stderr,
+                    "%s: Warning: Directory not in list: '%s'\n",
+                    cmd, wd_oper_dir);
+        }
+    }
+}
+
 int main( int argc, char* argv[] )
 {
     int ret_code = 0;
@@ -38,13 +79,7 @@ int main( int argc, char* argv[] )
 
             switch( wd_oper ) {
                 case WD_OPER_REMOVE:
-                    if( remove_dir( dir_list, wd_oper_dir ) ) {
-                        save_dir_list( dir_list, list_fn );
-                    } else {
-                        fprintf(stderr,
-                                "%s: Warning: Directory not in list: '%s'\n",
-                                argv[0], wd_oper_dir);
-                    }
+                    do_remove( argv[0], dir_list );
                     break;
                 case WD_OPER_ADD:
                     if( !dir_in_list( dir_list, wd_oper_dir )) {
@@ -61,6 +96,7 @@ int main( int argc, char* argv[] )
                     break;
                 default:
                     fprintf(stderr,"Unhandled operation type\n");
+                    break;
             }
         }
     } else {

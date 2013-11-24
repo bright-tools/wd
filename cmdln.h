@@ -31,4 +31,6 @@ int process_cmdln( const int argc, char* const argv[] );
 extern wd_oper_t wd_oper;
 extern char*     list_fn;
 extern char      wd_oper_dir[ MAXPATHLEN ];
+extern int       wd_prompt;
+
 #endif

@@ -37,6 +37,7 @@
 wd_oper_t wd_oper;
 char*     list_fn = NULL;
 char      wd_oper_dir[ MAXPATHLEN ];
+int       wd_prompt;
 
 void get_home( void )
 {
@@ -72,6 +73,7 @@ void init_cmdln( void ) {
     get_home();
 
     wd_oper = WD_OPER_NONE;
+    wd_prompt = 0;
 }
 
 static void show_help( const char* const p_cmd ) {
@@ -99,6 +101,8 @@ int process_cmdln( const int argc, char* const argv[] ) {
             fprintf( stdout, "%s\n", VERSION_STRING );
         } else if( 0 == strcmp( this_arg, "-h" ) ) {
             show_help( argv[0] );
+        } else if( 0 == strcmp( this_arg, "-p" ) ) {
+            wd_prompt = 1;
         } else if( 0 == strcmp( this_arg, "-d" ) ) {
             wd_oper = WD_OPER_DUMP;
         } else if(( 0 == strcmp( this_arg, "-a" )) ||

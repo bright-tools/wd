@@ -152,18 +152,17 @@ static int find_dir_location( dir_list_t p_list, const char* const p_dir, size_t
     return( ret_val );
 }
 
-int        remove_dir( dir_list_t p_list, const char* const p_dir )
+int remove_dir_by_index( dir_list_t p_list, const size_t p_dir )
 {
     int ret_val = 0;
-    size_t location;
 
-    if( find_dir_location( p_list, p_dir, &location )) {
+    if( p_dir < p_list->dir_count ) {
         p_list->dir_count--;
 
         /* Must use memmove here not memcpy as regions overlap */
-        memmove(&(p_list->dir_list[location]), 
-                &(p_list->dir_list[location+1]),
-                (p_list->dir_count - location) * DLI_SIZE );
+        memmove(&(p_list->dir_list[p_dir]), 
+                &(p_list->dir_list[p_dir+1]),
+                (p_list->dir_count - p_dir) * DLI_SIZE );
 
         ret_val = 1;
     }
@@ -171,10 +170,23 @@ int        remove_dir( dir_list_t p_list, const char* const p_dir )
     return( ret_val );
 }
 
-int        dir_in_list( dir_list_t p_list, const char* const p_dir )
+int remove_dir( dir_list_t p_list, const char* const p_dir )
+{
+    int ret_val = 0;
+    size_t location;
+
+    if( find_dir_location( p_list, p_dir, &location )) {
+        ret_val = remove_dir_by_index( p_list, location );
+    }
+
+    return( ret_val );
+}
+
+int dir_in_list( dir_list_t p_list, const char* const p_dir )
 {
     return( find_dir_location( p_list, p_dir, NULL ) );
 }
+
 void dump_dir_list( const dir_list_t p_list )
 {
     if( p_list == NULL )
