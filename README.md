@@ -15,7 +15,31 @@ the Windows command prompt as well as BASH).
 Usage
 =====
 
-TODO
+Manipulating The Directory List
+-------------------------------
+
+### Adding Directories
+
+Add the current working directory:
+
+   wd -a
+
+Add a specific directory:
+
+   wd -a /path/here
+
+Using Within BASH
+-----------------
+
+Source the support file:
+
+   source md.bash
+
+Then use the 'wcd' command to change directory with tab completion support, e.g.:
+
+   wcd /pa[TAB][TAB]
+
+TODO: named bookmark support
 
 Alternatives
 ============
@@ -29,4 +53,4 @@ Alternatives
 References
 ==========
 
-  * [1] TODO
+  * [1] Tab expansion in BASH - http://tldp.org/LDP/abs/html/tabexpansion.html
