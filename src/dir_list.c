@@ -37,6 +37,7 @@
 struct dir_list_item
 {
     char* dir_name;
+    char* bookmark_name;
     /* TODO: Other data here?  Time added?  Meta-data such as whether it exists?
        Shortcut name? */
 };
@@ -214,7 +215,7 @@ void list_dirs( const dir_list_t p_list )
             }
 
             if( valid ) {
-                fprintf( stdout, "%s ", dir );
+                fprintf( stdout, "%s\n", dir );
             }
         }
     }

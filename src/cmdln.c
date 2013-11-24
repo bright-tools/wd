@@ -37,6 +37,7 @@
 wd_oper_t wd_oper;
 char*     list_fn = NULL;
 char      wd_oper_dir[ MAXPATHLEN ];
+char*     wd_bookmark_name;
 int       wd_prompt;
 
 void get_home( void )
@@ -74,6 +75,7 @@ void init_cmdln( void ) {
 
     wd_oper = WD_OPER_NONE;
     wd_prompt = 0;
+    wd_bookmark_name = NULL;
 }
 
 static void show_help( const char* const p_cmd ) {

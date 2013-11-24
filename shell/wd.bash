@@ -1,13 +1,14 @@
 function _wd_complete()
 {
+    # Make separator a newline for directories with spaces in their names
+    IFS=$'\n';
     local cmd="${1##*/}"
     local word=${COMP_WORDS[COMP_CWORD]}
     local line=${COMP_LINE}
     local list=$(wd -l)
 
-    # TODO: likely not to work for directories with spaces in their names
     COMPREPLY=($(compgen -W "${list}" -- "${word}"))
-
+    unset IFS
 }
 function wcd()
 {
