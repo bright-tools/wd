@@ -26,10 +26,16 @@ typedef enum {
     WD_OPER_LIST,
 } wd_oper_t;
 
+typedef enum {
+    WD_DIRFORM_NONE,
+    WD_DIRFORM_CYGWIN
+} wd_dir_format_t;
+
 void init_cmdln( void );
 int process_cmdln( const int argc, char* const argv[] );
 
 extern wd_oper_t wd_oper;
+extern wd_dir_format_t wd_dir_form;
 extern char*     list_fn;
 extern char      wd_oper_dir[ MAXPATHLEN ];
 extern char*     wd_bookmark_name;

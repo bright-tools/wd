@@ -15,6 +15,7 @@
 */
 
 #include "dir_list.h"
+#include "cmdln.h"
 
 #define FILE_HEADER_DESC_STRING "# WD directory list file"
 #define FILE_HEADER_VER_STRING "# File format: version 1"
@@ -188,6 +189,38 @@ int dir_in_list( dir_list_t p_list, const char* const p_dir )
     return( find_dir_location( p_list, p_dir, NULL ) );
 }
 
+char* format_dir( char* p_dir ) {
+    char* ret_val = NULL;
+
+    switch( wd_dir_form ) {
+        case WD_DIRFORM_NONE:
+            ret_val = p_dir;
+            break;
+        case WD_DIRFORM_CYGWIN: {
+            char* dest;
+            char* src;
+            ret_val = (char*)malloc( strlen( p_dir ) + 1 );
+            for( dest = ret_val, src = p_dir;
+                 *src != '\0';
+                 dest++, src++ ) {
+                if( *src == '\\' ) {
+                    *dest = '/';
+                } else {
+                    *dest = *src;
+                }
+            }
+            *dest = 0;
+                                }
+            break;
+        default:
+            fprintf(stderr,"Unhandled directory format\n");
+            ret_val = p_dir;
+            break;
+    }
+
+    return( ret_val );
+}
+
 void list_dirs( const dir_list_t p_list )
 {
     if( p_list == NULL )
@@ -215,7 +248,11 @@ void list_dirs( const dir_list_t p_list )
             }
 
             if( valid ) {
-                fprintf( stdout, "%s\n", dir );
+                char* dir_formatted = format_dir( dir );
+                fprintf( stdout, "%s\n", dir_formatted );
+                if( dir != dir_formatted ) {
+                    free( dir_formatted );
+                }
             }
         }
     }

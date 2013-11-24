@@ -20,28 +20,38 @@
 #define UNRECOGNISED_ARG_STRING "Unrecognised command line argument"
 #define NEED_PARAMETER_STRING "No parameter specified for argument"
 #define INCOMPATIBLE_OP_STRING "Parameter incompatible with other arguments"
+#define UNRECOGNISED_PARAM_STRING "Parameter to argument not recognised"
 
 #define DEFAULT_LIST_FILE "/.wd_list"
 
 #include <stdio.h>
 
 /* Supporting get_home() */
-#include <stdlib.h>
 #include <unistd.h>
+#if defined _WIN32
+#include <shlobj.h>
+#else
+#include <stdlib.h>
 #include <pwd.h>
 #include <sys/types.h>
 #include <string.h>
+#endif
 /* !Supporting get_home() */
 
-
 wd_oper_t wd_oper;
-char*     list_fn = NULL;
-char      wd_oper_dir[ MAXPATHLEN ];
-char*     wd_bookmark_name;
-int       wd_prompt;
+char*         list_fn = NULL;
+char          wd_oper_dir[ MAXPATHLEN ];
+char*         wd_bookmark_name;
+int           wd_prompt;
+wd_dir_format_t wd_dir_form;
 
 void get_home( void )
 {
+    int success = 0;
+#if defined _WIN32
+    char homedir[MAX_PATH];
+    success = SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PROFILE, NULL, 0, homedir));
+#else
     char *homedir = getenv("HOME");
     if( homedir == NULL ) {
         uid_t uid = getuid();
@@ -50,8 +60,12 @@ void get_home( void )
             homedir = pw->pw_dir;
         }
     }
+    if( homedir == NULL ) {
+        success = 1;
+    }
+#endif
 
-    if( homedir != NULL ) {
+    if( success ) {
         /* Stitch the home directory and default filename together into list_fn
            */
 
@@ -76,6 +90,7 @@ void init_cmdln( void ) {
     wd_oper = WD_OPER_NONE;
     wd_prompt = 0;
     wd_bookmark_name = NULL;
+    wd_dir_form = WD_DIRFORM_NONE;
 }
 
 static void show_help( const char* const p_cmd ) {
@@ -84,6 +99,7 @@ static void show_help( const char* const p_cmd ) {
             " -v       : Show version information\n"
             " -h       : Show usage help\n"
             " -d       : Dump bookmark list\n"
+            " -s <c>   : Format paths for cygwin\n"
             " -p       : Prompt for input (can be used with -r instead of specifying directory\n"
             " -f <fn>  : Use file <fn> for storing bookmarks\n"
             " -r [dir] : Remove directory\n"
@@ -106,6 +122,23 @@ int process_cmdln( const int argc, char* const argv[] ) {
             show_help( argv[0] );
         } else if( 0 == strcmp( this_arg, "-p" ) ) {
             wd_prompt = 1;
+        } else if( 0 == strcmp( this_arg, "-s" ) ) {
+            if(( arg_loop + 1 ) < argc ) {
+                arg_loop++;
+                /* TODO: Validate length of argument? */
+                switch( argv[ arg_loop ][0] ) {
+                    case 'c':
+                        wd_dir_form = WD_DIRFORM_CYGWIN;
+                        break;
+                    default:
+                        fprintf( stdout, "%s: %s\n", UNRECOGNISED_PARAM_STRING, this_arg );
+                        ret_val = 0;
+                        break;
+                }
+            } else {
+                fprintf( stdout, "%s: %s\n", NEED_PARAMETER_STRING, this_arg );
+                ret_val = 0;
+            }
         } else if( 0 == strcmp( this_arg, "-d" ) ) {
             wd_oper = WD_OPER_DUMP;
         } else if( 0 == strcmp( this_arg, "-l" ) ) {

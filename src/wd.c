@@ -20,6 +20,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#if defined _WIN32
+#include <io.h>
+#include <fcntl.h>
+#endif
+
 void do_remove( const char* cmd, dir_list_t p_dir_list )
 {
     int success;
@@ -95,6 +100,9 @@ int main( int argc, char* argv[] )
                     dump_dir_list( dir_list );
                     break;
                 case WD_OPER_LIST:
+#if defined _WIN32
+                    _setmode(1,_O_BINARY);
+#endif
                     list_dirs( dir_list );
                     break;
                 default:
