@@ -22,22 +22,22 @@ Manipulating The Directory List
 
 Add the current working directory:
 
-   wd -a
+    wd -a
 
 Add a specific directory:
 
-   wd -a /path/here
+    wd -a /path/here
 
 Using Within BASH
 -----------------
 
 Source the support file:
 
-   source md.bash
+    source md.bash
 
 Then use the 'wcd' command to change directory with tab completion support, e.g.:
 
-   wcd /pa[TAB][TAB]
+    wcd /pa[TAB][TAB]
 
 TODO: named bookmark support
 
