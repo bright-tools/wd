@@ -187,6 +187,39 @@ int dir_in_list( dir_list_t p_list, const char* const p_dir )
     return( find_dir_location( p_list, p_dir, NULL ) );
 }
 
+void list_dirs( const dir_list_t p_list )
+{
+    if( p_list == NULL )
+    {
+        fprintf( stdout, "Empty dirlist structure\n" );
+    } else {
+        size_t dir_loop;
+        struct dir_list_item* current_item;
+        int valid = 1;
+
+        for( dir_loop = 0, current_item = p_list->dir_list;
+             dir_loop < p_list->dir_count;
+             dir_loop++, current_item++ )
+        {
+            char* dir = current_item->dir_name;
+            struct stat s;
+            int err = stat( dir , &s);
+            if(-1 == err) {
+                valid = 0;
+            } else {
+                if(!S_ISDIR(s.st_mode)) {
+                    /* Not a directory */
+                    valid = 0;
+                }
+            }
+
+            if( valid ) {
+                fprintf( stdout, "%s ", dir );
+            }
+        }
+    }
+}
+
 void dump_dir_list( const dir_list_t p_list )
 {
     if( p_list == NULL )

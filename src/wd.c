@@ -94,6 +94,9 @@ int main( int argc, char* argv[] )
                 case WD_OPER_DUMP:
                     dump_dir_list( dir_list );
                     break;
+                case WD_OPER_LIST:
+                    list_dirs( dir_list );
+                    break;
                 default:
                     fprintf(stderr,"Unhandled operation type\n");
                     break;

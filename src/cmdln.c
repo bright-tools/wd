@@ -78,11 +78,12 @@ void init_cmdln( void ) {
 
 static void show_help( const char* const p_cmd ) {
     fprintf(stdout,
-            "%s [-v] [-h] [-a [dir]]\n"
+            "%s [-v] [-h] [-r] [-a [dir]]\n"
             " -v       : Show version information\n"
             " -h       : Show usage help\n"
             " -d       : Dump bookmark list\n"
-            " -l <fn>  : Use file <fn> for storing bookmarks\n"
+            " -p       : Prompt for input (can be used with -r instead of specifying directory\n"
+            " -f <fn>  : Use file <fn> for storing bookmarks\n"
             " -r [dir] : Remove directory\n"
             " -a [dir] : Add directory\n",
             p_cmd );
@@ -105,6 +106,8 @@ int process_cmdln( const int argc, char* const argv[] ) {
             wd_prompt = 1;
         } else if( 0 == strcmp( this_arg, "-d" ) ) {
             wd_oper = WD_OPER_DUMP;
+        } else if( 0 == strcmp( this_arg, "-l" ) ) {
+            wd_oper = WD_OPER_LIST;
         } else if(( 0 == strcmp( this_arg, "-a" )) ||
                   ( 0 == strcmp( this_arg, "-r" )) ) {
             if( wd_oper == WD_OPER_NONE ) {
@@ -135,7 +138,7 @@ int process_cmdln( const int argc, char* const argv[] ) {
                     arg_loop++;
                 }
             }
-        } else if( 0 == strcmp( this_arg, "-l" ) ) {
+        } else if( 0 == strcmp( this_arg, "-f" ) ) {
             arg_loop++;
             if( arg_loop < argc ) {
                 /* To be consistent, list_fn always points to malloc'd memory

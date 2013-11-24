@@ -23,6 +23,7 @@ typedef enum {
     WD_OPER_ADD,
     WD_OPER_REMOVE,
     WD_OPER_DUMP,
+    WD_OPER_LIST,
 } wd_oper_t;
 
 void init_cmdln( void );
