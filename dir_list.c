@@ -163,7 +163,7 @@ int        remove_dir( dir_list_t p_list, const char* const p_dir )
         /* Must use memmove here not memcpy as regions overlap */
         memmove(&(p_list->dir_list[location]), 
                 &(p_list->dir_list[location+1]),
-                (p_list->dir_count - dir_loop) * DLI_SIZE );
+                (p_list->dir_count - location) * DLI_SIZE );
 
         ret_val = 1;
     }
