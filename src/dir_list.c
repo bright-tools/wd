@@ -44,7 +44,6 @@ struct dir_list_item
 };
 
 #define DLI_SIZE (sizeof( struct dir_list_item ))
-#define DLI_PTR_SIZE (sizeof( struct dir_list_item* ))
 
 struct dir_list_s
 {
@@ -55,14 +54,16 @@ struct dir_list_s
 
 static void increase_dir_alloc( dir_list_t p_list )
 {
-    if( p_list->dir_size == 0 ) {
-        p_list->dir_size += MIN_DIR_SIZE;
-    }
+    struct dir_list_item* new_mem;
+    p_list->dir_size += MIN_DIR_SIZE;
 
-    p_list->dir_list = 
+    new_mem = 
         (struct dir_list_item*) realloc( p_list->dir_list,
                                          p_list->dir_size * DLI_SIZE );
-    /* TODO: deal with re-alloc failure */
+    if( new_mem != NULL )
+    {
+        p_list->dir_list = new_mem;
+    }
 }
 
 int add_dir( dir_list_t p_list,
@@ -70,42 +71,61 @@ int add_dir( dir_list_t p_list,
              const char* const p_name )
 {
     int ret_val = 0;
-    char* dest;
+    char* dest = NULL;
+    const size_t idx = p_list->dir_count;
 
-    if( p_list->dir_count == p_list->dir_size )
+    if( idx == p_list->dir_size )
     {
+        DEBUG_OUT("list does not have space, increasing allocation"); 
         increase_dir_alloc( p_list );
-        /* TODO: deal with failure */
+        DEBUG_OUT("increased allocation"); 
     }
 
-    dest = (char*)malloc( strlen( p_dir ) + 1);
-    strcpy( dest, p_dir );
-    p_list->dir_list[ p_list->dir_count ].dir_name = dest;
-    
-    if( p_name != NULL ) 
+    /* Check to see if there's space now - it's possible that an attempt to
+       increase the allocation (above) actually failed */
+    if( idx < p_list->dir_size )
     {
-        dest = (char*)malloc( strlen( p_name ) + 1);
-        strcpy( dest, p_name );
-        p_list->dir_list[ p_list->dir_count ].bookmark_name = dest;
-    } else {
-        p_list->dir_list[ p_list->dir_count ].bookmark_name = NULL;
+        dest = (char*)malloc( strlen( p_dir ) + 1);
+        if( dest != NULL ) {
+            strcpy( dest, p_dir );
+            p_list->dir_list[ idx ].dir_name = dest;
+
+            if( p_name != NULL )
+            {
+                dest = (char*)malloc( strlen( p_name ) + 1);
+                if( dest != NULL ) {
+                    strcpy( dest, p_name );
+                    p_list->dir_list[ idx ].bookmark_name = dest;
+                    ret_val = 1;
+                } else {
+                    p_list->dir_list[ idx ].bookmark_name = NULL;
+                }
+            } else {
+                p_list->dir_list[ idx ].bookmark_name = NULL;
+                ret_val = 1;
+            }
+
+            if( ret_val ) {
+                p_list->dir_count++;
+            }
+        }
     }
-
-    p_list->dir_count++;
-    ret_val = 1;
-
 
     return( ret_val );
 }
 
 dir_list_t new_dir_list( void )
 {
-    dir_list_t ret_val = (dir_list_t)malloc( sizeof( dir_list_t ) );
+    dir_list_t ret_val = (dir_list_t)malloc( sizeof( struct dir_list_s ) );
 
     if( ret_val != NULL ) {
         ret_val->dir_count = 0;
         ret_val->dir_list = NULL;
         ret_val->dir_size = 0;
+
+        /* Allocate some initial memory for the directory list - this saves us
+           having to deal with dir_list being NULL in the general case */
+        increase_dir_alloc( ret_val );
     }
 
     return( ret_val );
@@ -117,6 +137,7 @@ dir_list_t load_dir_list( const char* const p_fn )
     dir_list_t ret_val = NULL;
 
     if( file != NULL ) {
+        DEBUG_OUT("opened bookmark file");
         ret_val = new_dir_list();
 
         if( ret_val != NULL ) {
@@ -128,9 +149,11 @@ dir_list_t load_dir_list( const char* const p_fn )
 
             path[0] = 0;
             name[0] = 0;
+            DEBUG_OUT("generated empty bookmark list");
 
             while(( fstr = fgets( read, MAXPATHLEN, file ) ) ||
                   one_last_go ) {
+                DEBUG_OUT("read from file: %s",read);
                 /* Didn't get anything from the file?  Set the read string to
                    indicate that it's a new bookmark so that we flush out
                    any previous bookmark data and flag that we don't need to go
@@ -163,11 +186,13 @@ dir_list_t load_dir_list( const char* const p_fn )
                         /* Already read some bookmark details? */
                         if ( path[0] != '\0' ) {
 
+                            DEBUG_OUT("creating new bookmark: %s",path);
+
                             /* Create the new bookmark and reset attributes */
                             add_dir( ret_val, path, name );
-#if 0
-                            printf("ADDING: %s %s\n",path,name);
-#endif
+
+                            DEBUG_OUT("created new bookmark");
+
                             path[0] = 0;
                             name[0] = 0;
                         }
@@ -197,7 +222,8 @@ int bookmark_in_list( dir_list_t p_list, const char* const p_name )
 
     for( dir_loop = 0; dir_loop < p_list->dir_count; dir_loop++, current_item++ )
     {
-        if( 0 == strcmp( p_name, current_item->bookmark_name )) {
+        if((current_item->bookmark_name != NULL ) &&
+           (0 == strcmp( p_name, current_item->bookmark_name ))) {
             ret_val = 1;
             break;
         }
@@ -293,16 +319,21 @@ char* format_dir( char* p_dir ) {
     return( ret_val );
 }
 
-void dump_dir_with_name( dir_list_t p_list, const char* const p_name )
+void dump_dir_with_name( const dir_list_t p_list, const char* const p_name )
 {
     size_t dir_loop;
-    struct dir_list_item* current_item = p_list->dir_list;
+    struct dir_list_item* current_item;
 
-    for( dir_loop = 0; dir_loop < p_list->dir_count; dir_loop++, current_item++ )
+    for( dir_loop = 0, current_item = p_list->dir_list;
+         dir_loop < p_list->dir_count;
+         dir_loop++, current_item++ )
     {
-        if( 0 == strcmp( p_name, current_item->bookmark_name )) {
+        if(( current_item->bookmark_name != NULL ) &&
+           ( 0 == strcmp( p_name, current_item->bookmark_name ))) {
+
             char* dir_formatted = format_dir( current_item->dir_name );
             fprintf( stdout, "%s", dir_formatted );
+
             if( current_item->dir_name != dir_formatted ) {
                 free( dir_formatted );
             }
