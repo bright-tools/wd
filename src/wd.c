@@ -73,11 +73,14 @@ int main( int argc, char* argv[] )
     init_cmdln();
 
     if( process_cmdln( argc, argv ) ) {
+        DEBUG_OUT("command line processed");
         if( wd_oper != WD_OPER_NONE ) {
-#if 0
-            printf("FILE: %s\n",list_fn);
-#endif
-            dir_list_t dir_list = load_dir_list( list_fn );
+
+            dir_list_t dir_list = NULL;
+
+            DEBUG_OUT("loading bookmark file %s",list_fn);
+
+            dir_list = load_dir_list( list_fn );
 
             if( dir_list == NULL ) {
                 fprintf(stderr,"%s: Warning: Unable to load list file '%s'\n",
@@ -85,11 +88,14 @@ int main( int argc, char* argv[] )
                 dir_list = new_dir_list();
             }
 
+            DEBUG_OUT("loaded bookmark file");
+
             switch( wd_oper ) {
                 case WD_OPER_REMOVE:
                     do_remove( argv[0], dir_list );
                     break;
                 case WD_OPER_GET_BY_BM_NAME:
+                    DEBUG_OUT("WD_OPER_GET_BY_BM_NAME: %s",wd_bookmark_name);
                     dump_dir_with_name( dir_list, wd_bookmark_name );
                     break;
                 case WD_OPER_ADD:
@@ -126,5 +132,7 @@ int main( int argc, char* argv[] )
     } else {
         ret_code = EXIT_FAILURE;
     }
+
+    DEBUG_OUT("all done");
     return ret_code;
 }
