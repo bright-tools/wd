@@ -99,7 +99,8 @@ int main( int argc, char* argv[] )
                         fprintf(stderr,
                                 "%s: Warning: Directory already in list: '%s'\n",
                                 argv[0], wd_oper_dir);
-                    } else if( bookmark_in_list( dir_list, wd_bookmark_name )) {
+                    } else if( (wd_bookmark_name != NULL) &&
+                               bookmark_in_list( dir_list, wd_bookmark_name )) {
                         fprintf(stderr,
                                 "%s: Warning: Bookmark name already in list: '%s'\n",
                                 argv[0], wd_bookmark_name);
