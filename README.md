@@ -28,6 +28,24 @@ Add a specific directory:
 
     wd -a /path/here
 
+Add a directory with an alias:
+ 
+    wd -a /path/here fav_dir
+
+### Removing Directories
+
+Remove the current working directory:
+
+    wd -r
+
+Remove a specific directory:
+
+    wd -r /path/here
+
+Show a list of directories and prompt for which one to remove:
+
+    wd -r -p
+
 Using Within BASH
 -----------------
 
@@ -39,7 +57,17 @@ Then use the 'wcd' command to change directory with tab completion support, e.g.
 
     wcd /pa[TAB][TAB]
 
-TODO: named bookmark support
+Tab complete should work for both directory paths and aliases
+
+Using Within Windows CMD
+------------------------
+
+Ensure that wcd.bat (and wd) is on the path.
+
+Then use the 'wcd' command to change directory using bookmark aliases, e.g.:
+
+    C:\Users\fred\Documents> wcd wd_git_repo
+    C:\Users\fred\Documents\wd\working\git> 
 
 Alternatives
 ============
