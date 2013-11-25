@@ -38,22 +38,30 @@
 #endif
 /* !Supporting get_home() */
 
-wd_oper_t wd_oper;
+/* Exported variables for accessing configuration options.
+   TODO: Consider combining these into a struct */
+wd_oper_t     wd_oper;
 char*         list_fn = NULL;
 char          wd_oper_dir[ MAXPATHLEN ];
 char*         wd_bookmark_name;
 int           wd_prompt;
 wd_dir_format_t wd_dir_form;
+/* !Exported variables */
 
-void get_home( void )
+static void get_home( void )
 {
     int success = 0;
+
 #if defined _WIN32
     char homedir[MAX_PATH];
     success = SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PROFILE, NULL, 0, homedir));
 #else
+    /* Try and retrieve the home from the environment first */
     char *homedir = getenv("HOME");
+    
     if( homedir == NULL ) {
+        /* Couldn't get user's home directory from the environment so
+           try the user database */
         uid_t uid = getuid();
         struct passwd *pw = getpwuid(uid);
         if (pw != NULL) {
@@ -78,7 +86,7 @@ void get_home( void )
         strcpy( &(list_fn[ home_size ]), DEFAULT_LIST_FILE);
         list_fn[ complete -1 ] = 0;
     } else {
-        /* TODO */
+        /* TODO: Deal with not having a home directory */
     }
 }
 
@@ -95,17 +103,24 @@ void init_cmdln( void ) {
 
 static void show_help( const char* const p_cmd ) {
     fprintf(stdout,
-            "%s [-v] [-h] [-r] [-a [dir]]\n"
+            "%s [-v] [-h] [-f <fn>] [-r [dir] [-p]] [-a [dir]] [-d] [-l] [-s <c>]\n"
             " -v       : Show version information\n"
             " -h       : Show usage help\n"
             " -d       : Dump bookmark list\n"
+            " -l       : List directories & bookmark names (generally for use in tab\n"
+            "             expansion)\n"
             " -s <c>   : Format paths for cygwin\n"
-            " -p       : Prompt for input (can be used with -r instead of specifying directory\n"
+            " -n <nam> : Get bookmark directory with specified shortcut name\n"
+            " -p       : Prompt for input (can be used with -r instead of specifying\n"
+            "             directory\n"
             " -f <fn>  : Use file <fn> for storing bookmarks\n"
-            " -r [dir] : Remove directory\n"
-            " -a [dir] : Add directory\n",
+            " -r [dir] : Remove specified directory or current directory if none\n"
+            " -a [dir] : Add specified directory or current directory if none\n"
+            "             specified\n",
             p_cmd );
-    /* TODO */
+    /* TODO: Complete the description */
+    /* TODO: Add option to sort dump alphabetically by directory, by name,
+             by date added */
 }
 
 int process_cmdln( const int argc, char* const argv[] ) {
@@ -169,8 +184,9 @@ int process_cmdln( const int argc, char* const argv[] ) {
                 if((( arg_loop + 1 ) < argc ) &&
                     ( argv[ arg_loop + 1 ][0] != '-' )) {
                     arg_loop++;
-/* TODO: Make the directory absolute */
 
+                    /* TODO: Add a switch to prevent the path being made
+                       absolute? */
 #if defined _WIN32
                     GetFullPathName( argv[ arg_loop ],
                                      MAXPATHLEN,
