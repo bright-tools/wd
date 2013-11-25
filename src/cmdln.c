@@ -169,7 +169,17 @@ int process_cmdln( const int argc, char* const argv[] ) {
                 if((( arg_loop + 1 ) < argc ) &&
                     ( argv[ arg_loop + 1 ][0] != '-' )) {
                     arg_loop++;
-                    strcpy( wd_oper_dir, argv[ arg_loop ] );
+/* TODO: Make the directory absolute */
+
+#if defined _WIN32
+                    GetFullPathName( argv[ arg_loop ],
+                                     MAXPATHLEN,
+                                     wd_oper_dir,
+                                     NULL );
+#else
+                    realpath( argv[ arg_loop ], wd_oper_dir );
+#endif
+
                     if((( arg_loop + 1 ) < argc ) &&
                         ( argv[ arg_loop + 1 ][0] != '-' )) {
                         arg_loop++;
