@@ -93,13 +93,19 @@ int main( int argc, char* argv[] )
                     dump_dir_with_name( dir_list, wd_bookmark_name );
                     break;
                 case WD_OPER_ADD:
-                    if( !dir_in_list( dir_list, wd_oper_dir )) {
-                        add_dir( dir_list, wd_oper_dir, wd_bookmark_name );
-                        save_dir_list( dir_list, list_fn );
-                    } else {
+                    /* TODO: Consider allowing directory to be added twice with
+                             different bookmark name? */
+                    if( dir_in_list( dir_list, wd_oper_dir )) {
                         fprintf(stderr,
                                 "%s: Warning: Directory already in list: '%s'\n",
                                 argv[0], wd_oper_dir);
+                    } else if( bookmark_in_list( dir_list, wd_bookmark_name )) {
+                        fprintf(stderr,
+                                "%s: Warning: Bookmark name already in list: '%s'\n",
+                                argv[0], wd_bookmark_name);
+                    } else {
+                        add_dir( dir_list, wd_oper_dir, wd_bookmark_name );
+                        save_dir_list( dir_list, list_fn );
                     }
                     break;
                 case WD_OPER_DUMP:

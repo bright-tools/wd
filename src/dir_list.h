@@ -29,6 +29,7 @@ int        remove_dir( dir_list_t p_list, const char* const p_dir );
 void       dump_dir_with_name( dir_list_t p_list, const char* const p_name );
 int        remove_dir_by_index( dir_list_t p_list, const size_t p_dir );
 int        dir_in_list( dir_list_t p_list, const char* const p_dir );
+int        bookmark_in_list( dir_list_t p_list, const char* const p_name );
 int        save_dir_list( const dir_list_t p_list, const char* p_fn );
 void       dump_dir_list( const dir_list_t p_list );
 void       list_dirs( const dir_list_t p_list );

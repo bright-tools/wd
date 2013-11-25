@@ -189,6 +189,23 @@ dir_list_t load_dir_list( const char* const p_fn )
     return( ret_val );
 }
 
+int bookmark_in_list( dir_list_t p_list, const char* const p_name )
+{
+    int ret_val = 0;
+    size_t dir_loop;
+    struct dir_list_item* current_item = p_list->dir_list;
+
+    for( dir_loop = 0; dir_loop < p_list->dir_count; dir_loop++, current_item++ )
+    {
+        if( 0 == strcmp( p_name, current_item->bookmark_name )) {
+            ret_val = 1;
+            break;
+        }
+    }
+
+    return( ret_val );
+}
+
 static int find_dir_location( dir_list_t p_list, const char* const p_dir, size_t* p_loc )
 {
     int ret_val = 0;
