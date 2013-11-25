@@ -24,6 +24,7 @@ typedef enum {
     WD_OPER_REMOVE,
     WD_OPER_DUMP,
     WD_OPER_LIST,
+    WD_OPER_GET_BY_BM_NAME,
 } wd_oper_t;
 
 typedef enum {

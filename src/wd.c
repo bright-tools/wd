@@ -74,6 +74,9 @@ int main( int argc, char* argv[] )
 
     if( process_cmdln( argc, argv ) ) {
         if( wd_oper != WD_OPER_NONE ) {
+#if 0
+            printf("FILE: %s\n",list_fn);
+#endif
             dir_list_t dir_list = load_dir_list( list_fn );
 
             if( dir_list == NULL ) {
@@ -86,9 +89,12 @@ int main( int argc, char* argv[] )
                 case WD_OPER_REMOVE:
                     do_remove( argv[0], dir_list );
                     break;
+                case WD_OPER_GET_BY_BM_NAME:
+                    dump_dir_with_name( dir_list, wd_bookmark_name );
+                    break;
                 case WD_OPER_ADD:
                     if( !dir_in_list( dir_list, wd_oper_dir )) {
-                        add_dir( dir_list, wd_oper_dir );
+                        add_dir( dir_list, wd_oper_dir, wd_bookmark_name );
                         save_dir_list( dir_list, list_fn );
                     } else {
                         fprintf(stderr,

@@ -65,7 +65,9 @@ static void increase_dir_alloc( dir_list_t p_list )
     /* TODO: deal with re-alloc failure */
 }
 
-int add_dir( dir_list_t p_list, const char* const p_dir )
+int add_dir( dir_list_t p_list,
+             const char* const p_dir,
+             const char* const p_name )
 {
     int ret_val = 0;
     char* dest;
@@ -79,6 +81,15 @@ int add_dir( dir_list_t p_list, const char* const p_dir )
     dest = (char*)malloc( strlen( p_dir ) + 1);
     strcpy( dest, p_dir );
     p_list->dir_list[ p_list->dir_count ].dir_name = dest;
+    
+    if( p_name != NULL ) 
+    {
+        dest = (char*)malloc( strlen( p_name ) + 1);
+        strcpy( dest, p_name );
+        p_list->dir_list[ p_list->dir_count ].bookmark_name = dest;
+    } else {
+        p_list->dir_list[ p_list->dir_count ].bookmark_name = NULL;
+    }
 
     p_list->dir_count++;
     ret_val = 1;
@@ -110,21 +121,65 @@ dir_list_t load_dir_list( const char* const p_fn )
 
         if( ret_val != NULL ) {
             char path[ MAXPATHLEN ];
+            char read[ MAXPATHLEN ];
+            char name[ MAXPATHLEN ];
+            char* fstr;
+            int one_last_go = 1;
 
-            while( fgets( path, MAXPATHLEN, file )) {
-                if( path[0] != '#' ) {
+            path[0] = 0;
+            name[0] = 0;
+
+            while(( fstr = fgets( read, MAXPATHLEN, file ) ) ||
+                  one_last_go ) {
+                /* Didn't get anything from the file?  Set the read string to
+                   indicate that it's a new bookmark so that we flush out
+                   any previous bookmark data and flag that we don't need to go
+                   round again ( one_last_go ) */
+                if( fstr == NULL ) {
+                    read[0] = ':';
+                    read[1] = 0;
+                    one_last_go = 0;
+                }
+
+                /* Check that it wasn't a comment line */
+                if( read[0] != '#' ) {
+                    size_t len = strlen( read );
+
+                    /* Trim off line endings */
                     size_t trimmer;
-                    for( trimmer = (strlen( path ) - 1);
+                    for( trimmer = len - 1;
                          trimmer > 0;
                          trimmer-- ) {
-                        if(( path[ trimmer ] == '\r' ) ||
-                           ( path[ trimmer ] == '\n' )) {
-                            path[ trimmer ] = 0;
+                        if(( read[ trimmer ] == '\r' ) ||
+                           ( read[ trimmer ] == '\n' )) {
+                            read[ trimmer ] = 0;
                         } else {
                             break;
                         }
                     }
-                    add_dir( ret_val, path );
+
+                    /* Is this the start of a new bookmark? */
+                    if( read[0] == ':' ) {
+                        /* Already read some bookmark details? */
+                        if ( path[0] != '\0' ) {
+
+                            /* Create the new bookmark and reset attributes */
+                            add_dir( ret_val, path, name );
+#if 0
+                            printf("ADDING: %s %s\n",path,name);
+#endif
+                            path[0] = 0;
+                            name[0] = 0;
+                        }
+                        strcpy( path, &(read[1]) );
+                    } else if(( read[0] == 'N' ) &&
+                              ( read[1] == ':' )) {
+                        strcpy( name, &(read[2]) );
+                    } else {
+                        fprintf(stderr,
+                                "Unrecognised content in bookmarks file: %s\n",
+                                read);
+                    }
                 }
             }
         }
@@ -221,6 +276,25 @@ char* format_dir( char* p_dir ) {
     return( ret_val );
 }
 
+void dump_dir_with_name( dir_list_t p_list, const char* const p_name )
+{
+    size_t dir_loop;
+    struct dir_list_item* current_item = p_list->dir_list;
+
+    for( dir_loop = 0; dir_loop < p_list->dir_count; dir_loop++, current_item++ )
+    {
+        if( 0 == strcmp( p_name, current_item->bookmark_name )) {
+            char* dir_formatted = format_dir( current_item->dir_name );
+            fprintf( stdout, "%s", dir_formatted );
+            if( current_item->dir_name != dir_formatted ) {
+                free( dir_formatted );
+            }
+
+            break;
+        }
+    }
+}
+
 void list_dirs( const dir_list_t p_list )
 {
     if( p_list == NULL )
@@ -250,6 +324,9 @@ void list_dirs( const dir_list_t p_list )
             if( valid ) {
                 char* dir_formatted = format_dir( dir );
                 fprintf( stdout, "%s\n", dir_formatted );
+                if( current_item->bookmark_name != NULL ) {
+                    fprintf( stdout, "%s\n", current_item->bookmark_name );
+                }
                 if( dir != dir_formatted ) {
                     free( dir_formatted );
                 }
@@ -291,10 +368,15 @@ void dump_dir_list( const dir_list_t p_list )
                 }
             }
 
-            fprintf( stdout, "[%d] %s%s%s\n", dir_loop,
+            fprintf( stdout, "[%3d] %s%s", dir_loop,
                                               col,
-                                              dir,
-                                              ANSI_COLOUR_RESET );
+                                              dir );
+            if(( current_item->bookmark_name != NULL ) &&
+               ( current_item->bookmark_name[0] != 0 )) {
+                fprintf( stdout, "\n      - Shorthand: %s",
+                         current_item->bookmark_name);
+            }
+            fprintf( stdout, "%s\n", ANSI_COLOUR_RESET );
         }
     }
 }
@@ -315,7 +397,13 @@ int save_dir_list( const dir_list_t p_list, const char* p_fn ) {
 
         for( dir_loop = 0; dir_loop < p_list->dir_count; dir_loop++ )
         {
-            fprintf( file, "%s\n", p_list->dir_list[ dir_loop ].dir_name );
+            struct dir_list_item* this_item = &(p_list->dir_list[ dir_loop ]);
+            fprintf( file, ":%s\n",
+                           this_item->dir_name );
+            if( this_item->bookmark_name != NULL ) {
+                fprintf( file, "N:%s\n",
+                               this_item->bookmark_name );
+            }
         }
 
         fclose( file );

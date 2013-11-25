@@ -24,7 +24,12 @@ function wcd()
         cd "$1"
     else
         # See if the parameter was a bookmark name?
-        local dir=$(wd -n $1)
+        if [ "${OSTYPE}" = "cygwin" ]; then
+            # Ensure paths are cygwin formatted
+            local dir=$(wd -n $1 -s c)
+        else
+            local dir=$(wd -n $1)
+        fi
         if [ -d "${dir}" ]; then
             cd "${dir}"
         else

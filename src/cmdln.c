@@ -143,6 +143,16 @@ int process_cmdln( const int argc, char* const argv[] ) {
             wd_oper = WD_OPER_DUMP;
         } else if( 0 == strcmp( this_arg, "-l" ) ) {
             wd_oper = WD_OPER_LIST;
+        } else if( 0 == strcmp( this_arg, "-n" ) ) {
+            if((( arg_loop + 1 ) < argc ) &&
+                ( argv[ arg_loop + 1 ][0] != '-' )) {
+                arg_loop++;
+                wd_oper = WD_OPER_GET_BY_BM_NAME;
+                wd_bookmark_name = argv[ arg_loop ];
+            } else {
+                fprintf( stdout, "%s: %s\n", NEED_PARAMETER_STRING, this_arg );
+                ret_val = 0;
+            }
         } else if(( 0 == strcmp( this_arg, "-a" )) ||
                   ( 0 == strcmp( this_arg, "-r" )) ) {
             if( wd_oper == WD_OPER_NONE ) {
@@ -160,6 +170,11 @@ int process_cmdln( const int argc, char* const argv[] ) {
                     ( argv[ arg_loop + 1 ][0] != '-' )) {
                     arg_loop++;
                     strcpy( wd_oper_dir, argv[ arg_loop ] );
+                    if((( arg_loop + 1 ) < argc ) &&
+                        ( argv[ arg_loop + 1 ][0] != '-' )) {
+                        arg_loop++;
+                        wd_bookmark_name = argv[ arg_loop ];
+                    }
                 } else {
                     /* No argument .. use the CWD */
                     getcwd( wd_oper_dir, MAXPATHLEN );
