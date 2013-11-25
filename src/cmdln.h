@@ -42,4 +42,10 @@ extern char      wd_oper_dir[ MAXPATHLEN ];
 extern char*     wd_bookmark_name;
 extern int       wd_prompt;
 
+#if defined _DEBUG
+#define DEBUG_OUT( ... ) do { fprintf(stdout,"wd: " __VA_ARGS__ ); fprintf(stdout,"\n"); fflush(stdout); } while( 0 )
+#else
+#define DEBUG_OUT( ... )
+#endif
+
 #endif
