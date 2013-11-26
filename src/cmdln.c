@@ -68,7 +68,7 @@ static void get_home( void )
             homedir = pw->pw_dir;
         }
     }
-    if( homedir == NULL ) {
+    if( homedir != NULL ) {
         success = 1;
     }
 #endif
@@ -196,6 +196,8 @@ int process_cmdln( const int argc, char* const argv[] ) {
                     realpath( argv[ arg_loop ], wd_oper_dir );
 #endif
 
+                    /* TODO: This only really makes sense for an add operation
+                    */
                     if((( arg_loop + 1 ) < argc ) &&
                         ( argv[ arg_loop + 1 ][0] != '-' )) {
                         arg_loop++;
