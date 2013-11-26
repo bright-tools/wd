@@ -74,6 +74,10 @@ Source the support file:
 
     source md.bash
 
+To ensure that this is done automatically you could add it to .bash_rc, e.g.
+
+    echo "source /path/to/md.bash" >> ~/.bash_rc
+
 Then use the 'wcd' command to change directory with tab completion support, e.g.:
 
     wcd /pa[TAB][TAB]
@@ -90,6 +94,11 @@ Then use the 'wcd' command to change directory using bookmark aliases, e.g.:
     C:\Users\fred\Documents> wcd wd_git_repo
     C:\Users\fred\Documents\wd\working\git> 
 
+Project Doxygen
+===============
+
+Can be found here: http://bright-tools.github.io/wd
+
 Alternatives
 ============
 
@@ -103,3 +112,4 @@ References
 ==========
 
   * [1] Tab expansion in BASH - http://tldp.org/LDP/abs/html/tabexpansion.html
+  * [2] Dr. Memory - http://code.google.com/p/drmemory/ - Helpful for tracking down those pesky memory access bugs
