@@ -117,7 +117,10 @@ int main( int argc, char* argv[] )
                                 "%s: Warning: Bookmark name already in list: '%s'\n",
                                 argv[0], wd_bookmark_name);
                     } else {
-                        add_dir( dir_list, wd_oper_dir, wd_bookmark_name );
+                        add_dir( dir_list,
+                                 wd_oper_dir,
+                                 wd_bookmark_name,
+                                 time(NULL) );
                         save_dir_list( dir_list, list_fn );
                     }
                     break;
