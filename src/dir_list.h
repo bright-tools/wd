@@ -1,5 +1,11 @@
-/*
-   Copyright 2013 John Bailey
+/**
+   \file
+   \brief The dir_list module provides functions to manipulate and
+           search the list of bookmarks
+
+   \copyright Copyright 2013 John Bailey
+
+   \section LICENSE
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -19,10 +25,34 @@
 #include <stddef.h>
 #include <time.h>
 
+/**
+    Structure to represent a list of directory bookmarks.
+*/
 typedef struct dir_list_s* dir_list_t;
 
-dir_list_t new_dir_list( void );
+/**
+    Load a set of bookmarks from the specified file
+
+    Note that in the case where invalid data is found in the file or a problem
+    is encountered while reading from the file, the function will return
+    a list of the bookmarks it was able to successfully read
+
+    \param[in] p_fn The filename to load the bookmarks from
+    \returns Pointer to a list of bookmarks loaded from the file or
+              NULL in the case of a problem (failure to allocate memory,
+              failure to open file)
+*/
 dir_list_t load_dir_list( const char* const p_fn );
+
+/**
+    Create a new directory list structure.
+
+    Allocates the required memory and initialises the structure members
+
+    \returns Pointer to the newly created structure or NULL if allocation
+              failed
+*/
+extern dir_list_t new_dir_list( void );
 int        add_dir( dir_list_t p_list,
                     const char* const p_dir,
                     const char* const p_name,
