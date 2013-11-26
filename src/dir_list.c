@@ -25,7 +25,7 @@
 
 #define TIME_FORMAT_STRING "%Y/%m/%d %H:%M:%S"
 #define TIME_SSCAN_STRING  "%04u/%02u/%02u %02u:%02u:%02u"
-#define TIME_STRING_BUFFER_SIZE (21U)
+#define TIME_STRING_BUFFER_SIZE (30U)
 
 #define ANSI_COLOUR_RED     "\x1b[31m"
 #define ANSI_COLOUR_GREEN   "\x1b[32m"
@@ -230,8 +230,19 @@ dir_list_t load_dir_list( const char* const p_fn )
                         /* tm's month is the count of months since Jan */
                         tm.tm_mon -= 1;
 
-                        /* Convert to a UTC time */
-                        added = mktime(&tm) - timezone;
+                        /* The time in the file is already UTC, so using
+                           mktime is the wrong thing to do, as this assumes that
+                           the contents of tm is in local time
+                           see http://pubs.opengroup.org/onlinepubs/007904975/basedefs/xbd_chap04.html#tag_04_14 */
+                        added =
+                            tm.tm_sec +
+                            tm.tm_min*60 +
+                            tm.tm_hour*3600 +
+                            tm.tm_yday*86400 +
+                            (tm.tm_year-70)*31536000 +
+                            ((tm.tm_year-69)/4)*86400 -
+                            ((tm.tm_year-1)/100)*86400 +
+                            ((tm.tm_year+299)/400)*86400;
                     } else {
                         fprintf(stderr,
                                 "Unrecognised content in bookmarks file: %s\n",
