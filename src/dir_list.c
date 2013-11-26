@@ -562,7 +562,8 @@ int save_dir_list( const dir_list_t p_list, const char* p_fn ) {
             struct dir_list_item* this_item = &(p_list->dir_list[ dir_loop ]);
             fprintf( file, ":%s\n",
                            this_item->dir_name );
-            if( this_item->bookmark_name != NULL ) {
+            if(( this_item->bookmark_name != NULL ) &&
+               ( this_item->bookmark_name[0] != 0 )) {
                 fprintf( file, "N:%s\n",
                                this_item->bookmark_name );
             }
