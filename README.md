@@ -46,6 +46,26 @@ Show a list of directories and prompt for which one to remove:
 
     wd -r -p
 
+Listing The Bookmarks
+---------------------
+
+    wd -d
+
+will output something in the format:
+
+    Dirlist has 3 entries of 100 used
+    [  0] C:\Users\fred\Documents\wd\working\git
+          - Shorthand: git_wd
+    [  1] c:\Program Files\FOS
+          - Shorthand: FOS
+    [  2] c:\install.exe
+          - Shorthand: invalid
+
+If the console supports it the items in the list should be coloured
+
+  * Red : Item is in the file-system but is not a directory (e.g. is a file)
+  * Grey : Item does not exist in the filesystem
+  * Green : Item exists and is a directory
 Using Within BASH
 -----------------
 
