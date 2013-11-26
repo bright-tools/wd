@@ -37,7 +37,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -61,6 +60,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
+      <li><a href="globals.html"><span>Globals</span></a></li>
     </ul>
   </div>
 </div><!-- top -->
@@ -69,7 +69,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -83,55 +83,49 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">dir_list.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">   \file</span></div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">   \brief The dir_list module provides functions to manipulate and</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">           search the list of bookmarks</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment">   Copyright 2013 John Bailey</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment">   Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment">   you may not use this file except in compliance with the License.</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment">   You may obtain a copy of the License at</span></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment">       http://www.apache.org/licenses/LICENSE-2.0</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="comment">   Unless required by applicable law or agreed to in writing, software</span></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="comment">   distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="comment">   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="comment">   See the License for the specific language governing permissions and</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="comment">   limitations under the License.</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="comment">*/</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#if !defined( DIR_LIST_H )</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &lt;stddef.h&gt;</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &lt;time.h&gt;</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">typedef</span> <span class="keyword">struct </span><a class="code" href="structdir__list__s.html">dir_list_s</a>* <a class="code" href="structdir__list__s.html">dir_list_t</a>;</div>
+<a href="dir__list_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#if !defined( DIR_LIST_H )</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &lt;stddef.h&gt;</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#include &lt;time.h&gt;</span></div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;dir_list_t new_dir_list( <span class="keywordtype">void</span> );</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;dir_list_t load_dir_list( <span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> p_fn );</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="keywordtype">int</span>        add_dir( dir_list_t p_list,</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;                    <span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> p_dir,</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;                    <span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> p_name,</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;                    <span class="keyword">const</span> time_t      p_t_added );</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="keywordtype">int</span>        remove_dir( dir_list_t p_list, <span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> p_dir );</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="keywordtype">void</span>       dump_dir_with_name( <span class="keyword">const</span> dir_list_t p_list, <span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> p_name );</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="keywordtype">int</span>        remove_dir_by_index( dir_list_t p_list, <span class="keyword">const</span> <span class="keywordtype">size_t</span> p_dir );</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="keywordtype">int</span>        dir_in_list( dir_list_t p_list, <span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> p_dir );</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="keywordtype">int</span>        bookmark_in_list( dir_list_t p_list, <span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> p_name );</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="keywordtype">int</span>        save_dir_list( <span class="keyword">const</span> dir_list_t p_list, <span class="keyword">const</span> <span class="keywordtype">char</span>* p_fn );</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="keywordtype">void</span>       dump_dir_list( <span class="keyword">const</span> dir_list_t p_list );</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="keywordtype">void</span>       list_dirs( <span class="keyword">const</span> dir_list_t p_list );</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="structdir__list__s_html"><div class="ttname"><a href="structdir__list__s.html">dir_list_s</a></div><div class="ttdef"><b>Definition:</b> dir_list.c:57</div></div>
+<div class="line"><a name="l00031"></a><span class="lineno"><a class="line" href="dir__list_8h.html#aafc48e9a610905e9f18a72d5affde0a9">   31</a></span>&#160;<span class="keyword">typedef</span> <span class="keyword">struct </span><a class="code" href="structdir__list__s.html">dir_list_s</a>* <a class="code" href="dir__list_8h.html#aafc48e9a610905e9f18a72d5affde0a9">dir_list_t</a>;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;dir_list_t <a class="code" href="dir__list_8c.html#a3908efdff2e2c2cddb045a6086706f2e">load_dir_list</a>( <span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> p_fn );</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="keyword">extern</span> dir_list_t <a class="code" href="dir__list_8c.html#a51d5230a6f04bf04ee364d503498d815">new_dir_list</a>( <span class="keywordtype">void</span> );</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="keywordtype">int</span>        <a class="code" href="dir__list_8c.html#a53ed4ead9dac8d17ce6b1b3005508d54">add_dir</a>( dir_list_t p_list,</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;                    <span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> p_dir,</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;                    <span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> p_name,</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;                    <span class="keyword">const</span> time_t      p_t_added );</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="keywordtype">int</span>        <a class="code" href="dir__list_8c.html#af8b331af39f573e91539f4d06398006f">remove_dir</a>( dir_list_t p_list, <span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> p_dir );</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="keywordtype">void</span>       <a class="code" href="dir__list_8c.html#ab74666d0ecc439fabc443ff9df80280c">dump_dir_with_name</a>( <span class="keyword">const</span> dir_list_t p_list, <span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> p_name );</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="keywordtype">int</span>        <a class="code" href="dir__list_8c.html#a5e1218b2d87693a060ea44e3959221b4">remove_dir_by_index</a>( dir_list_t p_list, <span class="keyword">const</span> <span class="keywordtype">size_t</span> p_dir );</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="keywordtype">int</span>        <a class="code" href="dir__list_8c.html#a2df187d527135dbd44d6c3b0373d34a6">dir_in_list</a>( dir_list_t p_list, <span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> p_dir );</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="keywordtype">int</span>        <a class="code" href="dir__list_8c.html#a77caa5e02e6a6eaa72fd1f985bce1846">bookmark_in_list</a>( dir_list_t p_list, <span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> p_name );</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="keywordtype">int</span>        <a class="code" href="dir__list_8c.html#a1844cc9304b02b325fb6acc95c264553">save_dir_list</a>( <span class="keyword">const</span> dir_list_t p_list, <span class="keyword">const</span> <span class="keywordtype">char</span>* p_fn );</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="keywordtype">void</span>       <a class="code" href="dir__list_8c.html#a2f7f644951c503c0d1b3ca595ecf95cb">dump_dir_list</a>( <span class="keyword">const</span> dir_list_t p_list );</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="keywordtype">void</span>       <a class="code" href="dir__list_8c.html#ab5f115629d8f8a72a26b0142f1a93206">list_dirs</a>( <span class="keyword">const</span> dir_list_t p_list );</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="ttc" id="dir__list_8c_html_a2df187d527135dbd44d6c3b0373d34a6"><div class="ttname"><a href="dir__list_8c.html#a2df187d527135dbd44d6c3b0373d34a6">dir_in_list</a></div><div class="ttdeci">int dir_in_list(dir_list_t p_list, const char *const p_dir)</div><div class="ttdef"><b>Definition:</b> <a href="dir__list_8c_source.html#l00328">dir_list.c:328</a></div></div>
+<div class="ttc" id="dir__list_8c_html_ab5f115629d8f8a72a26b0142f1a93206"><div class="ttname"><a href="dir__list_8c.html#ab5f115629d8f8a72a26b0142f1a93206">list_dirs</a></div><div class="ttdeci">void list_dirs(const dir_list_t p_list)</div><div class="ttdef"><b>Definition:</b> <a href="dir__list_8c_source.html#l00389">dir_list.c:389</a></div></div>
+<div class="ttc" id="dir__list_8c_html_a3908efdff2e2c2cddb045a6086706f2e"><div class="ttname"><a href="dir__list_8c.html#a3908efdff2e2c2cddb045a6086706f2e">load_dir_list</a></div><div class="ttdeci">dir_list_t load_dir_list(const char *const p_fn)</div><div class="ttdoc">Load a set of bookmarks from the specified file. </div><div class="ttdef"><b>Definition:</b> <a href="dir__list_8c_source.html#l00145">dir_list.c:145</a></div></div>
+<div class="ttc" id="dir__list_8h_html_aafc48e9a610905e9f18a72d5affde0a9"><div class="ttname"><a href="dir__list_8h.html#aafc48e9a610905e9f18a72d5affde0a9">dir_list_t</a></div><div class="ttdeci">struct dir_list_s * dir_list_t</div><div class="ttdoc">Structure to represent a list of directory bookmarks. </div><div class="ttdef"><b>Definition:</b> <a href="dir__list_8h_source.html#l00031">dir_list.h:31</a></div></div>
+<div class="ttc" id="dir__list_8c_html_a77caa5e02e6a6eaa72fd1f985bce1846"><div class="ttname"><a href="dir__list_8c.html#a77caa5e02e6a6eaa72fd1f985bce1846">bookmark_in_list</a></div><div class="ttdeci">int bookmark_in_list(dir_list_t p_list, const char *const p_name)</div><div class="ttdef"><b>Definition:</b> <a href="dir__list_8c_source.html#l00260">dir_list.c:260</a></div></div>
+<div class="ttc" id="dir__list_8c_html_a1844cc9304b02b325fb6acc95c264553"><div class="ttname"><a href="dir__list_8c.html#a1844cc9304b02b325fb6acc95c264553">save_dir_list</a></div><div class="ttdeci">int save_dir_list(const dir_list_t p_list, const char *p_fn)</div><div class="ttdef"><b>Definition:</b> <a href="dir__list_8c_source.html#l00546">dir_list.c:546</a></div></div>
+<div class="ttc" id="dir__list_8c_html_a5e1218b2d87693a060ea44e3959221b4"><div class="ttname"><a href="dir__list_8c.html#a5e1218b2d87693a060ea44e3959221b4">remove_dir_by_index</a></div><div class="ttdeci">int remove_dir_by_index(dir_list_t p_list, const size_t p_dir)</div><div class="ttdef"><b>Definition:</b> <a href="dir__list_8c_source.html#l00298">dir_list.c:298</a></div></div>
+<div class="ttc" id="dir__list_8c_html_a53ed4ead9dac8d17ce6b1b3005508d54"><div class="ttname"><a href="dir__list_8c.html#a53ed4ead9dac8d17ce6b1b3005508d54">add_dir</a></div><div class="ttdeci">int add_dir(dir_list_t p_list, const char *const p_dir, const char *const p_name, const time_t p_t_added)</div><div class="ttdef"><b>Definition:</b> <a href="dir__list_8c_source.html#l00078">dir_list.c:78</a></div></div>
+<div class="ttc" id="dir__list_8c_html_a2f7f644951c503c0d1b3ca595ecf95cb"><div class="ttname"><a href="dir__list_8c.html#a2f7f644951c503c0d1b3ca595ecf95cb">dump_dir_list</a></div><div class="ttdeci">void dump_dir_list(const dir_list_t p_list)</div><div class="ttdef"><b>Definition:</b> <a href="dir__list_8c_source.html#l00462">dir_list.c:462</a></div></div>
+<div class="ttc" id="dir__list_8c_html_ab74666d0ecc439fabc443ff9df80280c"><div class="ttname"><a href="dir__list_8c.html#ab74666d0ecc439fabc443ff9df80280c">dump_dir_with_name</a></div><div class="ttdeci">void dump_dir_with_name(const dir_list_t p_list, const char *const p_name)</div><div class="ttdef"><b>Definition:</b> <a href="dir__list_8c_source.html#l00365">dir_list.c:365</a></div></div>
+<div class="ttc" id="structdir__list__s_html"><div class="ttname"><a href="structdir__list__s.html">dir_list_s</a></div><div class="ttdef"><b>Definition:</b> <a href="dir__list_8c_source.html#l00057">dir_list.c:57</a></div></div>
+<div class="ttc" id="dir__list_8c_html_af8b331af39f573e91539f4d06398006f"><div class="ttname"><a href="dir__list_8c.html#af8b331af39f573e91539f4d06398006f">remove_dir</a></div><div class="ttdeci">int remove_dir(dir_list_t p_list, const char *const p_dir)</div><div class="ttdef"><b>Definition:</b> <a href="dir__list_8c_source.html#l00316">dir_list.c:316</a></div></div>
+<div class="ttc" id="dir__list_8c_html_a51d5230a6f04bf04ee364d503498d815"><div class="ttname"><a href="dir__list_8c.html#a51d5230a6f04bf04ee364d503498d815">new_dir_list</a></div><div class="ttdeci">dir_list_t new_dir_list(void)</div><div class="ttdoc">Create a new directory list structure. </div><div class="ttdef"><b>Definition:</b> <a href="dir__list_8c_source.html#l00128">dir_list.c:128</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Nov 26 2013 15:07:06 for wd by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Nov 26 2013 15:19:59 for wd by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5
 </small></address>
