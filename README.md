@@ -66,6 +66,7 @@ If the console supports it the items in the list should be coloured
   * Red : Item is in the file-system but is not a directory (e.g. is a file)
   * Grey : Item does not exist in the filesystem
   * Green : Item exists and is a directory
+
 Using Within BASH
 -----------------
 
