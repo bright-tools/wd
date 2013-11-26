@@ -16,6 +16,9 @@
 
 #include "dir_list.h"
 #include "cmdln.h"
+#if defined WIN32
+#include <windows.h>
+#endif
 
 #define FILE_HEADER_DESC_STRING "# WD directory list file"
 #define FILE_HEADER_VER_STRING "# File format: version 1"
@@ -383,6 +386,39 @@ void list_dirs( const dir_list_t p_list )
     }
 }
 
+int determine_if_term_is_ansi()
+{
+    int ret_val = 0;
+    char* term = getenv("TERM");
+
+    if( term != NULL ) {
+        if(( strcmp( term, "vt100" ) == 0 ) ||
+           ( strcmp( term, "xterm" ) == 0 )) {
+            ret_val = 1;
+        }
+    }
+
+    return ret_val;
+}
+
+#if defined WIN32
+WORD TextColour(WORD fontcolor)
+{
+    HANDLE h = GetStdHandle ( STD_OUTPUT_HANDLE );
+    CONSOLE_SCREEN_BUFFER_INFO csbiInfo;
+    WORD wOldColorAttrs;
+
+    GetConsoleScreenBufferInfo(h, &csbiInfo);
+    wOldColorAttrs = csbiInfo.wAttributes; 
+
+    /* Seems to return 0 (i.e. fail) from Mintty, but otherwise no adverse
+       side-effects */
+    SetConsoleTextAttribute(h,fontcolor);
+
+    return wOldColorAttrs;
+}
+#endif
+
 void dump_dir_list( const dir_list_t p_list )
 {
     if( p_list == NULL )
@@ -391,6 +427,7 @@ void dump_dir_list( const dir_list_t p_list )
     } else {
         size_t dir_loop;
         struct dir_list_item* current_item;
+        int term_is_ansi = determine_if_term_is_ansi();
 
         fprintf( stdout, "Dirlist has %d entries of %d used\n",
                  p_list->dir_count, p_list->dir_size );
@@ -399,32 +436,60 @@ void dump_dir_list( const dir_list_t p_list )
              dir_loop < p_list->dir_count;
              dir_loop++, current_item++ )
         {
+#if defined WIN32
+            int wcol = -1;
+            WORD wOldColorAttrs;
+#endif
             char* col = ANSI_COLOUR_RESET;
             char* dir = current_item->dir_name;
             struct stat s;
             int err = stat( dir , &s);
             if(-1 == err) {
                 if(ENOENT == errno) {
+#if defined WIN32
+                    wcol = FOREGROUND_INTENSITY;
+#endif
                     col = ANSI_COLOUR_GREY;
                 }
             } else {
                 if(S_ISDIR(s.st_mode)) {
+#if defined WIN32
+                    wcol = FOREGROUND_GREEN;
+#endif
                     col = ANSI_COLOUR_GREEN;
                 } else {
                     /* Not a directory */
+#if defined WIN32
+                    wcol = FOREGROUND_RED;
+#endif
                     col = ANSI_COLOUR_RED;
                 }
             }
 
-            fprintf( stdout, "[%3d] %s%s", dir_loop,
-                                              col,
-                                              dir );
+            fprintf( stdout, "[%3d] ", dir_loop);
+#if defined WIN32
+            if( wcol != -1 ) {
+                wOldColorAttrs = TextColour(wcol);
+            }
+#endif
+            if( term_is_ansi ) {
+                fprintf( stdout, "%s", col );
+            }
+            fprintf( stdout, "%s", dir );
             if(( current_item->bookmark_name != NULL ) &&
                ( current_item->bookmark_name[0] != 0 )) {
                 fprintf( stdout, "\n      - Shorthand: %s",
                          current_item->bookmark_name);
             }
-            fprintf( stdout, "%s\n", ANSI_COLOUR_RESET );
+#if defined WIN32
+            if( wcol != -1 ) {
+                TextColour(wOldColorAttrs);
+            }
+#endif
+            if( term_is_ansi ) {
+                fprintf( stdout, "%s", ANSI_COLOUR_RESET );
+            }
+            printf("\n");
         }
     }
 }
