@@ -16,7 +16,7 @@
 
 #include "cmdln.h"
 
-#define VERSION_STRING "wd by John, v."
+#define VERSION_STRING "wd v1.0 by dev@brightsilence.com\n https://github.com/bright-tools/wd"
 #define UNRECOGNISED_ARG_STRING "Unrecognised command line argument"
 #define NEED_PARAMETER_STRING "No parameter specified for argument"
 #define INCOMPATIBLE_OP_STRING "Parameter incompatible with other arguments"

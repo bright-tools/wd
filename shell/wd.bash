@@ -1,3 +1,5 @@
+# wd support in BASH
+
 function _wd_complete()
 {
     # Make separator a newline for directories with spaces in their names

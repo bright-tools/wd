@@ -48,8 +48,8 @@ struct dir_list_item
     char*  dir_name;
     char*  bookmark_name;
     time_t time_added;
-    /* TODO: Other data here?  Time added?  Meta-data such as whether it exists?
-       Shortcut name? */
+    /* TODO: Other data here?  Time last usedc
+       Meta-data such as whether it exists?  Shortcut name? */
 };
 
 #define DLI_SIZE (sizeof( struct dir_list_item ))
@@ -551,6 +551,7 @@ int save_dir_list( const dir_list_t p_list, const char* p_fn ) {
     assert( p_list != NULL );
 
     file = fopen( p_fn, "wt" );
+    /* TODO: File locking here?  flock?  lockf? */
 
     if( file != NULL ) {
         size_t dir_loop;
