@@ -94,6 +94,23 @@ Then use the 'wcd' command to change directory using bookmark aliases, e.g.:
     C:\Users\fred\Documents> wcd wd_git_repo
     C:\Users\fred\Documents\wd\working\git> 
 
+In The Release Package
+======================
+
+  * README.md : This file
+  * wcd.bat : Support for using wd in Windows CMD
+  * wd.zsh : Support for using wd in Z Shell
+  * wd.bash : Support for using wd in BASH
+  * mingw/wd.exe : WD build using mingw.  No Cygwin dependency, uses "C:\xxx\yyy" style directories
+  * cygwin/md.exe : WD build using Cygwin.  Requires Cygwin to be installed, uses "/cygpath/c/xxx/yyy" style directories
+
+Currently binary distribution of md is for Windows platforms only, however it
+should be relatively simple to build on other platforms due to the minimal
+dependencies.
+
+I'd suggest using the "mingw" version of md unless you hae a preference for
+Cygwin style paths.
+
 Project Doxygen
 ===============
 
