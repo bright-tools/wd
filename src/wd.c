@@ -27,13 +27,19 @@
 
 void do_remove( const char* cmd, dir_list_t p_dir_list )
 {
-    int success;
+    int success = 0;
     size_t index = 0;
 
     if( wd_prompt )
     {
         dump_dir_list( p_dir_list );
         fprintf(stdout,"Enter number to remove: ");
+
+        /* Flush the output to ensure that the user knows that we're waiting for
+           some input.  This is necessary when, for example, running the Win32
+           version of this app within MinTTy on Cygwin */
+        fflush(stdout);
+
         success = fscanf(stdin,"%u",&index);
         if( success )
         {
