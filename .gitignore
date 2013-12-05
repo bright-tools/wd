@@ -1,5 +1,5 @@
 *.o
 *.exe
-*.swp
+*.sw[n|o|p]
 *.bak
 *.stackdump
