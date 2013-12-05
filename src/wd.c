@@ -25,10 +25,11 @@
 #include <fcntl.h>
 #endif
 
-void do_remove( const char* cmd, dir_list_t p_dir_list )
+int do_remove( const char* cmd, dir_list_t p_dir_list )
 {
     int success = 0;
     size_t index = 0;
+    int ret_val = 0;
 
     if( wd_prompt )
     {
@@ -53,7 +54,7 @@ void do_remove( const char* cmd, dir_list_t p_dir_list )
 
     if( success )
     {
-        save_dir_list( p_dir_list, list_fn );
+        ret_val = 1;
     }
     else
     {
@@ -70,6 +71,8 @@ void do_remove( const char* cmd, dir_list_t p_dir_list )
                     cmd, wd_oper_dir);
         }
     }
+
+    return ret_val;
 }
 
 int main( int argc, char* argv[] )
@@ -78,9 +81,12 @@ int main( int argc, char* argv[] )
 
     init_cmdln();
 
-    if( process_cmdln( argc, argv ) ) {
+    if( process_env() &&
+        process_cmdln( argc, argv ) ) {
         DEBUG_OUT("command line processed");
         if( wd_oper != WD_OPER_NONE ) {
+
+            int dir_list_needs_save = 0;
 
             dir_list_t dir_list = NULL;
 
@@ -98,11 +104,18 @@ int main( int argc, char* argv[] )
 
             switch( wd_oper ) {
                 case WD_OPER_REMOVE:
-                    do_remove( argv[0], dir_list );
+                    dir_list_needs_save = do_remove( argv[0], dir_list );
                     break;
                 case WD_OPER_GET_BY_BM_NAME:
                     DEBUG_OUT("WD_OPER_GET_BY_BM_NAME: %s",wd_bookmark_name);
                     dump_dir_with_name( dir_list, wd_bookmark_name );
+                    /* TODO: only do this if bookmark was found */
+
+                    /* We're updating access times, so flag that the list needs
+                       saving */
+                    if( wd_store_access ) {
+                        dir_list_needs_save = 1;
+                    }
                     break;
                 case WD_OPER_ADD:
                     /* TODO: Consider allowing directory to be added twice with
@@ -117,11 +130,16 @@ int main( int argc, char* argv[] )
                                 "%s: Warning: Bookmark name already in list: '%s'\n",
                                 argv[0], wd_bookmark_name);
                     } else {
+                        time_t a_time = -1;
+                        if( wd_store_access ) {
+                            a_time = wd_now_time;
+                        }
                         add_dir( dir_list,
                                  wd_oper_dir,
                                  wd_bookmark_name,
-                                 time(NULL) );
-                        save_dir_list( dir_list, list_fn );
+                                 wd_now_time,
+                                 a_time );
+                        dir_list_needs_save = 1;
                     }
                     break;
                 case WD_OPER_DUMP:
@@ -131,13 +149,22 @@ int main( int argc, char* argv[] )
 #if defined _WIN32
                     _setmode(1,_O_BINARY);
 #endif
+                    /* TODO: This won't update the access time - don't
+                       necessarily want to because we might be listing out a lot
+                       of directories.  Probably want a call-back from the shell
+                       script */
                     list_dirs( dir_list );
                     break;
                 default:
                     fprintf(stderr,"Unhandled operation type\n");
                     break;
             }
+            if( dir_list_needs_save ) {
+                save_dir_list( dir_list, list_fn );
+            }
         }
+        /* TODO: be more selective about setting this */
+        ret_code = EXIT_SUCCESS;
     } else {
         ret_code = EXIT_FAILURE;
     }

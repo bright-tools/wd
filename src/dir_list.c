@@ -48,6 +48,7 @@ struct dir_list_item
     char*  dir_name;
     char*  bookmark_name;
     time_t time_added;
+    time_t time_accessed;
     /* TODO: Other data here?  Time last usedc
        Meta-data such as whether it exists?  Shortcut name? */
 };
@@ -78,7 +79,8 @@ static void increase_dir_alloc( dir_list_t p_list )
 int add_dir( dir_list_t p_list,
              const char* const p_dir,
              const char* const p_name,
-             const time_t      p_t_added )
+             const time_t      p_t_added,
+             const time_t      p_t_accessed )
 {
     int ret_val = 0;
     char* dest = NULL;
@@ -117,6 +119,8 @@ int add_dir( dir_list_t p_list,
 
             if( ret_val ) {
                 p_list->dir_list[ idx ].time_added = p_t_added;
+                p_list->dir_list[ idx ].time_accessed = p_t_accessed;
+
                 p_list->dir_count++;
             }
         }
@@ -142,6 +146,46 @@ dir_list_t new_dir_list( void )
     return( ret_val );
 }
 
+static time_t sscan_time( const char* const p_str )
+{
+    time_t ret_val;
+    struct tm tm;
+    tm.tm_isdst = -1;
+    tm.tm_yday = -1;
+    tm.tm_wday = -1;
+    sscanf(p_str, TIME_SSCAN_STRING,
+                  &tm.tm_year,
+                  &tm.tm_mon,
+                  &tm.tm_mday,
+                  &tm.tm_hour,
+                  &tm.tm_min,
+                  &tm.tm_sec);
+
+    /* tm's year is baselined at 1900 */
+    tm.tm_year -= 1900;
+    /* tm's month is the count of months since Jan */
+    tm.tm_mon -= 1;
+
+    /* This call will ensure that tm_yday is calculated - we need that for the
+       conversion below */
+    mktime( &tm );
+
+    /* The time in the file is already UTC, so using
+       mktime is the wrong thing to do, as this assumes that
+       the contents of tm is in local time
+       see http://pubs.opengroup.org/onlinepubs/007904975/basedefs/xbd_chap04.html#tag_04_14 */
+    ret_val = tm.tm_sec +
+              tm.tm_min*60 +
+              tm.tm_hour*3600 +
+              tm.tm_yday*86400 +
+              (tm.tm_year-70)*31536000 +
+              ((tm.tm_year-69)/4)*86400 -
+              ((tm.tm_year-1)/100)*86400 +
+              ((tm.tm_year+299)/400)*86400;
+
+    return ret_val;
+}
+
 dir_list_t load_dir_list( const char* const p_fn )
 {
     FILE* file = fopen( p_fn, "rt" );
@@ -156,12 +200,14 @@ dir_list_t load_dir_list( const char* const p_fn )
             char read[ MAXPATHLEN ];
             char name[ MAXPATHLEN ];
             time_t added;
+            time_t accessed;
             char* fstr;
             int one_last_go = 1;
 
             path[0] = 0;
             name[0] = 0;
             added = -1;
+            accessed = -1;
             DEBUG_OUT("generated empty bookmark list");
 
             while(( fstr = fgets( read, MAXPATHLEN, file ) ) ||
@@ -202,12 +248,14 @@ dir_list_t load_dir_list( const char* const p_fn )
                             DEBUG_OUT("creating new bookmark: %s",path);
 
                             /* Create the new bookmark and reset attributes */
-                            add_dir( ret_val, path, name, added );
+                            add_dir( ret_val, path, name, added, accessed );
 
                             DEBUG_OUT("created new bookmark");
 
                             path[0] = 0;
                             name[0] = 0;
+                            added = -1;
+                            accessed = -1;
                         }
                         strcpy( path, &(read[1]) );
                     } else if(( read[0] == 'N' ) &&
@@ -215,34 +263,10 @@ dir_list_t load_dir_list( const char* const p_fn )
                         strcpy( name, &(read[2]) );
                     } else if(( read[0] == 'A' ) &&
                               ( read[1] == ':' )) {
-                        struct tm tm;
-                        tm.tm_isdst = -1;
-                        sscanf(&(read[2]), TIME_SSCAN_STRING,
-                                           &tm.tm_year,
-                                           &tm.tm_mon,
-                                           &tm.tm_mday,
-                                           &tm.tm_hour,
-                                           &tm.tm_min,
-                                           &tm.tm_sec);
-
-                        /* tm's year is baselined at 1900 */
-                        tm.tm_year -= 1900;
-                        /* tm's month is the count of months since Jan */
-                        tm.tm_mon -= 1;
-
-                        /* The time in the file is already UTC, so using
-                           mktime is the wrong thing to do, as this assumes that
-                           the contents of tm is in local time
-                           see http://pubs.opengroup.org/onlinepubs/007904975/basedefs/xbd_chap04.html#tag_04_14 */
-                        added =
-                            tm.tm_sec +
-                            tm.tm_min*60 +
-                            tm.tm_hour*3600 +
-                            tm.tm_yday*86400 +
-                            (tm.tm_year-70)*31536000 +
-                            ((tm.tm_year-69)/4)*86400 -
-                            ((tm.tm_year-1)/100)*86400 +
-                            ((tm.tm_year+299)/400)*86400;
+                        added = sscan_time(&(read[2]));
+                    } else if(( read[0] == 'C' ) &&
+                              ( read[1] == ':' )) {
+                        accessed = sscan_time(&(read[2]));
                     } else {
                         fprintf(stderr,
                                 "Unrecognised content in bookmarks file: %s\n",
@@ -330,6 +354,8 @@ int dir_in_list( dir_list_t p_list, const char* const p_dir )
     return( find_dir_location( p_list, p_dir, NULL ) );
 }
 
+#define CYGDRIVE_PREFIX "/cygdrive/"
+
 char* format_dir( char* p_dir ) {
     char* ret_val = NULL;
 
@@ -339,9 +365,22 @@ char* format_dir( char* p_dir ) {
             break;
         case WD_DIRFORM_CYGWIN: {
             char* dest;
-            char* src;
-            ret_val = (char*)malloc( strlen( p_dir ) + 1 );
-            for( dest = ret_val, src = p_dir;
+            char* src = p_dir;
+            ret_val = (char*)malloc( strlen( p_dir ) + 14 );
+            dest = ret_val;
+            if(((( src[0] >= 'a' ) && (src[0] <= 'z' )) ||
+                (( src[0] >= 'A' ) && (src[0] <= 'Z' ))) &&
+               ( src[1] == ':' ) &&
+               (( src[2] == '\\') ||
+                ( src[2] == '/' )))
+            {
+                strcpy( ret_val, CYGDRIVE_PREFIX );
+                dest += strlen( CYGDRIVE_PREFIX );
+                *dest = *src;
+                dest++;
+                src += 2;
+            }
+            for( ;
                  *src != '\0';
                  dest++, src++ ) {
                 if( *src == '\\' ) {
@@ -353,6 +392,34 @@ char* format_dir( char* p_dir ) {
             *dest = 0;
                                 }
             break;
+       case WD_DIRFORM_WINDOWS: {
+            char* dest;
+            char* src;
+            ret_val = (char*)malloc( strlen( p_dir ) + 1 );
+            src = p_dir;
+            dest = ret_val;
+            if( strncmp( src, CYGDRIVE_PREFIX, strlen( CYGDRIVE_PREFIX )) == 0 )
+            {
+                src += strlen( CYGDRIVE_PREFIX );
+                *dest = *src;
+                dest++;
+                *dest = ':';
+                dest++;
+                src += 1;
+            }
+            for( ;
+                 *src != '\0';
+                 dest++, src++ ) {
+                if( *src == '/' ) {
+                    *dest = '\\';
+                } else {
+                    *dest = *src;
+                }
+            }
+            *dest = 0;
+                                }
+            break;
+
         default:
             fprintf(stderr,"Unhandled directory format\n");
             ret_val = p_dir;
@@ -379,6 +446,10 @@ void dump_dir_with_name( const dir_list_t p_list, const char* const p_name )
 
             if( current_item->dir_name != dir_formatted ) {
                 free( dir_formatted );
+            }
+
+            if( wd_store_access ) {
+                current_item->time_accessed = wd_now_time;
             }
 
             break;
@@ -459,6 +530,18 @@ WORD TextColour(WORD fontcolor)
 }
 #endif
 
+static void dump_time( const char* const p_header, const time_t* const p_time )
+{
+    char buffer[ TIME_STRING_BUFFER_SIZE ];
+
+    strftime( buffer, sizeof( buffer ), "%c %Z",
+              gmtime( p_time ));
+
+    fprintf( stdout, "\n      - %s: %s",
+                     p_header,
+                     buffer );
+}
+
 void dump_dir_list( const dir_list_t p_list )
 {
     if( p_list == NULL )
@@ -484,6 +567,8 @@ void dump_dir_list( const dir_list_t p_list )
             char* dir = current_item->dir_name;
             struct stat s;
             int err = stat( dir , &s);
+            char* dir_formatted;
+
             if(-1 == err) {
                 if(ENOENT == errno) {
 #if defined WIN32
@@ -515,20 +600,26 @@ void dump_dir_list( const dir_list_t p_list )
             if( term_is_ansi ) {
                 fprintf( stdout, "%s", col );
             }
-            fprintf( stdout, "%s", dir );
+
+            dir_formatted = format_dir( dir );
+            fprintf( stdout, "%s", dir_formatted );
+
+            if( current_item->dir_name != dir_formatted ) {
+                fprintf( stdout, "\n      - Unconverted: %s",
+                         dir);
+                free( dir_formatted );
+            }
+
             if(( current_item->bookmark_name != NULL ) &&
                ( current_item->bookmark_name[0] != 0 )) {
                 fprintf( stdout, "\n      - Shorthand: %s",
                          current_item->bookmark_name);
             }
             if( current_item->time_added != -1 ) {
-                char buffer[ TIME_STRING_BUFFER_SIZE ];
-
-                strftime( buffer, sizeof( buffer ), "%c %Z",
-                          gmtime( &( current_item->time_added )));
-
-                fprintf( stdout, "\n      - Added: %s",
-                         buffer );
+                dump_time( "Added", &( current_item->time_added ) );
+            }
+            if( current_item->time_accessed != -1 ) {
+                dump_time( "Accessed", &( current_item->time_accessed ) );
             }
 #if defined WIN32
             if( wcol != -1 ) {
@@ -574,6 +665,14 @@ int save_dir_list( const dir_list_t p_list, const char* p_fn ) {
                 if (strftime(buff, sizeof( buff ), TIME_FORMAT_STRING, 
                              gmtime( &(this_item->time_added) ))) {
                     fprintf( file, "A:%s\n",buff);
+                }
+            }
+            if( this_item->time_accessed != -1 ) {
+                char buff[ TIME_STRING_BUFFER_SIZE ];
+
+                if (strftime(buff, sizeof( buff ), TIME_FORMAT_STRING, 
+                             gmtime( &(this_item->time_accessed) ))) {
+                    fprintf( file, "C:%s\n",buff);
                 }
             }
         }

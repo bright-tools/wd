@@ -29,11 +29,13 @@ typedef enum {
 
 typedef enum {
     WD_DIRFORM_NONE,
-    WD_DIRFORM_CYGWIN
+    WD_DIRFORM_CYGWIN,
+    WD_DIRFORM_WINDOWS
 } wd_dir_format_t;
 
 void init_cmdln( void );
 int process_cmdln( const int argc, char* const argv[] );
+int process_env( void );
 
 extern wd_oper_t wd_oper;
 extern wd_dir_format_t wd_dir_form;
@@ -41,6 +43,8 @@ extern char*     list_fn;
 extern char      wd_oper_dir[ MAXPATHLEN ];
 extern char*     wd_bookmark_name;
 extern int       wd_prompt;
+extern int       wd_store_access;
+extern time_t    wd_now_time;
 
 #if defined _DEBUG
 #define DEBUG_OUT( ... ) do { fprintf(stdout,"wd: " __VA_ARGS__ ); fprintf(stdout,"\n"); fflush(stdout); } while( 0 )

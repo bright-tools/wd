@@ -56,7 +56,8 @@ extern dir_list_t new_dir_list( void );
 int        add_dir( dir_list_t p_list,
                     const char* const p_dir,
                     const char* const p_name,
-                    const time_t      p_t_added );
+                    const time_t      p_t_added,
+                    const time_t      p_t_accessed );
 int        remove_dir( dir_list_t p_list, const char* const p_dir );
 void       dump_dir_with_name( const dir_list_t p_list, const char* const p_name );
 int        remove_dir_by_index( dir_list_t p_list, const size_t p_dir );

@@ -16,13 +16,15 @@
 
 #include "cmdln.h"
 
-#define VERSION_STRING "wd v1.0 by dev@brightsilence.com\n https://github.com/bright-tools/wd"
+#define VERSION_STRING "wd v1.1 by dev@brightsilence.com\n https://github.com/bright-tools/wd"
 #define UNRECOGNISED_ARG_STRING "Unrecognised command line argument"
 #define NEED_PARAMETER_STRING "No parameter specified for argument"
 #define INCOMPATIBLE_OP_STRING "Parameter incompatible with other arguments"
 #define UNRECOGNISED_PARAM_STRING "Parameter to argument not recognised"
 
+/* Windows is quite happy with a forward slash in the path */
 #define DEFAULT_LIST_FILE "/.wd_list"
+#define ENV_VAR_NAME      "WD_OPTS"
 
 #include <stdio.h>
 
@@ -45,7 +47,9 @@ char*         list_fn = NULL;
 char          wd_oper_dir[ MAXPATHLEN ];
 char*         wd_bookmark_name;
 int           wd_prompt;
+int           wd_store_access;
 wd_dir_format_t wd_dir_form;
+time_t        wd_now_time;
 /* !Exported variables */
 
 static void get_home( void )
@@ -97,16 +101,18 @@ void init_cmdln( void ) {
 
     wd_oper = WD_OPER_NONE;
     wd_prompt = 0;
+    wd_store_access = 0;
     wd_bookmark_name = NULL;
     wd_dir_form = WD_DIRFORM_NONE;
 }
 
 static void show_help( const char* const p_cmd ) {
     fprintf(stdout,
-            "%s [-v] [-h] [-f <fn>] [-r [dir] [-p]] [-a [dir]] [-d] [-l] [-s <c>]\n"
+            "%s [-v] [-h] [-t] [-f <fn>] [-r [dir] [-p]] [-a [dir]] [-d] [-l] [-s <c>]\n"
             " -v       : Show version information\n"
             " -h       : Show usage help\n"
             " -d       : Dump bookmark list\n"
+            " -t       : Store access times for bookmarks\n"
             " -l       : List directories & bookmark names (generally for use in tab\n"
             "             expansion)\n"
             " -s <c>   : Format paths for cygwin\n"
@@ -123,7 +129,7 @@ static void show_help( const char* const p_cmd ) {
              by date added */
 }
 
-int process_cmdln( const int argc, char* const argv[] ) {
+int process_opts( const int argc, char* const argv[], const int p_cmd_line ) {
     int arg_loop;
     int ret_val = 1;
 
@@ -131,12 +137,23 @@ int process_cmdln( const int argc, char* const argv[] ) {
     for( arg_loop = 1; arg_loop < argc; arg_loop++ )
     {
         char* this_arg = argv[ arg_loop ];
-        if( 0 == strcmp( this_arg, "-v" ) ) {
+        DEBUG_OUT("process_opts: %s",this_arg); 
+        if( p_cmd_line && ( 0 == strcmp( this_arg, "-v" ) )) {
             fprintf( stdout, "%s\n", VERSION_STRING );
-        } else if( 0 == strcmp( this_arg, "-h" ) ) {
+        } else if( p_cmd_line && ( 0 == strcmp( this_arg, "-h" )) ) {
             show_help( argv[0] );
-        } else if( 0 == strcmp( this_arg, "-p" ) ) {
+        } else if( p_cmd_line && ( 0 == strcmp( this_arg, "-p" )) ) {
             wd_prompt = 1;
+        } else if( 0 == strcmp( this_arg, "-t" ) ) {
+            wd_store_access = 1;
+        } else if( 0 == strcmp( this_arg, "-z" ) ) {
+            if(( arg_loop + 1 ) < argc ) {
+                arg_loop++;
+                sscanf(argv[arg_loop],"%ld",(long int*)(&wd_now_time));
+            } else {
+                fprintf( stdout, "%s: %s\n", NEED_PARAMETER_STRING, this_arg );
+                ret_val = 0;
+            }
         } else if( 0 == strcmp( this_arg, "-s" ) ) {
             if(( arg_loop + 1 ) < argc ) {
                 arg_loop++;
@@ -144,6 +161,9 @@ int process_cmdln( const int argc, char* const argv[] ) {
                 switch( argv[ arg_loop ][0] ) {
                     case 'c':
                         wd_dir_form = WD_DIRFORM_CYGWIN;
+                        break;
+                    case 'w':
+                        wd_dir_form = WD_DIRFORM_WINDOWS;
                         break;
                     default:
                         fprintf( stdout, "%s: %s\n", UNRECOGNISED_PARAM_STRING, this_arg );
@@ -154,11 +174,11 @@ int process_cmdln( const int argc, char* const argv[] ) {
                 fprintf( stdout, "%s: %s\n", NEED_PARAMETER_STRING, this_arg );
                 ret_val = 0;
             }
-        } else if( 0 == strcmp( this_arg, "-d" ) ) {
+        } else if( p_cmd_line && ( 0 == strcmp( this_arg, "-d" )) ) {
             wd_oper = WD_OPER_DUMP;
-        } else if( 0 == strcmp( this_arg, "-l" ) ) {
+        } else if( p_cmd_line && ( 0 == strcmp( this_arg, "-l" )) ) {
             wd_oper = WD_OPER_LIST;
-        } else if( 0 == strcmp( this_arg, "-n" ) ) {
+        } else if( p_cmd_line && ( 0 == strcmp( this_arg, "-n" )) ) {
             if((( arg_loop + 1 ) < argc ) &&
                 ( argv[ arg_loop + 1 ][0] != '-' )) {
                 arg_loop++;
@@ -168,8 +188,9 @@ int process_cmdln( const int argc, char* const argv[] ) {
                 fprintf( stdout, "%s: %s\n", NEED_PARAMETER_STRING, this_arg );
                 ret_val = 0;
             }
-        } else if(( 0 == strcmp( this_arg, "-a" )) ||
-                  ( 0 == strcmp( this_arg, "-r" )) ) {
+        } else if( p_cmd_line && 
+                  (( 0 == strcmp( this_arg, "-a" )) ||
+                   ( 0 == strcmp( this_arg, "-r" ))) ) {
             if( wd_oper == WD_OPER_NONE ) {
                 switch( this_arg[ 1 ] ) {
                     case 'a':
@@ -234,4 +255,89 @@ int process_cmdln( const int argc, char* const argv[] ) {
     }
 
     return ret_val;
+}
+
+int process_env( void )
+{
+    char *opts = getenv(ENV_VAR_NAME);
+    int ret_val = 1;
+
+    /* Retrieved environment string OK? */
+    if( opts != NULL ) {
+        /* +1 to take the NULL terminator into account - when we're looping
+           through the string below we want to include this, hence we factor
+           it in at this point */
+        const size_t opts_len = strlen( opts ) + 1U;
+        char*        opt_copy = (char*) malloc( opts_len );
+        size_t breaks = 0;
+        size_t loop = 0;
+        char** argv;
+        int waiting;
+        char *src, *dest;
+
+        DEBUG_OUT(ENV_VAR_NAME ": %s",opts);
+
+        /* TODO: Deal with quotes in strings */
+
+        /* Copy the environment string to a fresh memory area so that we can
+           maniupulate it.  Replace spaces with null terminators to break string
+           into individual arguments and keep a count of the amount we've done
+           */
+        for( loop = 0, src = opts, dest = opt_copy ;
+             loop < opts_len;
+             loop++, src++, dest++ ) 
+        {
+            if( *src == ' ' )
+            {
+                *dest = 0;
+                breaks++;
+            } else {
+                *dest = *src;
+            }
+        }
+
+        /* Allocate memory for pointers to the arguments
+           +1 to take into account the fact that the first argument has special
+           meaning
+           +1 to take into account the final, un-counted element in the loop
+           above */
+        argv = malloc( sizeof( char*[ breaks + 2 ] ));
+        /* First argument is the name of the program */
+        argv[0] = ENV_VAR_NAME;
+        breaks = 1;
+        waiting = 1;
+
+        /* Loop through the broken up string, populating argv with pointers to
+           the start of each argument */
+        for( loop = 0;
+             loop < opts_len;
+             loop++ )
+        {
+            /* Are we waiting to find the start of a new string and this is a
+               non-null character?
+               Using this mechanism deals with multiple consecutive spaces/NULLs
+               in the string and prevents argv having entries pointing to NULL
+               strings */
+            if( waiting && ( opt_copy[ loop ] != '0' )) {
+                argv[breaks++] = &(opt_copy[loop]);
+                DEBUG_OUT(ENV_VAR_NAME ": opt - %s",argv[breaks-1]);
+                waiting = 0;
+            } else if( opt_copy[loop ] == 0 ) {
+                waiting = 1;
+            }
+        }
+
+        DEBUG_OUT(ENV_VAR_NAME ": opt count - %d",breaks);
+        /* Finally, process the array of options */
+        ret_val = process_opts( breaks, argv, 0 );
+
+        free( opt_copy );
+        free( argv );
+    }
+
+    return ret_val;
+}
+
+int process_cmdln( const int argc, char* const argv[] ) {
+    return process_opts( argc, argv, 1 );
 }
