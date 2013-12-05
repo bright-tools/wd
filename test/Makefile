@@ -10,7 +10,8 @@ OFF     = 0
 CHECK_E = $(PFX) diff list $(PASS)/list.$(STEP) && diff out.log $(PASS)/out.log.$(STEP) && diff err.log $(PASS)/err.log.$(STEP)
 
 .PHONY: all
-all: test5
+all: test7
+	@echo -e \\nAll tests run OK
 
 .PHONY: clean
 clean:
@@ -57,3 +58,18 @@ test5: test4
 	$(TGT_E) -r 'C:\Windows' $(OUT)
 	$(CHECK_E)
 
+.PHONY: test6
+test6: OFF=25
+test6: STEP=6
+test6: test5
+	@echo Adding a duplicate directory
+	$(TGT_E) -a 'C:\' $(OUT)
+	$(CHECK_E)
+
+.PHONY: test7
+test7: OFF=30
+test7: STEP=7
+test7: test6
+	@echo Removing a directory \(list now empty\)
+	$(TGT_E) -r 'C:\' $(OUT)
+	$(CHECK_E)
