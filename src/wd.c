@@ -106,14 +106,22 @@ int main( int argc, char* argv[] )
                 case WD_OPER_REMOVE:
                     dir_list_needs_save = do_remove( argv[0], dir_list );
                     break;
+                case WD_OPER_GET:
+                    DEBUG_OUT("WD_OPER_GET: %s",wd_bookmark_name);
+
+                    if(( dump_dir_with_name( dir_list, wd_bookmark_name ) ||
+                         dump_dir_if_exists( dir_list, wd_bookmark_name )) && wd_store_access ) {
+                        /* We're updating access times, so flag that the list needs
+                           saving */
+                        dir_list_needs_save = 1;
+                    }
+                    break;
                 case WD_OPER_GET_BY_BM_NAME:
                     DEBUG_OUT("WD_OPER_GET_BY_BM_NAME: %s",wd_bookmark_name);
-                    dump_dir_with_name( dir_list, wd_bookmark_name );
-                    /* TODO: only do this if bookmark was found */
 
-                    /* We're updating access times, so flag that the list needs
-                       saving */
-                    if( wd_store_access ) {
+                    if( dump_dir_with_name( dir_list, wd_bookmark_name ) && wd_store_access ) {
+                        /* We're updating access times, so flag that the list needs
+                           saving */
                         dir_list_needs_save = 1;
                     }
                     break;

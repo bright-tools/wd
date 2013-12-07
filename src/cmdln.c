@@ -27,6 +27,7 @@
 #define ENV_VAR_NAME      "WD_OPTS"
 
 #include <stdio.h>
+#include <time.h>
 
 /* Supporting get_home() */
 #include <unistd.h>
@@ -42,14 +43,14 @@
 
 /* Exported variables for accessing configuration options.
    TODO: Consider combining these into a struct */
-wd_oper_t     wd_oper;
-char*         list_fn = NULL;
-char          wd_oper_dir[ MAXPATHLEN ];
-char*         wd_bookmark_name;
-int           wd_prompt;
-int           wd_store_access;
+wd_oper_t       wd_oper;
+char*           list_fn = NULL;
+char            wd_oper_dir[ MAXPATHLEN ];
+char*           wd_bookmark_name;
+int             wd_prompt;
+int             wd_store_access;
 wd_dir_format_t wd_dir_form;
-time_t        wd_now_time;
+time_t          wd_now_time;
 /* !Exported variables */
 
 static void get_home( void )
@@ -62,7 +63,7 @@ static void get_home( void )
 #else
     /* Try and retrieve the home from the environment first */
     char *homedir = getenv("HOME");
-    
+
     if( homedir == NULL ) {
         /* Couldn't get user's home directory from the environment so
            try the user database */
@@ -104,6 +105,7 @@ void init_cmdln( void ) {
     wd_store_access = 0;
     wd_bookmark_name = NULL;
     wd_dir_form = WD_DIRFORM_NONE;
+    wd_now_time = time(NULL);
 }
 
 static void show_help( const char* const p_cmd ) {
@@ -178,11 +180,16 @@ int process_opts( const int argc, char* const argv[], const int p_cmd_line ) {
             wd_oper = WD_OPER_DUMP;
         } else if( p_cmd_line && ( 0 == strcmp( this_arg, "-l" )) ) {
             wd_oper = WD_OPER_LIST;
-        } else if( p_cmd_line && ( 0 == strcmp( this_arg, "-n" )) ) {
+        } else if( p_cmd_line && (( 0 == strcmp( this_arg, "-n" )) ||
+                                  ( 0 == strcmp( this_arg, "-g" )))) {
             if((( arg_loop + 1 ) < argc ) &&
                 ( argv[ arg_loop + 1 ][0] != '-' )) {
                 arg_loop++;
-                wd_oper = WD_OPER_GET_BY_BM_NAME;
+                if( 0 == strcmp( this_arg, "-n" ) ) {
+                    wd_oper = WD_OPER_GET_BY_BM_NAME;
+                } else {
+                    wd_oper = WD_OPER_GET;
+                }
                 wd_bookmark_name = argv[ arg_loop ];
             } else {
                 fprintf( stdout, "%s: %s\n", NEED_PARAMETER_STRING, this_arg );

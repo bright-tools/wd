@@ -429,10 +429,43 @@ char* format_dir( char* p_dir ) {
     return( ret_val );
 }
 
-void dump_dir_with_name( const dir_list_t p_list, const char* const p_name )
+int        dump_dir_if_exists( const dir_list_t p_list, const char* const p_dir )
 {
     size_t dir_loop;
     struct dir_list_item* current_item;
+    int found = 0;
+
+    for( dir_loop = 0, current_item = p_list->dir_list;
+         dir_loop < p_list->dir_count;
+         dir_loop++, current_item++ )
+    {
+        /* TODO: Case insensitive on Windows?  Case insensitive switch? */
+        if(( current_item->bookmark_name != NULL ) &&
+           ( 0 == strcmp( p_dir, current_item->dir_name ))) {
+
+            char* dir_formatted = format_dir( current_item->dir_name );
+            fprintf( stdout, "%s", dir_formatted );
+
+            if( current_item->dir_name != dir_formatted ) {
+                free( dir_formatted );
+            }
+
+            if( wd_store_access ) {
+                current_item->time_accessed = wd_now_time;
+            }
+
+            found = 1;
+            break;
+        }
+    }
+    return( found );
+}
+
+int dump_dir_with_name( const dir_list_t p_list, const char* const p_name )
+{
+    size_t dir_loop;
+    struct dir_list_item* current_item;
+    int found = 0;
 
     for( dir_loop = 0, current_item = p_list->dir_list;
          dir_loop < p_list->dir_count;
@@ -452,9 +485,12 @@ void dump_dir_with_name( const dir_list_t p_list, const char* const p_name )
                 current_item->time_accessed = wd_now_time;
             }
 
+            found = 1;
             break;
         }
     }
+
+    return( found );
 }
 
 void list_dirs( const dir_list_t p_list )
