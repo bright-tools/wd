@@ -1,5 +1,22 @@
 # wd support in BASH
 
+function wd_run()
+{
+    # See if the parameter was a bookmark name?
+    if [ "$3" = "cygwin" ]; then
+        # Ensure paths are cygwin formatted
+        local dir=$(wd -g "$2" -s c)
+    else
+        # Ensure paths are windows formatted
+        local dir=$(wd -g "$2" -s w)
+    fi
+    if [ -d "${dir}" ]; then
+        $1 "${dir}"
+    else
+        echo "wcd: Couldn't find a directory or a bookmark for '$2'";
+    fi
+}
+
 function _wd_complete()
 {
     # Make separator a newline for directories with spaces in their names
@@ -18,25 +35,18 @@ function _wd_complete()
     unset IFS
 }
 
+EXPLORER=$(which explorer 2>/dev/null)
+if [ -x ${EXPLORER} ]; then
+    function wed()
+    {
+        wd_run explorer "$1"
+    }
+    complete -F _wd_complete wed
+fi
+
 # Function to change directory using wd for favourites
 function wcd()
 {
-    # If the parameter's a directory, change to it
-    if [ -d "$1" ]; then
-        cd "$1"
-    else
-        # See if the parameter was a bookmark name?
-        if [ "${OSTYPE}" = "cygwin" ]; then
-            # Ensure paths are cygwin formatted
-            local dir=$(wd -n $1 -s c)
-        else
-            local dir=$(wd -n $1)
-        fi
-        if [ -d "${dir}" ]; then
-            cd "${dir}"
-        else
-            echo "wcd: Couldn't find a directory or a bookmark for '$1'";
-        fi
-    fi
+    wd_run cd "$1" "${OSTYPE}"
 }
 complete -F _wd_complete wcd
