@@ -30,20 +30,29 @@ typedef enum {
 } wd_oper_t;
 
 typedef enum {
+    WD_ENTITY_ANY,
+    WD_ENTITY_DIR,
+    WD_ENTITY_FILE,
+    WD_ENTITY_UNKNOWN,
+    WD_ENTITY_NONEXISTANT
+} wd_entity_t;
+
+typedef enum {
     WD_DIRFORM_NONE,
     WD_DIRFORM_CYGWIN,
     WD_DIRFORM_WINDOWS
 } wd_dir_format_t;
 
 typedef struct {
-    wd_oper_t wd_oper;
+    wd_oper_t       wd_oper;
     wd_dir_format_t wd_dir_form;
-    char*     list_fn;
-    char      wd_oper_dir[ MAXPATHLEN ];
-    char*     wd_bookmark_name;
-    int       wd_prompt;
-    int       wd_store_access;
-    time_t    wd_now_time;
+    char*           list_fn;
+    char            wd_oper_dir[ MAXPATHLEN ];
+    char*           wd_bookmark_name;
+    int             wd_prompt;
+    int             wd_store_access;
+    time_t          wd_now_time;
+    wd_entity_t     wd_entity_type;
 } config_container_t;
 
 /** Initialise the specified config with default values

@@ -61,7 +61,8 @@ int        add_dir( dir_list_t p_list,
                     const char* const p_dir,
                     const char* const p_name,
                     const time_t      p_t_added,
-                    const time_t      p_t_accessed );
+                    const time_t      p_t_accessed,
+                    const wd_entity_t p_type );
 int        remove_dir( dir_list_t p_list, const char* const p_dir );
 int        dump_dir_with_name( const dir_list_t p_list, const char* const p_name );
 int        dump_dir_if_exists( const dir_list_t p_list, const char* const p_dir );

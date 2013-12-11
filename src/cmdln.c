@@ -84,16 +84,18 @@ static void get_home( config_container_t* const p_config )
 }
 
 void init_cmdln( config_container_t* const p_config ) {
-    /* TODO: Consider only doing this if the file has not been specified on the
-       command line */
-    get_home( p_config );
-
     p_config->wd_oper = WD_OPER_NONE;
     p_config->wd_prompt = 0;
     p_config->wd_store_access = 0;
     p_config->wd_bookmark_name = NULL;
     p_config->wd_dir_form = WD_DIRFORM_NONE;
     p_config->wd_now_time = time(NULL);
+    p_config->wd_entity_type = WD_ENTITY_ANY;
+    p_config->list_fn = NULL;
+
+    /* TODO: Consider only doing this if the file has not been specified on the
+       command line for efficiency reasons */
+    get_home( p_config );
 }
 
 static void show_help( const char* const p_cmd ) {
@@ -140,6 +142,29 @@ static int process_opts( config_container_t* const p_config, const int argc, cha
             if(( arg_loop + 1 ) < argc ) {
                 arg_loop++;
                 sscanf(argv[arg_loop],"%ld",(long int*)(&p_config->wd_now_time));
+            } else {
+                fprintf( stdout, "%s: %s\n", NEED_PARAMETER_STRING, this_arg );
+                ret_val = 0;
+            }
+        } else if( 0 == strcmp( this_arg, "-e" ) ) {
+            if(( arg_loop + 1 ) < argc ) {
+                arg_loop++;
+                /* TODO: Validate length of argument? */
+                switch( argv[ arg_loop ][0] ) {
+                    case 'a':
+                        p_config->wd_entity_type = WD_ENTITY_ANY;
+                        break;
+                    case 'd':
+                        p_config->wd_entity_type = WD_ENTITY_DIR;
+                        break;
+                    case 'f':
+                        p_config->wd_entity_type = WD_ENTITY_FILE;
+                        break;
+                    default:
+                        fprintf( stdout, "%s: %s\n", UNRECOGNISED_PARAM_STRING, this_arg );
+                        ret_val = 0;
+                        break;
+                }
             } else {
                 fprintf( stdout, "%s: %s\n", NEED_PARAMETER_STRING, this_arg );
                 ret_val = 0;

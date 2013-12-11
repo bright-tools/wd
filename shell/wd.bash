@@ -13,7 +13,11 @@ function wd_run()
     if [ -d "${dir}" ]; then
         $1 "${dir}"
     else
-        echo "wcd: Couldn't find a directory or a bookmark for '$2'";
+        if [ -d "$2" ]; then
+            cd "$2"
+        else
+            echo "wcd: Couldn't find a directory or a bookmark for '$2' and there did not seem to be a local directory either";
+        fi
     fi
 }
 
@@ -26,9 +30,9 @@ function _wd_complete()
     local line=${COMP_LINE}
     if [ "${OSTYPE}" = "cygwin" ]; then
         # Ensure paths are cygwin formatted
-        local list=$(wd -l -s c)
+        local list=$(wd -l -e d -s c)
     else
-        local list=$(wd -l)
+        local list=$(wd -l -e d)
     fi
 
     COMPREPLY=($(compgen -W "${list}" -- "${word}"))

@@ -150,7 +150,8 @@ int main( int argc, char* argv[] )
                                  cfg.wd_oper_dir,
                                  cfg.wd_bookmark_name,
                                  cfg.wd_now_time,
-                                 a_time );
+                                 a_time,
+                                 WD_ENTITY_UNKNOWN );
                         dir_list_needs_save = 1;
                     }
                     break;

@@ -43,12 +43,16 @@
 
 #define MIN_DIR_SIZE 100
 
+/* TODO: Since chage #6, we support files as well as directories, so all of the
+   "dir" references in this file are a little misleading */
+
 struct dir_list_item
 {
-    char*  dir_name;
-    char*  bookmark_name;
-    time_t time_added;
-    time_t time_accessed;
+    char*       dir_name;
+    char*       bookmark_name;
+    time_t      time_added;
+    time_t      time_accessed;
+    wd_entity_t type;
     /* TODO: Other data here?  Time last usedc
        Meta-data such as whether it exists?  Shortcut name? */
 };
@@ -65,6 +69,9 @@ struct dir_list_s
        things that this class doesn't care about */
     const config_container_t* cfg;
 };
+
+static wd_entity_t get_type( const char* const p_path );
+
 
 static void increase_dir_alloc( dir_list_t p_list )
 {
@@ -84,8 +91,10 @@ int add_dir( dir_list_t p_list,
              const char* const p_dir,
              const char* const p_name,
              const time_t      p_t_added,
-             const time_t      p_t_accessed )
+             const time_t      p_t_accessed,
+             const wd_entity_t p_type )
 {
+    /* TODO: Check that item is of type p_list->cfg->wd_entity_type? */
     int ret_val = 0;
     char* dest = NULL;
     const size_t idx = p_list->dir_count;
@@ -124,6 +133,11 @@ int add_dir( dir_list_t p_list,
             if( ret_val ) {
                 p_list->dir_list[ idx ].time_added = p_t_added;
                 p_list->dir_list[ idx ].time_accessed = p_t_accessed;
+                if( p_type == WD_ENTITY_UNKNOWN ) {
+                    p_list->dir_list[ idx ].type = get_type( dest );
+                } else {
+                    p_list->dir_list[ idx ].type = p_type;
+                }
 
                 p_list->dir_count++;
             }
@@ -208,11 +222,13 @@ dir_list_t load_dir_list( const config_container_t* const p_config, const char* 
             time_t accessed;
             char* fstr;
             int one_last_go = 1;
+            wd_entity_t ent_type;
 
             path[0] = 0;
             name[0] = 0;
             added = -1;
             accessed = -1;
+            ent_type = WD_ENTITY_UNKNOWN;
             DEBUG_OUT("generated empty bookmark list");
 
             while(( fstr = fgets( read, MAXPATHLEN, file ) ) ||
@@ -253,7 +269,8 @@ dir_list_t load_dir_list( const config_container_t* const p_config, const char* 
                             DEBUG_OUT("creating new bookmark: %s",path);
 
                             /* Create the new bookmark and reset attributes */
-                            add_dir( ret_val, path, name, added, accessed );
+                            add_dir( ret_val, path, name, added, accessed,
+                                     ent_type );
 
                             DEBUG_OUT("created new bookmark");
 
@@ -261,6 +278,7 @@ dir_list_t load_dir_list( const config_container_t* const p_config, const char* 
                             name[0] = 0;
                             added = -1;
                             accessed = -1;
+                            ent_type = WD_ENTITY_UNKNOWN;
                         }
                         strcpy( path, &(read[1]) );
                     } else if(( read[0] == 'N' ) &&
@@ -272,6 +290,19 @@ dir_list_t load_dir_list( const config_container_t* const p_config, const char* 
                     } else if(( read[0] == 'C' ) &&
                               ( read[1] == ':' )) {
                         accessed = sscan_time(&(read[2]));
+                    } else if(( read[0] == 'T' ) &&
+                              ( read[1] == ':' )) {
+                        switch(read[2]) {
+                            case 'D':
+                                ent_type = WD_ENTITY_DIR;
+                                break;
+                            case 'F':
+                                ent_type = WD_ENTITY_FILE;
+                                break;
+                            default:
+                                ent_type = WD_ENTITY_UNKNOWN;
+                                break;
+                        }
                     } else {
                         fprintf(stderr,
                                 "Unrecognised content in bookmarks file: %s\n",
@@ -500,6 +531,28 @@ int dump_dir_with_name( const dir_list_t p_list, const char* const p_name )
     return( found );
 }
 
+static wd_entity_t get_type( const char* const p_path )
+{
+    wd_entity_t ret_val = WD_ENTITY_UNKNOWN;
+    struct stat s;
+    int err = stat( p_path , &s);
+
+    if( err == -1 )
+    {
+        if(ENOENT == errno) {
+            ret_val = WD_ENTITY_NONEXISTANT;
+        }
+    } else {
+        if( S_ISDIR(s.st_mode) ) {
+            ret_val = WD_ENTITY_DIR;
+        } else if( S_ISREG( s.st_mode )) {
+            ret_val = WD_ENTITY_FILE;
+        }
+    }
+
+    return ret_val;
+}
+
 void list_dirs( const dir_list_t p_list )
 {
     if( p_list == NULL )
@@ -508,22 +561,19 @@ void list_dirs( const dir_list_t p_list )
     } else {
         size_t dir_loop;
         struct dir_list_item* current_item;
-        int valid = 1;
+        int valid;
 
         for( dir_loop = 0, current_item = p_list->dir_list;
              dir_loop < p_list->dir_count;
              dir_loop++, current_item++ )
         {
             char* dir = current_item->dir_name;
-            struct stat s;
-            int err = stat( dir , &s);
-            if(-1 == err) {
+            valid = 1;
+
+            /* TODO: Update current_item->type here? */
+            if((p_list->cfg->wd_entity_type != WD_ENTITY_ANY) &&
+               (p_list->cfg->wd_entity_type != current_item->type )) {
                 valid = 0;
-            } else {
-                if(!S_ISDIR(s.st_mode)) {
-                    /* Not a directory */
-                    valid = 0;
-                }
             }
 
             if( valid ) {
@@ -609,30 +659,26 @@ void dump_dir_list( const dir_list_t p_list )
 #endif
             char* col = ANSI_COLOUR_RESET;
             char* dir = current_item->dir_name;
-            struct stat s;
-            int err = stat( dir , &s);
             char* dir_formatted;
 
-            if(-1 == err) {
-                if(ENOENT == errno) {
+            current_item->type = get_type( dir );
+
+            if( current_item->type == WD_ENTITY_NONEXISTANT ) {
 #if defined WIN32
-                    wcol = FOREGROUND_INTENSITY;
+                wcol = FOREGROUND_INTENSITY;
 #endif
-                    col = ANSI_COLOUR_GREY;
-                }
+                col = ANSI_COLOUR_GREY;
+            } else if((p_list->cfg->wd_entity_type != WD_ENTITY_ANY) &&
+                      (p_list->cfg->wd_entity_type != current_item->type )) {
+#if defined WIN32
+                wcol = FOREGROUND_RED;
+#endif
+                col = ANSI_COLOUR_RED;
             } else {
-                if(S_ISDIR(s.st_mode)) {
 #if defined WIN32
-                    wcol = FOREGROUND_GREEN;
+                wcol = FOREGROUND_GREEN;
 #endif
-                    col = ANSI_COLOUR_GREEN;
-                } else {
-                    /* Not a directory */
-#if defined WIN32
-                    wcol = FOREGROUND_RED;
-#endif
-                    col = ANSI_COLOUR_RED;
-                }
+                col = ANSI_COLOUR_GREEN;
             }
 
             fprintf( stdout, "[%3d] ", dir_loop);
@@ -696,6 +742,7 @@ int save_dir_list( const dir_list_t p_list, const char* p_fn ) {
         for( dir_loop = 0; dir_loop < p_list->dir_count; dir_loop++ )
         {
             struct dir_list_item* this_item = &(p_list->dir_list[ dir_loop ]);
+            char*  type_string;
             fprintf( file, ":%s\n",
                            this_item->dir_name );
             if(( this_item->bookmark_name != NULL ) &&
@@ -719,6 +766,24 @@ int save_dir_list( const dir_list_t p_list, const char* p_fn ) {
                     fprintf( file, "C:%s\n",buff);
                 }
             }
+            
+            /* Refresh the type.
+               TODO: This may be over-zealous if it has already been done */
+            this_item->type = get_type( this_item->dir_name );
+
+            switch( this_item->type )
+            {
+                case WD_ENTITY_DIR:
+                    type_string = "D";
+                    break;
+                case WD_ENTITY_FILE:
+                    type_string = "F";
+                    break;
+                default:
+                    type_string = "U";
+                    break;
+            }
+            fprintf( file, "T:%s\n",type_string);
         }
 
         fclose( file );
