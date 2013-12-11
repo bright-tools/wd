@@ -571,9 +571,25 @@ void list_dirs( const dir_list_t p_list )
             valid = 1;
 
             /* TODO: Update current_item->type here? */
+
+            /* TODO: take notice of wd_output_all here */
+
+            /* Check to see if this item matches the filter */
             if((p_list->cfg->wd_entity_type != WD_ENTITY_ANY) &&
                (p_list->cfg->wd_entity_type != current_item->type )) {
+                /* No, don't output */
                 valid = 0;
+            } else if( 0 == p_list->cfg->wd_output_all ) {
+                /* TODO: Update current_item->type here? */
+                wd_entity_t type = get_type( dir );
+
+                /* Check to see if it's other than a file or directory (ie. a valid
+                   entity */
+                if(( type != WD_ENTITY_DIR ) &&
+                   ( type != WD_ENTITY_FILE ))
+                {
+                    valid = 0;
+                }
             }
 
             if( valid ) {

@@ -53,6 +53,7 @@ typedef struct {
     int             wd_store_access;
     time_t          wd_now_time;
     wd_entity_t     wd_entity_type;
+    int             wd_output_all;
 } config_container_t;
 
 /** Initialise the specified config with default values

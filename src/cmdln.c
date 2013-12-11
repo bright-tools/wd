@@ -92,6 +92,7 @@ void init_cmdln( config_container_t* const p_config ) {
     p_config->wd_now_time = time(NULL);
     p_config->wd_entity_type = WD_ENTITY_ANY;
     p_config->list_fn = NULL;
+    p_config->wd_output_all = 1;
 
     /* TODO: Consider only doing this if the file has not been specified on the
        command line for efficiency reasons */
@@ -153,13 +154,29 @@ static int process_opts( config_container_t* const p_config, const int argc, cha
                 switch( argv[ arg_loop ][0] ) {
                     case 'a':
                         p_config->wd_entity_type = WD_ENTITY_ANY;
+                        p_config->wd_output_all = 0;
                         break;
                     case 'd':
                         p_config->wd_entity_type = WD_ENTITY_DIR;
+                        p_config->wd_output_all = 0;
                         break;
                     case 'f':
                         p_config->wd_entity_type = WD_ENTITY_FILE;
+                        p_config->wd_output_all = 0;
                         break;
+                    case 'A':
+                        p_config->wd_entity_type = WD_ENTITY_ANY;
+                        p_config->wd_output_all = 1;
+                        break;
+                    case 'D':
+                        p_config->wd_entity_type = WD_ENTITY_DIR;
+                        p_config->wd_output_all = 1;
+                        break;
+                    case 'F':
+                        p_config->wd_entity_type = WD_ENTITY_FILE;
+                        p_config->wd_output_all = 1;
+                        break;
+
                     default:
                         fprintf( stdout, "%s: %s\n", UNRECOGNISED_PARAM_STRING, this_arg );
                         ret_val = 0;
