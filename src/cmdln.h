@@ -44,15 +44,32 @@ typedef enum {
 } wd_dir_format_t;
 
 typedef struct {
+    /** Type of operation which the command line has instructed should be
+        performed */
     wd_oper_t       wd_oper;
+    /** Format in which file paths should be output */
     wd_dir_format_t wd_dir_form;
+    /** Directory containing list of bookmarks */
     char*           list_fn;
+    /** Directory read from the command line upon which operations should be
+        performed */
     char            wd_oper_dir[ MAXPATHLEN ];
+    /** Name of a bookmark read from the command line on which operations should
+        be performed */
     char*           wd_bookmark_name;
+    /** Indicate whether or not to run in "interactive" mode */
     int             wd_prompt;
+    /** Indicate whether or not access times should be stored in the bookmarks
+    */
     int             wd_store_access;
+    /** Time to use as the current time when manipulating datestamps.  Saves
+        calls to time() and also allows time to be manipulated for testing
+        purposes */
     time_t          wd_now_time;
+    /** Control which types of entity should be included in the output */
     wd_entity_t     wd_entity_type;
+    /** Control whether or not all items should be output regardless of whether
+        or not they seem to point to a valid entry in the current filesystem */
     int             wd_output_all;
 } config_container_t;
 
