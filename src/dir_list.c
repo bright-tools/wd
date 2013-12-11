@@ -60,6 +60,10 @@ struct dir_list_s
     size_t                dir_count;
     struct dir_list_item* dir_list;
     int                   dir_size;
+
+    /* TODO: Is it the best thing to store the config here?  config contains
+       things that this class doesn't care about */
+    const config_container_t* cfg;
 };
 
 static void increase_dir_alloc( dir_list_t p_list )
@@ -186,7 +190,7 @@ static time_t sscan_time( const char* const p_str )
     return ret_val;
 }
 
-dir_list_t load_dir_list( const char* const p_fn )
+dir_list_t load_dir_list( const config_container_t* const p_config, const char* const p_fn )
 {
     FILE* file = fopen( p_fn, "rt" );
     dir_list_t ret_val = NULL;
@@ -194,6 +198,7 @@ dir_list_t load_dir_list( const char* const p_fn )
     if( file != NULL ) {
         DEBUG_OUT("opened bookmark file");
         ret_val = new_dir_list();
+        ret_val->cfg = p_config;
 
         if( ret_val != NULL ) {
             char path[ MAXPATHLEN ];
@@ -356,10 +361,10 @@ int dir_in_list( dir_list_t p_list, const char* const p_dir )
 
 #define CYGDRIVE_PREFIX "/cygdrive/"
 
-char* format_dir( char* p_dir ) {
+char* format_dir( wd_dir_format_t p_fmt, char* p_dir ) {
     char* ret_val = NULL;
 
-    switch( wd_dir_form ) {
+    switch( p_fmt ) {
         case WD_DIRFORM_NONE:
             ret_val = p_dir;
             break;
@@ -443,15 +448,16 @@ int        dump_dir_if_exists( const dir_list_t p_list, const char* const p_dir 
         if(( current_item->bookmark_name != NULL ) &&
            ( 0 == strcmp( p_dir, current_item->dir_name ))) {
 
-            char* dir_formatted = format_dir( current_item->dir_name );
+            char* dir_formatted = format_dir( p_list->cfg->wd_dir_form,
+                                              current_item->dir_name );
             fprintf( stdout, "%s", dir_formatted );
 
             if( current_item->dir_name != dir_formatted ) {
                 free( dir_formatted );
             }
 
-            if( wd_store_access ) {
-                current_item->time_accessed = wd_now_time;
+            if( p_list->cfg->wd_store_access ) {
+                current_item->time_accessed = p_list->cfg->wd_now_time;
             }
 
             found = 1;
@@ -474,15 +480,16 @@ int dump_dir_with_name( const dir_list_t p_list, const char* const p_name )
         if(( current_item->bookmark_name != NULL ) &&
            ( 0 == strcmp( p_name, current_item->bookmark_name ))) {
 
-            char* dir_formatted = format_dir( current_item->dir_name );
+            char* dir_formatted = format_dir( p_list->cfg->wd_dir_form,
+                                              current_item->dir_name );
             fprintf( stdout, "%s", dir_formatted );
 
             if( current_item->dir_name != dir_formatted ) {
                 free( dir_formatted );
             }
 
-            if( wd_store_access ) {
-                current_item->time_accessed = wd_now_time;
+            if( p_list->cfg->wd_store_access ) {
+                current_item->time_accessed = p_list->cfg->wd_now_time;
             }
 
             found = 1;
@@ -520,7 +527,8 @@ void list_dirs( const dir_list_t p_list )
             }
 
             if( valid ) {
-                char* dir_formatted = format_dir( dir );
+                char* dir_formatted = format_dir( p_list->cfg->wd_dir_form,
+                                                  dir );
                 fprintf( stdout, "%s\n", dir_formatted );
                 if( current_item->bookmark_name != NULL ) {
                     fprintf( stdout, "%s\n", current_item->bookmark_name );
@@ -637,7 +645,7 @@ void dump_dir_list( const dir_list_t p_list )
                 fprintf( stdout, "%s", col );
             }
 
-            dir_formatted = format_dir( dir );
+            dir_formatted = format_dir( p_list->cfg->wd_dir_form, dir );
             fprintf( stdout, "%s", dir_formatted );
 
             if( current_item->dir_name != dir_formatted ) {

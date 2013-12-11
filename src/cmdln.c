@@ -41,19 +41,7 @@
 #endif
 /* !Supporting get_home() */
 
-/* Exported variables for accessing configuration options.
-   TODO: Consider combining these into a struct */
-wd_oper_t       wd_oper;
-char*           list_fn = NULL;
-char            wd_oper_dir[ MAXPATHLEN ];
-char*           wd_bookmark_name;
-int             wd_prompt;
-int             wd_store_access;
-wd_dir_format_t wd_dir_form;
-time_t          wd_now_time;
-/* !Exported variables */
-
-static void get_home( void )
+static void get_home( config_container_t* const p_config )
 {
     int success = 0;
 
@@ -86,26 +74,26 @@ static void get_home( void )
         size_t complete = home_size +
                           strlen( DEFAULT_LIST_FILE ) +
                           1U;
-        list_fn = realloc( list_fn, complete );
-        strcpy( list_fn, homedir );
-        strcpy( &(list_fn[ home_size ]), DEFAULT_LIST_FILE);
-        list_fn[ complete -1 ] = 0;
+        p_config->list_fn = realloc( p_config->list_fn, complete );
+        strcpy( p_config->list_fn, homedir );
+        strcpy( &(p_config->list_fn[ home_size ]), DEFAULT_LIST_FILE);
+        p_config->list_fn[ complete -1 ] = 0;
     } else {
         /* TODO: Deal with not having a home directory */
     }
 }
 
-void init_cmdln( void ) {
+void init_cmdln( config_container_t* const p_config ) {
     /* TODO: Consider only doing this if the file has not been specified on the
        command line */
-    get_home();
+    get_home( p_config );
 
-    wd_oper = WD_OPER_NONE;
-    wd_prompt = 0;
-    wd_store_access = 0;
-    wd_bookmark_name = NULL;
-    wd_dir_form = WD_DIRFORM_NONE;
-    wd_now_time = time(NULL);
+    p_config->wd_oper = WD_OPER_NONE;
+    p_config->wd_prompt = 0;
+    p_config->wd_store_access = 0;
+    p_config->wd_bookmark_name = NULL;
+    p_config->wd_dir_form = WD_DIRFORM_NONE;
+    p_config->wd_now_time = time(NULL);
 }
 
 static void show_help( const char* const p_cmd ) {
@@ -131,7 +119,7 @@ static void show_help( const char* const p_cmd ) {
              by date added */
 }
 
-int process_opts( const int argc, char* const argv[], const int p_cmd_line ) {
+static int process_opts( config_container_t* const p_config, const int argc, char* const argv[], const int p_cmd_line ) {
     int arg_loop;
     int ret_val = 1;
 
@@ -145,13 +133,13 @@ int process_opts( const int argc, char* const argv[], const int p_cmd_line ) {
         } else if( p_cmd_line && ( 0 == strcmp( this_arg, "-h" )) ) {
             show_help( argv[0] );
         } else if( p_cmd_line && ( 0 == strcmp( this_arg, "-p" )) ) {
-            wd_prompt = 1;
+            p_config->wd_prompt = 1;
         } else if( 0 == strcmp( this_arg, "-t" ) ) {
-            wd_store_access = 1;
+            p_config->wd_store_access = 1;
         } else if( 0 == strcmp( this_arg, "-z" ) ) {
             if(( arg_loop + 1 ) < argc ) {
                 arg_loop++;
-                sscanf(argv[arg_loop],"%ld",(long int*)(&wd_now_time));
+                sscanf(argv[arg_loop],"%ld",(long int*)(&p_config->wd_now_time));
             } else {
                 fprintf( stdout, "%s: %s\n", NEED_PARAMETER_STRING, this_arg );
                 ret_val = 0;
@@ -162,10 +150,10 @@ int process_opts( const int argc, char* const argv[], const int p_cmd_line ) {
                 /* TODO: Validate length of argument? */
                 switch( argv[ arg_loop ][0] ) {
                     case 'c':
-                        wd_dir_form = WD_DIRFORM_CYGWIN;
+                        p_config->wd_dir_form = WD_DIRFORM_CYGWIN;
                         break;
                     case 'w':
-                        wd_dir_form = WD_DIRFORM_WINDOWS;
+                        p_config->wd_dir_form = WD_DIRFORM_WINDOWS;
                         break;
                     default:
                         fprintf( stdout, "%s: %s\n", UNRECOGNISED_PARAM_STRING, this_arg );
@@ -177,20 +165,20 @@ int process_opts( const int argc, char* const argv[], const int p_cmd_line ) {
                 ret_val = 0;
             }
         } else if( p_cmd_line && ( 0 == strcmp( this_arg, "-d" )) ) {
-            wd_oper = WD_OPER_DUMP;
+            p_config->wd_oper = WD_OPER_DUMP;
         } else if( p_cmd_line && ( 0 == strcmp( this_arg, "-l" )) ) {
-            wd_oper = WD_OPER_LIST;
+            p_config->wd_oper = WD_OPER_LIST;
         } else if( p_cmd_line && (( 0 == strcmp( this_arg, "-n" )) ||
                                   ( 0 == strcmp( this_arg, "-g" )))) {
             if((( arg_loop + 1 ) < argc ) &&
                 ( argv[ arg_loop + 1 ][0] != '-' )) {
                 arg_loop++;
                 if( 0 == strcmp( this_arg, "-n" ) ) {
-                    wd_oper = WD_OPER_GET_BY_BM_NAME;
+                    p_config->wd_oper = WD_OPER_GET_BY_BM_NAME;
                 } else {
-                    wd_oper = WD_OPER_GET;
+                    p_config->wd_oper = WD_OPER_GET;
                 }
-                wd_bookmark_name = argv[ arg_loop ];
+                p_config->wd_bookmark_name = argv[ arg_loop ];
             } else {
                 fprintf( stdout, "%s: %s\n", NEED_PARAMETER_STRING, this_arg );
                 ret_val = 0;
@@ -198,13 +186,13 @@ int process_opts( const int argc, char* const argv[], const int p_cmd_line ) {
         } else if( p_cmd_line && 
                   (( 0 == strcmp( this_arg, "-a" )) ||
                    ( 0 == strcmp( this_arg, "-r" ))) ) {
-            if( wd_oper == WD_OPER_NONE ) {
+            if( p_config->wd_oper == WD_OPER_NONE ) {
                 switch( this_arg[ 1 ] ) {
                     case 'a':
-                        wd_oper = WD_OPER_ADD;
+                        p_config->wd_oper = WD_OPER_ADD;
                         break;
                     case 'r':
-                        wd_oper = WD_OPER_REMOVE;
+                        p_config->wd_oper = WD_OPER_REMOVE;
                         break;
                 }
 
@@ -218,10 +206,10 @@ int process_opts( const int argc, char* const argv[], const int p_cmd_line ) {
 #if defined _WIN32
                     GetFullPathName( argv[ arg_loop ],
                                      MAXPATHLEN,
-                                     wd_oper_dir,
+                                     p_config->wd_oper_dir,
                                      NULL );
 #else
-                    realpath( argv[ arg_loop ], wd_oper_dir );
+                    realpath( argv[ arg_loop ], p_config->wd_oper_dir );
 #endif
 
                     /* TODO: This only really makes sense for an add operation
@@ -229,11 +217,11 @@ int process_opts( const int argc, char* const argv[], const int p_cmd_line ) {
                     if((( arg_loop + 1 ) < argc ) &&
                         ( argv[ arg_loop + 1 ][0] != '-' )) {
                         arg_loop++;
-                        wd_bookmark_name = argv[ arg_loop ];
+                        p_config->wd_bookmark_name = argv[ arg_loop ];
                     }
                 } else {
                     /* No argument .. use the CWD */
-                    getcwd( wd_oper_dir, MAXPATHLEN );
+                    getcwd( p_config->wd_oper_dir, MAXPATHLEN );
                 }
             } else {
                 fprintf( stdout, "%s: %s\n", INCOMPATIBLE_OP_STRING, this_arg );
@@ -249,8 +237,8 @@ int process_opts( const int argc, char* const argv[], const int p_cmd_line ) {
             if( arg_loop < argc ) {
                 /* To be consistent, list_fn always points to malloc'd memory
                    rather than just pointing it to the parameter string */
-                list_fn = realloc( list_fn, strlen( argv[ arg_loop ] ));
-                strcpy( list_fn, argv[ arg_loop ] );
+                p_config->list_fn = realloc( p_config->list_fn, strlen( argv[ arg_loop ] ));
+                strcpy( p_config->list_fn, argv[ arg_loop ] );
             } else {
                 fprintf( stdout, "%s: %s\n", NEED_PARAMETER_STRING, this_arg );
                 ret_val = 0;
@@ -264,7 +252,7 @@ int process_opts( const int argc, char* const argv[], const int p_cmd_line ) {
     return ret_val;
 }
 
-int process_env( void )
+int process_env( config_container_t* const p_config )
 {
     char *opts = getenv(ENV_VAR_NAME);
     int ret_val = 1;
@@ -336,7 +324,7 @@ int process_env( void )
 
         DEBUG_OUT(ENV_VAR_NAME ": opt count - %d",breaks);
         /* Finally, process the array of options */
-        ret_val = process_opts( breaks, argv, 0 );
+        ret_val = process_opts( p_config, breaks, argv, 0 );
 
         free( opt_copy );
         free( argv );
@@ -345,6 +333,6 @@ int process_env( void )
     return ret_val;
 }
 
-int process_cmdln( const int argc, char* const argv[] ) {
-    return process_opts( argc, argv, 1 );
+int process_cmdln( config_container_t* const p_config, const int argc, char* const argv[] ) {
+    return process_opts( p_config, argc, argv, 1 );
 }

@@ -25,13 +25,13 @@
 #include <fcntl.h>
 #endif
 
-int do_remove( const char* cmd, dir_list_t p_dir_list )
+static int do_remove( const config_container_t* const p_config, const char* cmd, dir_list_t p_dir_list )
 {
     int success = 0;
     size_t index = 0;
     int ret_val = 0;
 
-    if( wd_prompt )
+    if( p_config->wd_prompt )
     {
         dump_dir_list( p_dir_list );
         fprintf(stdout,"Enter number to remove: ");
@@ -49,7 +49,7 @@ int do_remove( const char* cmd, dir_list_t p_dir_list )
     }
     else
     {
-        success = remove_dir( p_dir_list, wd_oper_dir );
+        success = remove_dir( p_dir_list, p_config->wd_oper_dir );
     }
 
     if( success )
@@ -58,7 +58,7 @@ int do_remove( const char* cmd, dir_list_t p_dir_list )
     }
     else
     {
-        if( wd_prompt )
+        if( p_config->wd_prompt )
         {
             fprintf(stderr,
                     "%s: Error: Invalid index '%d'\n",
@@ -68,7 +68,7 @@ int do_remove( const char* cmd, dir_list_t p_dir_list )
         {
             fprintf(stderr,
                     "%s: Warning: Directory not in list: '%s'\n",
-                    cmd, wd_oper_dir);
+                    cmd, p_config->wd_oper_dir);
         }
     }
 
@@ -79,47 +79,51 @@ int main( int argc, char* argv[] )
 {
     int ret_code = 0;
 
-    init_cmdln();
+    config_container_t cfg;
 
-    if( process_env() &&
-        process_cmdln( argc, argv ) ) {
+    init_cmdln( &cfg );
+
+    if( process_env( &cfg ) &&
+        process_cmdln( &cfg, argc, argv ) ) {
+
         DEBUG_OUT("command line processed");
-        if( wd_oper != WD_OPER_NONE ) {
+
+        if( cfg.wd_oper != WD_OPER_NONE ) {
 
             int dir_list_needs_save = 0;
 
             dir_list_t dir_list = NULL;
 
-            DEBUG_OUT("loading bookmark file %s",list_fn);
+            DEBUG_OUT("loading bookmark file %s", cfg.list_fn);
 
-            dir_list = load_dir_list( list_fn );
+            dir_list = load_dir_list( &cfg, cfg.list_fn );
 
             if( dir_list == NULL ) {
                 fprintf(stderr,"%s: Warning: Unable to load list file '%s'\n",
-                        argv[0], list_fn);
+                        argv[0], cfg.list_fn);
                 dir_list = new_dir_list();
             }
 
             DEBUG_OUT("loaded bookmark file");
 
-            switch( wd_oper ) {
+            switch( cfg.wd_oper ) {
                 case WD_OPER_REMOVE:
-                    dir_list_needs_save = do_remove( argv[0], dir_list );
+                    dir_list_needs_save = do_remove( &cfg, argv[0], dir_list );
                     break;
                 case WD_OPER_GET:
-                    DEBUG_OUT("WD_OPER_GET: %s",wd_bookmark_name);
+                    DEBUG_OUT("WD_OPER_GET: %s",cfg.wd_bookmark_name);
 
-                    if(( dump_dir_with_name( dir_list, wd_bookmark_name ) ||
-                         dump_dir_if_exists( dir_list, wd_bookmark_name )) && wd_store_access ) {
+                    if(( dump_dir_with_name( dir_list, cfg.wd_bookmark_name ) ||
+                         dump_dir_if_exists( dir_list, cfg.wd_bookmark_name )) && cfg.wd_store_access ) {
                         /* We're updating access times, so flag that the list needs
                            saving */
                         dir_list_needs_save = 1;
                     }
                     break;
                 case WD_OPER_GET_BY_BM_NAME:
-                    DEBUG_OUT("WD_OPER_GET_BY_BM_NAME: %s",wd_bookmark_name);
+                    DEBUG_OUT("WD_OPER_GET_BY_BM_NAME: %s",cfg.wd_bookmark_name);
 
-                    if( dump_dir_with_name( dir_list, wd_bookmark_name ) && wd_store_access ) {
+                    if( dump_dir_with_name( dir_list, cfg.wd_bookmark_name ) && cfg.wd_store_access ) {
                         /* We're updating access times, so flag that the list needs
                            saving */
                         dir_list_needs_save = 1;
@@ -128,24 +132,24 @@ int main( int argc, char* argv[] )
                 case WD_OPER_ADD:
                     /* TODO: Consider allowing directory to be added twice with
                              different bookmark name? */
-                    if( dir_in_list( dir_list, wd_oper_dir )) {
+                    if( dir_in_list( dir_list, cfg.wd_oper_dir )) {
                         fprintf(stderr,
                                 "%s: Warning: Directory already in list: '%s'\n",
-                                argv[0], wd_oper_dir);
-                    } else if( (wd_bookmark_name != NULL) &&
-                               bookmark_in_list( dir_list, wd_bookmark_name )) {
+                                argv[0], cfg.wd_oper_dir);
+                    } else if( (cfg.wd_bookmark_name != NULL) &&
+                               bookmark_in_list( dir_list, cfg.wd_bookmark_name )) {
                         fprintf(stderr,
                                 "%s: Warning: Bookmark name already in list: '%s'\n",
-                                argv[0], wd_bookmark_name);
+                                argv[0], cfg.wd_bookmark_name);
                     } else {
                         time_t a_time = -1;
-                        if( wd_store_access ) {
-                            a_time = wd_now_time;
+                        if( cfg.wd_store_access ) {
+                            a_time = cfg.wd_now_time;
                         }
                         add_dir( dir_list,
-                                 wd_oper_dir,
-                                 wd_bookmark_name,
-                                 wd_now_time,
+                                 cfg.wd_oper_dir,
+                                 cfg.wd_bookmark_name,
+                                 cfg.wd_now_time,
                                  a_time );
                         dir_list_needs_save = 1;
                     }
@@ -168,7 +172,7 @@ int main( int argc, char* argv[] )
                     break;
             }
             if( dir_list_needs_save ) {
-                save_dir_list( dir_list, list_fn );
+                save_dir_list( dir_list, cfg.list_fn );
             }
         }
         /* TODO: be more selective about setting this */

@@ -15,6 +15,7 @@
 */
 
 #if !defined CMDLN_H
+#define      CMDLN_H
 
 #include <sys/param.h>
 
@@ -34,18 +35,24 @@ typedef enum {
     WD_DIRFORM_WINDOWS
 } wd_dir_format_t;
 
-void init_cmdln( void );
-int process_cmdln( const int argc, char* const argv[] );
-int process_env( void );
+typedef struct {
+    wd_oper_t wd_oper;
+    wd_dir_format_t wd_dir_form;
+    char*     list_fn;
+    char      wd_oper_dir[ MAXPATHLEN ];
+    char*     wd_bookmark_name;
+    int       wd_prompt;
+    int       wd_store_access;
+    time_t    wd_now_time;
+} config_container_t;
 
-extern wd_oper_t wd_oper;
-extern wd_dir_format_t wd_dir_form;
-extern char*     list_fn;
-extern char      wd_oper_dir[ MAXPATHLEN ];
-extern char*     wd_bookmark_name;
-extern int       wd_prompt;
-extern int       wd_store_access;
-extern time_t    wd_now_time;
+/** Initialise the specified config with default values
+
+    \param[in] p_config The configuration to initialise
+*/
+void init_cmdln( config_container_t* const p_config );
+int process_cmdln( config_container_t* const p_config, const int argc, char* const argv[] );
+int process_env( config_container_t* const p_config );
 
 #if defined _DEBUG
 #define DEBUG_OUT( ... ) do { fprintf(stdout,"wd: " __VA_ARGS__ ); fprintf(stdout,"\n"); fflush(stdout); } while( 0 )

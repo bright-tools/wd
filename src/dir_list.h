@@ -21,6 +21,9 @@
 */
 
 #if !defined( DIR_LIST_H )
+#define       DIR_LIST_H
+
+#include "cmdln.h"
 
 #include <stddef.h>
 #include <time.h>
@@ -37,12 +40,13 @@ typedef struct dir_list_s* dir_list_t;
     is encountered while reading from the file, the function will return
     a list of the bookmarks it was able to successfully read
 
+    \param[in] p_config Configuration options to associate with the dir list
     \param[in] p_fn The filename to load the bookmarks from
     \returns Pointer to a list of bookmarks loaded from the file or
               NULL in the case of a problem (failure to allocate memory,
               failure to open file)
 */
-dir_list_t load_dir_list( const char* const p_fn );
+dir_list_t load_dir_list( const config_container_t* const p_config, const char* const p_fn );
 
 /**
     Create a new directory list structure.
