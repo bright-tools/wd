@@ -23,6 +23,8 @@
 #define FILE_HEADER_DESC_STRING "# WD directory list file"
 #define FILE_HEADER_VER_STRING "# File format: version 1"
 
+#define USE_FAVOURITES_FILE_STR "USE_FAVOURITES"
+
 #define TIME_FORMAT_STRING "%Y/%m/%d %H:%M:%S"
 #define TIME_SSCAN_STRING  "%04u/%02u/%02u %02u:%02u:%02u"
 #define TIME_STRING_BUFFER_SIZE (30U)
@@ -71,6 +73,10 @@ struct dir_list_s
 };
 
 static wd_entity_t get_type( const char* const p_path );
+static dir_list_t load_dir_list_from_file( const config_container_t* const p_config,
+                                           const char* const p_fn );
+static dir_list_t load_dir_list_from_favourites( const config_container_t* const p_config,
+                                                 const char* const p_fn );
 
 
 static void increase_dir_alloc( dir_list_t p_list )
@@ -205,6 +211,79 @@ static time_t sscan_time( const char* const p_str )
 }
 
 dir_list_t load_dir_list( const config_container_t* const p_config, const char* const p_fn )
+{
+    dir_list_t ret_val = NULL;
+#if defined _WIN32
+    if( 0 == strcmp( p_fn, USE_FAVOURITES_FILE_STR )) {
+        ret_val = load_dir_list_from_favourites( p_config, p_fn );
+    } else {
+#endif
+        ret_val = load_dir_list_from_file( p_config, p_fn );
+#if defined _WIN32
+    }
+#endif
+    return ret_val;
+}
+
+#if defined _WIN32
+#include <shlobj.h>
+#include <dirent.h>
+static dir_list_t load_dir_list_from_favourites( const config_container_t* const p_config, const char* const p_fn )
+{
+    dir_list_t ret_val = NULL;
+    TCHAR path[MAX_PATH];
+    HRESULT hr = SHGetFolderPath(0, CSIDL_FAVORITES, 0, 0, path);
+ 
+    if (SUCCEEDED(hr)) {
+        DIR* FD;
+        DEBUG_OUT("got favourites drectory: %s", path);
+        /* TODO: recurse sub-directories */
+        if (NULL != (FD = opendir (path))) 
+        {
+            struct dirent* in_file;
+            DEBUG_OUT("opened favourites drectory: %s", path);
+            ret_val = new_dir_list();
+            ret_val->cfg = p_config;
+            while ((in_file = readdir(FD))) 
+            {
+                if((0 != strcmp (in_file->d_name, ".")) &&
+                   (0 != strcmp (in_file->d_name, "..")))
+                {
+                    size_t len = strlen( in_file->d_name );
+                    if(( len > 4 ) &&
+                       ( 0 == stricmp( &(in_file->d_name[len-4]), ".ini" ))) {
+                        char path[ MAXPATHLEN ];
+                        char name[ MAXPATHLEN ];
+                        time_t added;
+                        time_t accessed;
+                        wd_entity_t ent_type;
+
+                        DEBUG_OUT("found file: %s",in_file->d_name);
+
+                        strncpy( name, in_file->d_name, len-4 );
+
+
+                        /* TODO */
+                        path[0] = 0;
+                        added = -1;
+                        accessed = -1;
+                        ent_type = WD_ENTITY_UNKNOWN;
+
+
+                        add_dir( ret_val, path, name, added, accessed,
+                                 ent_type );
+
+                        DEBUG_OUT("created new bookmark");
+                    }
+                }
+            }
+        }
+    }
+    return ret_val;
+}
+#endif
+
+static dir_list_t load_dir_list_from_file( const config_container_t* const p_config, const char* const p_fn )
 {
     FILE* file = fopen( p_fn, "rt" );
     dir_list_t ret_val = NULL;
