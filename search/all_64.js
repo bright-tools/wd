@@ -14,7 +14,7 @@ var searchData=
   ['dir_5fname',['dir_name',['../structdir__list__item.html#a6bfc58743f9dacbc9f7c527eeaac0308',1,'dir_list_item']]],
   ['dir_5fsize',['dir_size',['../structdir__list__s.html#a2d58a46182af6513830ce06a33675373',1,'dir_list_s']]],
   ['dli_5fsize',['DLI_SIZE',['../dir__list_8c.html#ad4af29b148255f55abb95d483204b9f2',1,'dir_list.c']]],
-  ['do_5fremove',['do_remove',['../wd_8c.html#a256c0edccbaa1b89b49b3ea8869aeea7',1,'wd.c']]],
+  ['dump_5fdir_5fif_5fexists',['dump_dir_if_exists',['../dir__list_8c.html#aab46ecd265f2f73a0171026bed05bcb9',1,'dump_dir_if_exists(const dir_list_t p_list, const char *const p_dir):&#160;dir_list.c'],['../dir__list_8h.html#aab46ecd265f2f73a0171026bed05bcb9',1,'dump_dir_if_exists(const dir_list_t p_list, const char *const p_dir):&#160;dir_list.c']]],
   ['dump_5fdir_5flist',['dump_dir_list',['../dir__list_8c.html#a2f7f644951c503c0d1b3ca595ecf95cb',1,'dump_dir_list(const dir_list_t p_list):&#160;dir_list.c'],['../dir__list_8h.html#a2f7f644951c503c0d1b3ca595ecf95cb',1,'dump_dir_list(const dir_list_t p_list):&#160;dir_list.c']]],
-  ['dump_5fdir_5fwith_5fname',['dump_dir_with_name',['../dir__list_8c.html#ab74666d0ecc439fabc443ff9df80280c',1,'dump_dir_with_name(const dir_list_t p_list, const char *const p_name):&#160;dir_list.c'],['../dir__list_8h.html#ab74666d0ecc439fabc443ff9df80280c',1,'dump_dir_with_name(const dir_list_t p_list, const char *const p_name):&#160;dir_list.c']]]
+  ['dump_5fdir_5fwith_5fname',['dump_dir_with_name',['../dir__list_8c.html#ad0f0369164e0951d1698ed3a4e085167',1,'dump_dir_with_name(const dir_list_t p_list, const char *const p_name):&#160;dir_list.c'],['../dir__list_8h.html#ad0f0369164e0951d1698ed3a4e085167',1,'dump_dir_with_name(const dir_list_t p_list, const char *const p_name):&#160;dir_list.c']]]
 ];

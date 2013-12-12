@@ -80,10 +80,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Data Structures</a> &#124;
 <a href="#define-members">Macros</a> &#124;
 <a href="#enum-members">Enumerations</a> &#124;
-<a href="#func-members">Functions</a> &#124;
-<a href="#var-members">Variables</a>  </div>
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">cmdln.h File Reference</div>  </div>
 </div><!--header-->
@@ -92,9 +92,16 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 <p><a href="cmdln_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Data Structures</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structconfig__container__t.html">config_container_t</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:a20c2b8fc53eb5fc7c525a1a8b201e6f3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cmdln_8h.html#a20c2b8fc53eb5fc7c525a1a8b201e6f3">DEBUG_OUT</a>(...)</td></tr>
+<tr class="memitem:a152fc5203b90b1cff03b7b78579b8f52"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cmdln_8h.html#a152fc5203b90b1cff03b7b78579b8f52">_DEBUG</a></td></tr>
+<tr class="separator:a152fc5203b90b1cff03b7b78579b8f52"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a20c2b8fc53eb5fc7c525a1a8b201e6f3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cmdln_8h.html#a20c2b8fc53eb5fc7c525a1a8b201e6f3">DEBUG_OUT</a>(...)&#160;&#160;&#160;do { fprintf(stdout,&quot;wd: &quot; __VA_ARGS__ ); fprintf(stdout,&quot;\n&quot;); fflush(stdout); } while( 0 )</td></tr>
 <tr class="separator:a20c2b8fc53eb5fc7c525a1a8b201e6f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
@@ -106,38 +113,52 @@ Enumerations</h2></td></tr>
 <a class="el" href="cmdln_8h.html#a398e4466afda4af175e9caa4e5262086a2134d04afcd6627f94068c31d3f81517">WD_OPER_DUMP</a>, 
 <br/>
 &#160;&#160;<a class="el" href="cmdln_8h.html#a398e4466afda4af175e9caa4e5262086a8b415b7723bbd9f7576d64e9bbf4a864">WD_OPER_LIST</a>, 
-<a class="el" href="cmdln_8h.html#a398e4466afda4af175e9caa4e5262086a6fedb15cc0721d046ff692e54eaffae6">WD_OPER_GET_BY_BM_NAME</a>
+<a class="el" href="cmdln_8h.html#a398e4466afda4af175e9caa4e5262086a6fedb15cc0721d046ff692e54eaffae6">WD_OPER_GET_BY_BM_NAME</a>, 
+<a class="el" href="cmdln_8h.html#a398e4466afda4af175e9caa4e5262086a7f84684b8a6f88a7433f804b176f3aeb">WD_OPER_GET</a>
 <br/>
  }</td></tr>
 <tr class="separator:a398e4466afda4af175e9caa4e5262086"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3872f71c8c6fef51d1eb147a4ac69f9a"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cmdln_8h.html#a3872f71c8c6fef51d1eb147a4ac69f9a">wd_entity_t</a> { <br/>
+&#160;&#160;<a class="el" href="cmdln_8h.html#a3872f71c8c6fef51d1eb147a4ac69f9aa8c799eed879ba8d590df1d557faf2aa2">WD_ENTITY_ANY</a>, 
+<a class="el" href="cmdln_8h.html#a3872f71c8c6fef51d1eb147a4ac69f9aa3212f4c0043701994b9455fca924368d">WD_ENTITY_DIR</a>, 
+<a class="el" href="cmdln_8h.html#a3872f71c8c6fef51d1eb147a4ac69f9aada01f595b8a164e8547116f8bd8bdd48">WD_ENTITY_FILE</a>, 
+<a class="el" href="cmdln_8h.html#a3872f71c8c6fef51d1eb147a4ac69f9aab0c47b9b1f7a44e1fc4a9d226a4c3d52">WD_ENTITY_UNKNOWN</a>, 
+<br/>
+&#160;&#160;<a class="el" href="cmdln_8h.html#a3872f71c8c6fef51d1eb147a4ac69f9aa750aa1e983f5fd0a6c461f021a2f8e94">WD_ENTITY_NONEXISTANT</a>
+<br/>
+ }</td></tr>
+<tr class="separator:a3872f71c8c6fef51d1eb147a4ac69f9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7810997d0c6e8eea067bc74322737716"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cmdln_8h.html#a7810997d0c6e8eea067bc74322737716">wd_dir_format_t</a> { <a class="el" href="cmdln_8h.html#a7810997d0c6e8eea067bc74322737716a89ae3f77f512e690ecb43f3bbf350a49">WD_DIRFORM_NONE</a>, 
-<a class="el" href="cmdln_8h.html#a7810997d0c6e8eea067bc74322737716af448ee2658d99c3ab11d2267beffe523">WD_DIRFORM_CYGWIN</a>
+<a class="el" href="cmdln_8h.html#a7810997d0c6e8eea067bc74322737716af448ee2658d99c3ab11d2267beffe523">WD_DIRFORM_CYGWIN</a>, 
+<a class="el" href="cmdln_8h.html#a7810997d0c6e8eea067bc74322737716a379616951275323fd3f48effb9bda750">WD_DIRFORM_WINDOWS</a>
  }</td></tr>
 <tr class="separator:a7810997d0c6e8eea067bc74322737716"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a7eb69cf39687420eb10db4ac246e9159"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cmdln_8h.html#a7eb69cf39687420eb10db4ac246e9159">init_cmdln</a> (void)</td></tr>
-<tr class="separator:a7eb69cf39687420eb10db4ac246e9159"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8dfb8f171d983cdf754efc413cdfe0b3"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cmdln_8h.html#a8dfb8f171d983cdf754efc413cdfe0b3">process_cmdln</a> (const int argc, char *const argv[])</td></tr>
-<tr class="separator:a8dfb8f171d983cdf754efc413cdfe0b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
-Variables</h2></td></tr>
-<tr class="memitem:a9db26a3a9dd9c766b3c8d2d06d04fd13"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cmdln_8h.html#a398e4466afda4af175e9caa4e5262086">wd_oper_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cmdln_8h.html#a9db26a3a9dd9c766b3c8d2d06d04fd13">wd_oper</a></td></tr>
-<tr class="separator:a9db26a3a9dd9c766b3c8d2d06d04fd13"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3b3076e09275dc774bd25b5a565d2ec6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cmdln_8h.html#a7810997d0c6e8eea067bc74322737716">wd_dir_format_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cmdln_8h.html#a3b3076e09275dc774bd25b5a565d2ec6">wd_dir_form</a></td></tr>
-<tr class="separator:a3b3076e09275dc774bd25b5a565d2ec6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aed63a70497113d30cd3dad115a2c45b8"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cmdln_8h.html#aed63a70497113d30cd3dad115a2c45b8">list_fn</a></td></tr>
-<tr class="separator:aed63a70497113d30cd3dad115a2c45b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa7140bd913843d4934f7b98d62046084"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cmdln_8h.html#aa7140bd913843d4934f7b98d62046084">wd_oper_dir</a> [MAXPATHLEN]</td></tr>
-<tr class="separator:aa7140bd913843d4934f7b98d62046084"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af68ce5054412d43b8b1e1a2a309a2005"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cmdln_8h.html#af68ce5054412d43b8b1e1a2a309a2005">wd_bookmark_name</a></td></tr>
-<tr class="separator:af68ce5054412d43b8b1e1a2a309a2005"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ada62c151dc97c3225abc398b5b4a26c8"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cmdln_8h.html#ada62c151dc97c3225abc398b5b4a26c8">wd_prompt</a></td></tr>
-<tr class="separator:ada62c151dc97c3225abc398b5b4a26c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1291a7faa945077052afbd7239893fcb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cmdln_8h.html#a1291a7faa945077052afbd7239893fcb">init_cmdln</a> (<a class="el" href="structconfig__container__t.html">config_container_t</a> *const p_config)</td></tr>
+<tr class="memdesc:a1291a7faa945077052afbd7239893fcb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the specified config with default values.  <a href="#a1291a7faa945077052afbd7239893fcb">More...</a><br/></td></tr>
+<tr class="separator:a1291a7faa945077052afbd7239893fcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4bc35f1c7d919db78f55723a5f731488"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cmdln_8h.html#a4bc35f1c7d919db78f55723a5f731488">process_cmdln</a> (<a class="el" href="structconfig__container__t.html">config_container_t</a> *const p_config, const int argc, char *const argv[])</td></tr>
+<tr class="separator:a4bc35f1c7d919db78f55723a5f731488"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0cb83c52e8551da9363f6167a2bb233"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cmdln_8h.html#ad0cb83c52e8551da9363f6167a2bb233">process_env</a> (<a class="el" href="structconfig__container__t.html">config_container_t</a> *const p_config)</td></tr>
+<tr class="separator:ad0cb83c52e8551da9363f6167a2bb233"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
+<a class="anchor" id="a152fc5203b90b1cff03b7b78579b8f52"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define _DEBUG</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="cmdln_8h_source.html#l00084">84</a> of file <a class="el" href="cmdln_8h_source.html">cmdln.h</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a20c2b8fc53eb5fc7c525a1a8b201e6f3"></a>
 <div class="memitem">
 <div class="memproto">
@@ -147,12 +168,12 @@ Variables</h2></td></tr>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname"><em>...</em></td><td>)</td>
-          <td></td>
+          <td>&#160;&#160;&#160;do { fprintf(stdout,&quot;wd: &quot; __VA_ARGS__ ); fprintf(stdout,&quot;\n&quot;); fflush(stdout); } while( 0 )</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="cmdln_8h_source.html#l00048">48</a> of file <a class="el" href="cmdln_8h_source.html">cmdln.h</a>.</p>
+<p>Definition at line <a class="el" href="cmdln_8h_source.html#l00086">86</a> of file <a class="el" href="cmdln_8h_source.html">cmdln.h</a>.</p>
 
 </div>
 </div>
@@ -171,9 +192,37 @@ Variables</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><em><a class="anchor" id="a7810997d0c6e8eea067bc74322737716af448ee2658d99c3ab11d2267beffe523"></a>WD_DIRFORM_CYGWIN</em>&nbsp;</td><td class="fielddoc">
 </td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="a7810997d0c6e8eea067bc74322737716a379616951275323fd3f48effb9bda750"></a>WD_DIRFORM_WINDOWS</em>&nbsp;</td><td class="fielddoc">
+</td></tr>
 </table>
 
-<p>Definition at line <a class="el" href="cmdln_8h_source.html#l00030">30</a> of file <a class="el" href="cmdln_8h_source.html">cmdln.h</a>.</p>
+<p>Definition at line <a class="el" href="cmdln_8h_source.html#l00040">40</a> of file <a class="el" href="cmdln_8h_source.html">cmdln.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a3872f71c8c6fef51d1eb147a4ac69f9a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="cmdln_8h.html#a3872f71c8c6fef51d1eb147a4ac69f9a">wd_entity_t</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><em><a class="anchor" id="a3872f71c8c6fef51d1eb147a4ac69f9aa8c799eed879ba8d590df1d557faf2aa2"></a>WD_ENTITY_ANY</em>&nbsp;</td><td class="fielddoc">
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="a3872f71c8c6fef51d1eb147a4ac69f9aa3212f4c0043701994b9455fca924368d"></a>WD_ENTITY_DIR</em>&nbsp;</td><td class="fielddoc">
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="a3872f71c8c6fef51d1eb147a4ac69f9aada01f595b8a164e8547116f8bd8bdd48"></a>WD_ENTITY_FILE</em>&nbsp;</td><td class="fielddoc">
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="a3872f71c8c6fef51d1eb147a4ac69f9aab0c47b9b1f7a44e1fc4a9d226a4c3d52"></a>WD_ENTITY_UNKNOWN</em>&nbsp;</td><td class="fielddoc">
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="a3872f71c8c6fef51d1eb147a4ac69f9aa750aa1e983f5fd0a6c461f021a2f8e94"></a>WD_ENTITY_NONEXISTANT</em>&nbsp;</td><td class="fielddoc">
+</td></tr>
+</table>
+
+<p>Definition at line <a class="el" href="cmdln_8h_source.html#l00032">32</a> of file <a class="el" href="cmdln_8h_source.html">cmdln.h</a>.</p>
 
 </div>
 </div>
@@ -199,38 +248,54 @@ Variables</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><em><a class="anchor" id="a398e4466afda4af175e9caa4e5262086a6fedb15cc0721d046ff692e54eaffae6"></a>WD_OPER_GET_BY_BM_NAME</em>&nbsp;</td><td class="fielddoc">
 </td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="a398e4466afda4af175e9caa4e5262086a7f84684b8a6f88a7433f804b176f3aeb"></a>WD_OPER_GET</em>&nbsp;</td><td class="fielddoc">
+</td></tr>
 </table>
 
-<p>Definition at line <a class="el" href="cmdln_8h_source.html#l00021">21</a> of file <a class="el" href="cmdln_8h_source.html">cmdln.h</a>.</p>
+<p>Definition at line <a class="el" href="cmdln_8h_source.html#l00022">22</a> of file <a class="el" href="cmdln_8h_source.html">cmdln.h</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="a7eb69cf39687420eb10db4ac246e9159"></a>
+<a class="anchor" id="a1291a7faa945077052afbd7239893fcb"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void init_cmdln </td>
           <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structconfig__container__t.html">config_container_t</a> *const&#160;</td>
+          <td class="paramname"><em>p_config</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="cmdln_8c_source.html#l00093">93</a> of file <a class="el" href="cmdln_8c_source.html">cmdln.c</a>.</p>
+<p>Initialise the specified config with default values. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_config</td><td>The configuration to initialise </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="cmdln_8c_source.html#l00086">86</a> of file <a class="el" href="cmdln_8c_source.html">cmdln.c</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a8dfb8f171d983cdf754efc413cdfe0b3"></a>
+<a class="anchor" id="a4bc35f1c7d919db78f55723a5f731488"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">int process_cmdln </td>
           <td>(</td>
+          <td class="paramtype"><a class="el" href="structconfig__container__t.html">config_container_t</a> *const&#160;</td>
+          <td class="paramname"><em>p_config</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">const int&#160;</td>
           <td class="paramname"><em>argc</em>, </td>
         </tr>
@@ -248,99 +313,32 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="cmdln_8c_source.html#l00126">126</a> of file <a class="el" href="cmdln_8c_source.html">cmdln.c</a>.</p>
+<p>Definition at line <a class="el" href="cmdln_8c_source.html#l00378">378</a> of file <a class="el" href="cmdln_8c_source.html">cmdln.c</a>.</p>
 
 </div>
 </div>
-<h2 class="groupheader">Variable Documentation</h2>
-<a class="anchor" id="aed63a70497113d30cd3dad115a2c45b8"></a>
+<a class="anchor" id="ad0cb83c52e8551da9363f6167a2bb233"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char* list_fn</td>
+          <td class="memname">int process_env </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structconfig__container__t.html">config_container_t</a> *const&#160;</td>
+          <td class="paramname"><em>p_config</em></td><td>)</td>
+          <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="cmdln_8c_source.html#l00044">44</a> of file <a class="el" href="cmdln_8c_source.html">cmdln.c</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="af68ce5054412d43b8b1e1a2a309a2005"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">char* wd_bookmark_name</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Definition at line <a class="el" href="cmdln_8c_source.html#l00046">46</a> of file <a class="el" href="cmdln_8c_source.html">cmdln.c</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a3b3076e09275dc774bd25b5a565d2ec6"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="cmdln_8h.html#a7810997d0c6e8eea067bc74322737716">wd_dir_format_t</a> wd_dir_form</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Definition at line <a class="el" href="cmdln_8c_source.html#l00048">48</a> of file <a class="el" href="cmdln_8c_source.html">cmdln.c</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a9db26a3a9dd9c766b3c8d2d06d04fd13"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="cmdln_8h.html#a398e4466afda4af175e9caa4e5262086">wd_oper_t</a> wd_oper</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Definition at line <a class="el" href="cmdln_8c_source.html#l00043">43</a> of file <a class="el" href="cmdln_8c_source.html">cmdln.c</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="aa7140bd913843d4934f7b98d62046084"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">char wd_oper_dir[MAXPATHLEN]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Definition at line <a class="el" href="cmdln_8c_source.html#l00045">45</a> of file <a class="el" href="cmdln_8c_source.html">cmdln.c</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ada62c151dc97c3225abc398b5b4a26c8"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int wd_prompt</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Definition at line <a class="el" href="cmdln_8c_source.html#l00047">47</a> of file <a class="el" href="cmdln_8c_source.html">cmdln.c</a>.</p>
+<p>Definition at line <a class="el" href="cmdln_8c_source.html#l00297">297</a> of file <a class="el" href="cmdln_8c_source.html">cmdln.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Nov 26 2013 15:19:59 for wd by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Dec 12 2013 00:20:17 for wd by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5
 </small></address>

@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['add_5fdir',['add_dir',['../dir__list_8c.html#a53ed4ead9dac8d17ce6b1b3005508d54',1,'add_dir(dir_list_t p_list, const char *const p_dir, const char *const p_name, const time_t p_t_added):&#160;dir_list.c'],['../dir__list_8h.html#a53ed4ead9dac8d17ce6b1b3005508d54',1,'add_dir(dir_list_t p_list, const char *const p_dir, const char *const p_name, const time_t p_t_added):&#160;dir_list.c']]],
+  ['add_5fdir',['add_dir',['../dir__list_8c.html#afed60ad79e963b595e20f42350547268',1,'add_dir(dir_list_t p_list, const char *const p_dir, const char *const p_name, const time_t p_t_added, const time_t p_t_accessed, const wd_entity_t p_type):&#160;dir_list.c'],['../dir__list_8h.html#afed60ad79e963b595e20f42350547268',1,'add_dir(dir_list_t p_list, const char *const p_dir, const char *const p_name, const time_t p_t_added, const time_t p_t_accessed, const wd_entity_t p_type):&#160;dir_list.c']]],
   ['ansi_5fcolour_5fgreen',['ANSI_COLOUR_GREEN',['../dir__list_8c.html#a60a10eca3a5b426ff9df1c9f61a7f98c',1,'dir_list.c']]],
   ['ansi_5fcolour_5fgrey',['ANSI_COLOUR_GREY',['../dir__list_8c.html#ad85c5d12bd5f375630efbd074af1ed44',1,'dir_list.c']]],
   ['ansi_5fcolour_5fred',['ANSI_COLOUR_RED',['../dir__list_8c.html#a502c9067cd57eb4e6fd80d3986db48f9',1,'dir_list.c']]],

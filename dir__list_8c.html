@@ -113,6 +113,8 @@ Macros</h2></td></tr>
 <tr class="separator:ae87fe639d356675c4d582f3c70096313"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aec7794db2d4941dd4687ae69e23c0f84"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir__list_8c.html#aec7794db2d4941dd4687ae69e23c0f84">FILE_HEADER_VER_STRING</a>&#160;&#160;&#160;&quot;# File format: version 1&quot;</td></tr>
 <tr class="separator:aec7794db2d4941dd4687ae69e23c0f84"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1833490068232c5fb06a85b590f9a5db"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir__list_8c.html#a1833490068232c5fb06a85b590f9a5db">USE_FAVOURITES_FILE_STR</a>&#160;&#160;&#160;&quot;USE_FAVOURITES&quot;</td></tr>
+<tr class="separator:a1833490068232c5fb06a85b590f9a5db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a768ea84a7b5818ac12d03ad83f7d6193"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir__list_8c.html#a768ea84a7b5818ac12d03ad83f7d6193">TIME_FORMAT_STRING</a>&#160;&#160;&#160;&quot;%Y/%m/%d %H:%M:%S&quot;</td></tr>
 <tr class="separator:a768ea84a7b5818ac12d03ad83f7d6193"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a93e36d2a697637f2670b7deb6e11ad69"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir__list_8c.html#a93e36d2a697637f2670b7deb6e11ad69">TIME_SSCAN_STRING</a>&#160;&#160;&#160;&quot;%04u/%02u/%02u %02u:%02u:%02u&quot;</td></tr>
@@ -131,17 +133,19 @@ Macros</h2></td></tr>
 <tr class="separator:a601350d5dbbd1061d05c99181fcd280f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad4af29b148255f55abb95d483204b9f2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir__list_8c.html#ad4af29b148255f55abb95d483204b9f2">DLI_SIZE</a>&#160;&#160;&#160;(sizeof( struct <a class="el" href="structdir__list__item.html">dir_list_item</a> ))</td></tr>
 <tr class="separator:ad4af29b148255f55abb95d483204b9f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adc23265d8cfe5dbf3bb6b4b5283c8160"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir__list_8c.html#adc23265d8cfe5dbf3bb6b4b5283c8160">CYGDRIVE_PREFIX</a>&#160;&#160;&#160;&quot;/cygdrive/&quot;</td></tr>
+<tr class="separator:adc23265d8cfe5dbf3bb6b4b5283c8160"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a53ed4ead9dac8d17ce6b1b3005508d54"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir__list_8c.html#a53ed4ead9dac8d17ce6b1b3005508d54">add_dir</a> (<a class="el" href="dir__list_8h.html#aafc48e9a610905e9f18a72d5affde0a9">dir_list_t</a> p_list, const char *const p_dir, const char *const p_name, const time_t p_t_added)</td></tr>
-<tr class="separator:a53ed4ead9dac8d17ce6b1b3005508d54"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afed60ad79e963b595e20f42350547268"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir__list_8c.html#afed60ad79e963b595e20f42350547268">add_dir</a> (<a class="el" href="dir__list_8h.html#aafc48e9a610905e9f18a72d5affde0a9">dir_list_t</a> p_list, const char *const p_dir, const char *const p_name, const time_t p_t_added, const time_t p_t_accessed, const <a class="el" href="cmdln_8h.html#a3872f71c8c6fef51d1eb147a4ac69f9a">wd_entity_t</a> p_type)</td></tr>
+<tr class="separator:afed60ad79e963b595e20f42350547268"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a51d5230a6f04bf04ee364d503498d815"><td class="memItemLeft" align="right" valign="top"><a class="el" href="dir__list_8h.html#aafc48e9a610905e9f18a72d5affde0a9">dir_list_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir__list_8c.html#a51d5230a6f04bf04ee364d503498d815">new_dir_list</a> (void)</td></tr>
 <tr class="memdesc:a51d5230a6f04bf04ee364d503498d815"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new directory list structure.  <a href="#a51d5230a6f04bf04ee364d503498d815">More...</a><br/></td></tr>
 <tr class="separator:a51d5230a6f04bf04ee364d503498d815"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3908efdff2e2c2cddb045a6086706f2e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="dir__list_8h.html#aafc48e9a610905e9f18a72d5affde0a9">dir_list_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir__list_8c.html#a3908efdff2e2c2cddb045a6086706f2e">load_dir_list</a> (const char *const p_fn)</td></tr>
-<tr class="memdesc:a3908efdff2e2c2cddb045a6086706f2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load a set of bookmarks from the specified file.  <a href="#a3908efdff2e2c2cddb045a6086706f2e">More...</a><br/></td></tr>
-<tr class="separator:a3908efdff2e2c2cddb045a6086706f2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a18b8bbb7900edbf397a0c83913245c7d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="dir__list_8h.html#aafc48e9a610905e9f18a72d5affde0a9">dir_list_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir__list_8c.html#a18b8bbb7900edbf397a0c83913245c7d">load_dir_list</a> (const <a class="el" href="structconfig__container__t.html">config_container_t</a> *const p_config, const char *const p_fn)</td></tr>
+<tr class="memdesc:a18b8bbb7900edbf397a0c83913245c7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load a set of bookmarks from the specified file.  <a href="#a18b8bbb7900edbf397a0c83913245c7d">More...</a><br/></td></tr>
+<tr class="separator:a18b8bbb7900edbf397a0c83913245c7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a77caa5e02e6a6eaa72fd1f985bce1846"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir__list_8c.html#a77caa5e02e6a6eaa72fd1f985bce1846">bookmark_in_list</a> (<a class="el" href="dir__list_8h.html#aafc48e9a610905e9f18a72d5affde0a9">dir_list_t</a> p_list, const char *const p_name)</td></tr>
 <tr class="separator:a77caa5e02e6a6eaa72fd1f985bce1846"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5e1218b2d87693a060ea44e3959221b4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir__list_8c.html#a5e1218b2d87693a060ea44e3959221b4">remove_dir_by_index</a> (<a class="el" href="dir__list_8h.html#aafc48e9a610905e9f18a72d5affde0a9">dir_list_t</a> p_list, const size_t p_dir)</td></tr>
@@ -150,10 +154,12 @@ Functions</h2></td></tr>
 <tr class="separator:af8b331af39f573e91539f4d06398006f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2df187d527135dbd44d6c3b0373d34a6"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir__list_8c.html#a2df187d527135dbd44d6c3b0373d34a6">dir_in_list</a> (<a class="el" href="dir__list_8h.html#aafc48e9a610905e9f18a72d5affde0a9">dir_list_t</a> p_list, const char *const p_dir)</td></tr>
 <tr class="separator:a2df187d527135dbd44d6c3b0373d34a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afc140adde35ffefede4e8e510d4d91c4"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir__list_8c.html#afc140adde35ffefede4e8e510d4d91c4">format_dir</a> (char *p_dir)</td></tr>
-<tr class="separator:afc140adde35ffefede4e8e510d4d91c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab74666d0ecc439fabc443ff9df80280c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir__list_8c.html#ab74666d0ecc439fabc443ff9df80280c">dump_dir_with_name</a> (const <a class="el" href="dir__list_8h.html#aafc48e9a610905e9f18a72d5affde0a9">dir_list_t</a> p_list, const char *const p_name)</td></tr>
-<tr class="separator:ab74666d0ecc439fabc443ff9df80280c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab8d8cb782ff920a3bb2ed479043fdeb8"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir__list_8c.html#ab8d8cb782ff920a3bb2ed479043fdeb8">format_dir</a> (<a class="el" href="cmdln_8h.html#a7810997d0c6e8eea067bc74322737716">wd_dir_format_t</a> p_fmt, char *p_dir)</td></tr>
+<tr class="separator:ab8d8cb782ff920a3bb2ed479043fdeb8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab46ecd265f2f73a0171026bed05bcb9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir__list_8c.html#aab46ecd265f2f73a0171026bed05bcb9">dump_dir_if_exists</a> (const <a class="el" href="dir__list_8h.html#aafc48e9a610905e9f18a72d5affde0a9">dir_list_t</a> p_list, const char *const p_dir)</td></tr>
+<tr class="separator:aab46ecd265f2f73a0171026bed05bcb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0f0369164e0951d1698ed3a4e085167"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir__list_8c.html#ad0f0369164e0951d1698ed3a4e085167">dump_dir_with_name</a> (const <a class="el" href="dir__list_8h.html#aafc48e9a610905e9f18a72d5affde0a9">dir_list_t</a> p_list, const char *const p_name)</td></tr>
+<tr class="separator:ad0f0369164e0951d1698ed3a4e085167"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab5f115629d8f8a72a26b0142f1a93206"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir__list_8c.html#ab5f115629d8f8a72a26b0142f1a93206">list_dirs</a> (const <a class="el" href="dir__list_8h.html#aafc48e9a610905e9f18a72d5affde0a9">dir_list_t</a> p_list)</td></tr>
 <tr class="separator:ab5f115629d8f8a72a26b0142f1a93206"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeae77d08a6a93d99df8cd65627899186"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir__list_8c.html#aeae77d08a6a93d99df8cd65627899186">determine_if_term_is_ansi</a> ()</td></tr>
@@ -174,7 +180,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00031">31</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
+<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00033">33</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
 
 </div>
 </div>
@@ -188,7 +194,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00032">32</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
+<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00034">34</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
 
 </div>
 </div>
@@ -202,7 +208,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00030">30</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
+<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00032">32</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
 
 </div>
 </div>
@@ -216,7 +222,21 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00033">33</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
+<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00035">35</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="adc23265d8cfe5dbf3bb6b4b5283c8160"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CYGDRIVE_PREFIX&#160;&#160;&#160;&quot;/cygdrive/&quot;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00472">472</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
 
 </div>
 </div>
@@ -230,7 +250,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00055">55</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
+<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00062">62</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
 
 </div>
 </div>
@@ -272,7 +292,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00044">44</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
+<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00046">46</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
 
 </div>
 </div>
@@ -286,7 +306,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00026">26</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
+<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00028">28</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
 
 </div>
 </div>
@@ -300,7 +320,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00027">27</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
+<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00029">29</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
 
 </div>
 </div>
@@ -314,12 +334,26 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00028">28</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
+<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00030">30</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a1833490068232c5fb06a85b590f9a5db"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define USE_FAVOURITES_FILE_STR&#160;&#160;&#160;&quot;USE_FAVOURITES&quot;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00026">26</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="a53ed4ead9dac8d17ce6b1b3005508d54"></a>
+<a class="anchor" id="afed60ad79e963b595e20f42350547268"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -345,7 +379,19 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const time_t&#160;</td>
-          <td class="paramname"><em>p_t_added</em>&#160;</td>
+          <td class="paramname"><em>p_t_added</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const time_t&#160;</td>
+          <td class="paramname"><em>p_t_accessed</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="cmdln_8h.html#a3872f71c8c6fef51d1eb147a4ac69f9a">wd_entity_t</a>&#160;</td>
+          <td class="paramname"><em>p_type</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -355,7 +401,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00078">78</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
+<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00096">96</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
 
 </div>
 </div>
@@ -383,7 +429,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00260">260</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
+<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00399">399</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
 
 </div>
 </div>
@@ -400,7 +446,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00429">429</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
+<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00689">689</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
 
 </div>
 </div>
@@ -428,7 +474,35 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00328">328</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
+<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00467">467</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aab46ecd265f2f73a0171026bed05bcb9"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int dump_dir_if_exists </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="dir__list_8h.html#aafc48e9a610905e9f18a72d5affde0a9">dir_list_t</a>&#160;</td>
+          <td class="paramname"><em>p_list</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *const&#160;</td>
+          <td class="paramname"><em>p_dir</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00547">547</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
 
 </div>
 </div>
@@ -446,16 +520,16 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00462">462</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
+<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00734">734</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ab74666d0ecc439fabc443ff9df80280c"></a>
+<a class="anchor" id="ad0f0369164e0951d1698ed3a4e085167"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void dump_dir_with_name </td>
+          <td class="memname">int dump_dir_with_name </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="dir__list_8h.html#aafc48e9a610905e9f18a72d5affde0a9">dir_list_t</a>&#160;</td>
           <td class="paramname"><em>p_list</em>, </td>
@@ -474,25 +548,35 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00365">365</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
+<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00580">580</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="afc140adde35ffefede4e8e510d4d91c4"></a>
+<a class="anchor" id="ab8d8cb782ff920a3bb2ed479043fdeb8"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">char* format_dir </td>
           <td>(</td>
-          <td class="paramtype">char *&#160;</td>
-          <td class="paramname"><em>p_dir</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="cmdln_8h.html#a7810997d0c6e8eea067bc74322737716">wd_dir_format_t</a>&#160;</td>
+          <td class="paramname"><em>p_fmt</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>p_dir</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00333">333</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
+<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00474">474</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
 
 </div>
 </div>
@@ -510,34 +594,46 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00389">389</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
+<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00635">635</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a3908efdff2e2c2cddb045a6086706f2e"></a>
+<a class="anchor" id="a18b8bbb7900edbf397a0c83913245c7d"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="dir__list_8h.html#aafc48e9a610905e9f18a72d5affde0a9">dir_list_t</a> load_dir_list </td>
           <td>(</td>
-          <td class="paramtype">const char *const&#160;</td>
-          <td class="paramname"><em>p_fn</em></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="structconfig__container__t.html">config_container_t</a> *const&#160;</td>
+          <td class="paramname"><em>p_config</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const char *const&#160;</td>
+          <td class="paramname"><em>p_fn</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Load a set of bookmarks from the specified file. </p>
+<p>Note that in the case where invalid data is found in the file or a problem is encountered while reading from the file, the function will return a list of the bookmarks it was able to successfully read</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">p_config</td><td>Configuration options to associate with the dir list </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">p_fn</td><td>The filename to load the bookmarks from </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Pointer to a list of bookmarks loaded from the file or NULL in the case of a problem (failure to allocate memory, failure to open file) </dd></dl>
 
-<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00145">145</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
+<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00213">213</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
 
 </div>
 </div>
@@ -559,7 +655,7 @@ Functions</h2></td></tr>
 <p>Allocates the required memory and initialises the structure members</p>
 <dl class="section return"><dt>Returns</dt><dd>Pointer to the newly created structure or NULL if allocation failed </dd></dl>
 
-<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00128">128</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
+<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00156">156</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
 
 </div>
 </div>
@@ -587,7 +683,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00316">316</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
+<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00455">455</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
 
 </div>
 </div>
@@ -615,7 +711,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00298">298</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
+<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00437">437</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
 
 </div>
 </div>
@@ -643,14 +739,14 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00546">546</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
+<p>Definition at line <a class="el" href="dir__list_8c_source.html#l00822">822</a> of file <a class="el" href="dir__list_8c_source.html">dir_list.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Nov 26 2013 15:19:59 for wd by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Dec 12 2013 00:20:17 for wd by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5
 </small></address>
