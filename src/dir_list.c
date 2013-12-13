@@ -226,6 +226,7 @@ dir_list_t load_dir_list( const config_container_t* const p_config, const char* 
 }
 
 #if defined _WIN32
+#include "shrtcut.h"
 #include <shlobj.h>
 #include <dirent.h>
 static dir_list_t load_dir_list_from_favourites( const config_container_t* const p_config, const char* const p_fn )
@@ -238,6 +239,9 @@ static dir_list_t load_dir_list_from_favourites( const config_container_t* const
         DIR* FD;
         DEBUG_OUT("got favourites drectory: %s", path);
         /* TODO: recurse sub-directories */
+
+        CoInitialize( NULL );
+
         if (NULL != (FD = opendir (path))) 
         {
             struct dirent* in_file;
@@ -251,26 +255,47 @@ static dir_list_t load_dir_list_from_favourites( const config_container_t* const
                 {
                     size_t len = strlen( in_file->d_name );
                     if(( len > 4 ) &&
-                       ( 0 == stricmp( &(in_file->d_name[len-4]), ".ini" ))) {
-                        char path[ MAXPATHLEN ];
+                       ( 0 == stricmp( &(in_file->d_name[len-4]), ".lnk" ))) {
+                        char shortcut_full[ MAXPATHLEN ];
+                        char dest_path[ MAXPATHLEN ];
                         char name[ MAXPATHLEN ];
                         time_t added;
                         time_t accessed;
                         wd_entity_t ent_type;
+                        struct stat s;
+                        int err;
 
                         DEBUG_OUT("found file: %s",in_file->d_name);
 
-                        strncpy( name, in_file->d_name, len-4 );
-
-
                         /* TODO */
-                        path[0] = 0;
-                        added = -1;
+                        dest_path[0] = 0;
                         accessed = -1;
+                        added = -1;
                         ent_type = WD_ENTITY_UNKNOWN;
 
 
-                        add_dir( ret_val, path, name, added, accessed,
+                        strcpy( shortcut_full, path );
+                        strcat( shortcut_full, "\\" );
+                        strcat( shortcut_full, in_file->d_name );
+
+                        err = stat( shortcut_full, &s);
+                        if( err == -1 ) {
+                            /* TODO */
+                        } else {
+                            /* TODO: Are these really the appropriate attributes
+                               to use? */
+                            added = s.st_ctime;
+                            accessed = s.st_atime;
+                            ResolveIt( NULL, shortcut_full, dest_path,
+                                    MAXPATHLEN );
+                        }
+
+                        strncpy( name, in_file->d_name, len-4 );
+                        name[len-4] = 0;
+
+
+ 
+                        add_dir( ret_val, dest_path, name, added, accessed,
                                  ent_type );
 
                         DEBUG_OUT("created new bookmark");
@@ -278,6 +303,8 @@ static dir_list_t load_dir_list_from_favourites( const config_container_t* const
                 }
             }
         }
+        
+        CoUninitialize();
     }
     return ret_val;
 }

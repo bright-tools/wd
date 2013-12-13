@@ -81,6 +81,7 @@ void init_cmdln( config_container_t* const p_config );
 int process_cmdln( config_container_t* const p_config, const int argc, char* const argv[] );
 int process_env( config_container_t* const p_config );
 
+#define _DEBUG
 #if defined _DEBUG
 #define DEBUG_OUT( ... ) do { fprintf(stdout,"wd: " __VA_ARGS__ ); fprintf(stdout,"\n"); fflush(stdout); } while( 0 )
 #else
