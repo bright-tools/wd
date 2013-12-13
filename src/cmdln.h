@@ -85,6 +85,9 @@ typedef struct {
     /** Control whether or not all items should be output regardless of whether
         or not they seem to point to a valid entry in the current filesystem */
     int             wd_output_all;
+    /** Control whether or not the string contents of a list should be escaped.
+        May have the value 0 (no escape), 1 (single escape) or 2 (double-escape) */
+    int             wd_escape_output;
 } config_container_t;
 
 /** Initialise the specified config with default values
@@ -114,7 +117,6 @@ int process_cmdln( config_container_t* const p_config, const int argc, char* con
 */
 int process_env( config_container_t* const p_config );
 
-#define _DEBUG
 #if defined _DEBUG
 #define DEBUG_OUT( ... ) do { fprintf(stdout,"wd: " __VA_ARGS__ ); fprintf(stdout,"\n"); fflush(stdout); } while( 0 )
 #else

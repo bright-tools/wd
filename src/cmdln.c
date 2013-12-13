@@ -93,6 +93,7 @@ void init_cmdln( config_container_t* const p_config ) {
     p_config->wd_entity_type = WD_ENTITY_ANY;
     p_config->list_fn = NULL;
     p_config->wd_output_all = 1;
+    p_config->wd_escape_output = 0;
 
     /* TODO: Consider only doing this if the file has not been specified on the
        command line for efficiency reasons */
@@ -139,6 +140,10 @@ static int process_opts( config_container_t* const p_config, const int argc, cha
             p_config->wd_prompt = 1;
         } else if( 0 == strcmp( this_arg, "-t" ) ) {
             p_config->wd_store_access = 1;
+        } else if( 0 == strcmp( this_arg, "-c" ) ) {
+            p_config->wd_escape_output = 1;
+        } else if( 0 == strcmp( this_arg, "-C" ) ) {
+            p_config->wd_escape_output = 2;
         } else if( 0 == strcmp( this_arg, "-z" ) ) {
             if(( arg_loop + 1 ) < argc ) {
                 arg_loop++;
@@ -150,37 +155,44 @@ static int process_opts( config_container_t* const p_config, const int argc, cha
         } else if( 0 == strcmp( this_arg, "-e" ) ) {
             if(( arg_loop + 1 ) < argc ) {
                 arg_loop++;
-                /* TODO: Validate length of argument? */
-                switch( argv[ arg_loop ][0] ) {
-                    case 'a':
-                        p_config->wd_entity_type = WD_ENTITY_ANY;
-                        p_config->wd_output_all = 0;
-                        break;
-                    case 'd':
-                        p_config->wd_entity_type = WD_ENTITY_DIR;
-                        p_config->wd_output_all = 0;
-                        break;
-                    case 'f':
-                        p_config->wd_entity_type = WD_ENTITY_FILE;
-                        p_config->wd_output_all = 0;
-                        break;
-                    case 'A':
-                        p_config->wd_entity_type = WD_ENTITY_ANY;
-                        p_config->wd_output_all = 1;
-                        break;
-                    case 'D':
-                        p_config->wd_entity_type = WD_ENTITY_DIR;
-                        p_config->wd_output_all = 1;
-                        break;
-                    case 'F':
-                        p_config->wd_entity_type = WD_ENTITY_FILE;
-                        p_config->wd_output_all = 1;
-                        break;
 
-                    default:
-                        fprintf( stdout, "%s: %s\n", UNRECOGNISED_PARAM_STRING, this_arg );
-                        ret_val = 0;
+                if( strlen( argv[ arg_loop ] ) > 1 ) {
+                    fprintf( stdout, "%s: %s\n", UNRECOGNISED_PARAM_STRING, this_arg );
+                } else {
+                    switch( argv[ arg_loop ][0] ) {
+                        case 'a':
+                        case 'A':
+                            p_config->wd_entity_type = WD_ENTITY_ANY;
+                            break;
+                        case 'd':
+                        case 'D':
+                            p_config->wd_entity_type = WD_ENTITY_DIR;
+                            break;
+                        case 'f':
+                        case 'F':
+                            p_config->wd_entity_type = WD_ENTITY_FILE;
+                            break;
+                        default:
+                            fprintf( stdout, "%s: %s\n", UNRECOGNISED_PARAM_STRING, this_arg );
+                            ret_val = 0;
+                            break;
+                    }
+                    switch( argv[ arg_loop ][0] ) {
+                        case 'a':
+                        case 'd':
+                        case 'f':
+                            p_config->wd_output_all = 0;
+                            break;
+                        case 'A':
+                        case 'D':
+                        case 'F':
+                            p_config->wd_output_all = 1;
+                            break;
+                        default:
+                            /* Nothing to do here - error dealt with in previous
+                               switch */
                         break;
+                    }
                 }
             } else {
                 fprintf( stdout, "%s: %s\n", NEED_PARAMETER_STRING, this_arg );
@@ -189,18 +201,21 @@ static int process_opts( config_container_t* const p_config, const int argc, cha
         } else if( 0 == strcmp( this_arg, "-s" ) ) {
             if(( arg_loop + 1 ) < argc ) {
                 arg_loop++;
-                /* TODO: Validate length of argument? */
-                switch( argv[ arg_loop ][0] ) {
-                    case 'c':
-                        p_config->wd_dir_form = WD_DIRFORM_CYGWIN;
-                        break;
-                    case 'w':
-                        p_config->wd_dir_form = WD_DIRFORM_WINDOWS;
-                        break;
-                    default:
-                        fprintf( stdout, "%s: %s\n", UNRECOGNISED_PARAM_STRING, this_arg );
-                        ret_val = 0;
-                        break;
+                if( strlen( argv[ arg_loop ] ) > 1 ) {
+                    fprintf( stdout, "%s: %s\n", UNRECOGNISED_PARAM_STRING, this_arg );
+                } else {
+                    switch( argv[ arg_loop ][0] ) {
+                        case 'c':
+                            p_config->wd_dir_form = WD_DIRFORM_CYGWIN;
+                            break;
+                        case 'w':
+                            p_config->wd_dir_form = WD_DIRFORM_WINDOWS;
+                            break;
+                        default:
+                            fprintf( stdout, "%s: %s\n", UNRECOGNISED_PARAM_STRING, this_arg );
+                            ret_val = 0;
+                            break;
+                    }
                 }
             } else {
                 fprintf( stdout, "%s: %s\n", NEED_PARAMETER_STRING, this_arg );

@@ -30,9 +30,9 @@ function _wd_complete()
     local line=${COMP_LINE}
     if [ "${OSTYPE}" = "cygwin" ]; then
         # Ensure paths are cygwin formatted
-        local list=$(wd -l -e d -s c)
+        local list=$(wd -l -e d -C -s c)
     else
-        local list=$(wd -l -e d)
+        local list=$(wd -l -e d -C)
     fi
 
     COMPREPLY=($(compgen -W "${list}" -- "${word}"))

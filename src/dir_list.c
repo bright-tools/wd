@@ -497,8 +497,38 @@ int dir_in_list( dir_list_t p_list, const char* const p_dir )
 }
 
 #define CYGDRIVE_PREFIX "/cygdrive/"
+#define CYGDRIVE_PREFIX_LEN 10U
 
-char* format_dir( wd_dir_format_t p_fmt, char* p_dir ) {
+char* escape_string( int p_escape, char* p_str )
+{
+    char* ret_val;
+    char* dest;
+    char* src = p_str;
+
+    if( p_escape == 0 ) {
+        ret_val = p_str;
+    } else {
+        ret_val = (char*)malloc( (strlen( p_str )*3) + 1 );
+        for( dest = ret_val;
+             *src != '\0';
+             dest++, src++ ) {
+            if( *src == ' ' ) {
+                *dest = '\\';
+                dest++;
+                if( p_escape > 1 ) {
+                    *dest = '\\';
+                    dest++;
+                }
+            }
+            *dest = *src;
+        }
+        *dest = 0;
+    }
+
+    return ret_val;
+}
+
+char* format_dir( wd_dir_format_t p_fmt, int p_escape, char* p_dir ) {
     char* ret_val = NULL;
 
     switch( p_fmt ) {
@@ -508,7 +538,7 @@ char* format_dir( wd_dir_format_t p_fmt, char* p_dir ) {
         case WD_DIRFORM_CYGWIN: {
             char* dest;
             char* src = p_dir;
-            ret_val = (char*)malloc( strlen( p_dir ) + 14 );
+            ret_val = (char*)malloc( (strlen( p_dir )*2) + CYGDRIVE_PREFIX_LEN + 4 );
             dest = ret_val;
             if(((( src[0] >= 'a' ) && (src[0] <= 'z' )) ||
                 (( src[0] >= 'A' ) && (src[0] <= 'Z' ))) &&
@@ -517,7 +547,7 @@ char* format_dir( wd_dir_format_t p_fmt, char* p_dir ) {
                 ( src[2] == '/' )))
             {
                 strcpy( ret_val, CYGDRIVE_PREFIX );
-                dest += strlen( CYGDRIVE_PREFIX );
+                dest += CYGDRIVE_PREFIX_LEN;
                 *dest = *src;
                 dest++;
                 src += 2;
@@ -537,12 +567,12 @@ char* format_dir( wd_dir_format_t p_fmt, char* p_dir ) {
        case WD_DIRFORM_WINDOWS: {
             char* dest;
             char* src;
-            ret_val = (char*)malloc( strlen( p_dir ) + 1 );
+            ret_val = (char*)malloc( (strlen( p_dir )*2) + 1 );
             src = p_dir;
             dest = ret_val;
-            if( strncmp( src, CYGDRIVE_PREFIX, strlen( CYGDRIVE_PREFIX )) == 0 )
+            if( strncmp( src, CYGDRIVE_PREFIX, CYGDRIVE_PREFIX_LEN ) == 0 )
             {
-                src += strlen( CYGDRIVE_PREFIX );
+                src += CYGDRIVE_PREFIX_LEN;
                 *dest = *src;
                 dest++;
                 *dest = ':';
@@ -567,6 +597,23 @@ char* format_dir( wd_dir_format_t p_fmt, char* p_dir ) {
             ret_val = p_dir;
             break;
     }
+    
+    if( p_escape ) {
+        char* src;
+        char* f = NULL;
+        if( ret_val == p_dir ) {
+            src = p_dir;
+        } else {
+            src = ret_val;
+            f = src;
+        }
+        ret_val = escape_string( p_escape, src );
+        if( f != NULL ) {
+            free( f );
+        }
+
+    }
+
 
     return( ret_val );
 }
@@ -586,6 +633,7 @@ int        dump_dir_if_exists( const dir_list_t p_list, const char* const p_dir 
            ( 0 == strcmp( p_dir, current_item->dir_name ))) {
 
             char* dir_formatted = format_dir( p_list->cfg->wd_dir_form,
+                                              p_list->cfg->wd_escape_output,
                                               current_item->dir_name );
             fprintf( stdout, "%s", dir_formatted );
 
@@ -618,6 +666,7 @@ int dump_dir_with_name( const dir_list_t p_list, const char* const p_name )
            ( 0 == strcmp( p_name, current_item->bookmark_name ))) {
 
             char* dir_formatted = format_dir( p_list->cfg->wd_dir_form,
+                                              p_list->cfg->wd_escape_output,
                                               current_item->dir_name );
             fprintf( stdout, "%s", dir_formatted );
 
@@ -675,22 +724,18 @@ void list_dirs( const dir_list_t p_list )
         {
             char* dir = current_item->dir_name;
             valid = 1;
-
             /* TODO: Update current_item->type here? */
-
-            /* TODO: take notice of wd_output_all here */
+            wd_entity_t type = get_type( dir );
 
             /* Check to see if this item matches the filter */
             if((p_list->cfg->wd_entity_type != WD_ENTITY_ANY) &&
-               (p_list->cfg->wd_entity_type != current_item->type )) {
+               (p_list->cfg->wd_entity_type != type )) {
                 /* No, don't output */
                 valid = 0;
             } else if( 0 == p_list->cfg->wd_output_all ) {
-                /* TODO: Update current_item->type here? */
-                wd_entity_t type = get_type( dir );
 
-                /* Check to see if it's other than a file or directory (ie. a valid
-                   entity */
+                /* Check to see if it's other than a file or directory (ie. an
+                   invalid entity */
                 if(( type != WD_ENTITY_DIR ) &&
                    ( type != WD_ENTITY_FILE ))
                 {
@@ -700,10 +745,16 @@ void list_dirs( const dir_list_t p_list )
 
             if( valid ) {
                 char* dir_formatted = format_dir( p_list->cfg->wd_dir_form,
+                                                  p_list->cfg->wd_escape_output,
                                                   dir );
                 fprintf( stdout, "%s\n", dir_formatted );
                 if( current_item->bookmark_name != NULL ) {
-                    fprintf( stdout, "%s\n", current_item->bookmark_name );
+                    char* name_escaped = escape_string( p_list->cfg->wd_escape_output,
+                                                        current_item->bookmark_name );
+                    fprintf( stdout, "%s\n", name_escaped );
+                    if( name_escaped != current_item->bookmark_name ) {
+                        free( name_escaped );
+                    }
                 }
                 if( dir != dir_formatted ) {
                     free( dir_formatted );
@@ -813,7 +864,9 @@ void dump_dir_list( const dir_list_t p_list )
                 fprintf( stdout, "%s", col );
             }
 
-            dir_formatted = format_dir( p_list->cfg->wd_dir_form, dir );
+            dir_formatted = format_dir( p_list->cfg->wd_dir_form,
+                                        p_list->cfg->wd_escape_output,
+                                        dir );
             fprintf( stdout, "%s", dir_formatted );
 
             if( current_item->dir_name != dir_formatted ) {
