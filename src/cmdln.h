@@ -1,5 +1,12 @@
 /*
-   Copyright 2013 John Bailey
+   \file
+   \brief The cmdln module deals with reading parameters and options from the
+          command line and environment - coverting these from strings into
+          a data structure
+
+   \copyright Copyright 2013 John Bailey
+
+   \section LICENSE
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -19,30 +26,37 @@
 
 #include <sys/param.h>
 
+/** Indicate what type of operation the user has requested */
 typedef enum {
-    WD_OPER_NONE,
-    WD_OPER_ADD,
-    WD_OPER_REMOVE,
-    WD_OPER_DUMP,
-    WD_OPER_LIST,
-    WD_OPER_GET_BY_BM_NAME,
-    WD_OPER_GET
+    WD_OPER_NONE,            /**< No operation requested */
+    WD_OPER_ADD,             /**< Add a bookmark */
+    WD_OPER_REMOVE,          /**< Remove a bookmark */
+    WD_OPER_DUMP,            /**< Dump a report on all the current bookmarks */
+    WD_OPER_LIST,            /**< List of the bookmark names and destinations */
+    WD_OPER_GET_BY_BM_NAME,  /**< Get a bookmark based on the name */
+    WD_OPER_GET              /**< Get a bookmark based on either name or
+                                  destination */
 } wd_oper_t;
 
+/** Status/type of a bookmark destination */
 typedef enum {
-    WD_ENTITY_ANY,
-    WD_ENTITY_DIR,
-    WD_ENTITY_FILE,
-    WD_ENTITY_UNKNOWN,
-    WD_ENTITY_NONEXISTANT
+    WD_ENTITY_ANY,         /**< When filtering, match any type of entity */
+    WD_ENTITY_DIR,         /**< Bookmark pointing to a directory */
+    WD_ENTITY_FILE,        /**< Bookmark pointing to a file */
+    WD_ENTITY_UNKNOWN,     /**< Bookmark pointing to an unknown entity type */
+    WD_ENTITY_NONEXISTANT  /**< Bookmark pointing to an entity which doesn't
+                                exist in the filesystem */
 } wd_entity_t;
 
+/** Specify the format of strings to be output */
 typedef enum {
-    WD_DIRFORM_NONE,
-    WD_DIRFORM_CYGWIN,
-    WD_DIRFORM_WINDOWS
+    WD_DIRFORM_NONE,       /**< No specifier - use the default */
+    WD_DIRFORM_CYGWIN,     /** Use /cydrive/c/cygwin/type/paths */
+    WD_DIRFORM_WINDOWS     /** Use C:\windows\style\paths */
 } wd_dir_format_t;
 
+/** Structure to wrap up all of the options/parameters read by this module.
+    Should be initialised using init_cmdln() before use */
 typedef struct {
     /** Type of operation which the command line has instructed should be
         performed */
@@ -75,10 +89,29 @@ typedef struct {
 
 /** Initialise the specified config with default values
 
-    \param[in] p_config The configuration to initialise
+    \param[out] p_config The configuration to initialise
 */
 void init_cmdln( config_container_t* const p_config );
+
+/** Process command line options
+
+    \param[in,out] p_config The structure to add the options to.  Existing
+                            options will be overridden if new values are derived
+                            based on the contents of the command line.  Other
+                            values will be left as-is.
+    \param[in] argc Count of command line options
+    \param[in] argv String array of command line options to process
+*/
 int process_cmdln( config_container_t* const p_config, const int argc, char* const argv[] );
+
+/** Process options from the environment (a subset of those that can be used on
+    the command line).
+
+    \param[in,out] p_config The structure to add the options to.  Existing
+                            options will be overridden if new values are derived
+                            based on the contents of the environment.  Other
+                            values will be left as-is.
+*/
 int process_env( config_container_t* const p_config );
 
 #define _DEBUG
