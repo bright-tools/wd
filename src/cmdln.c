@@ -15,17 +15,6 @@
 */
 
 #include "cmdln.h"
-
-#define VERSION_STRING "wd v1.1 by dev@brightsilence.com\n https://github.com/bright-tools/wd"
-#define UNRECOGNISED_ARG_STRING "Unrecognised command line argument"
-#define NEED_PARAMETER_STRING "No parameter specified for argument"
-#define INCOMPATIBLE_OP_STRING "Parameter incompatible with other arguments"
-#define UNRECOGNISED_PARAM_STRING "Parameter to argument not recognised"
-
-/* Windows is quite happy with a forward slash in the path */
-#define DEFAULT_LIST_FILE "/.wd_list"
-#define ENV_VAR_NAME      "WD_OPTS"
-
 #include <stdio.h>
 #include <time.h>
 
@@ -40,6 +29,21 @@
 #include <string.h>
 #endif
 /* !Supporting get_home() */
+
+#define VERSION_STRING "wd v1.1 by dev@brightsilence.com\n https://github.com/bright-tools/wd"
+#define UNRECOGNISED_ARG_STRING "Unrecognised command line argument"
+#define NEED_PARAMETER_STRING "No parameter specified for argument"
+#define INCOMPATIBLE_OP_STRING "Parameter incompatible with other arguments"
+#define UNRECOGNISED_PARAM_STRING "Parameter to argument not recognised"
+
+/** Windows is quite happy with a forward slash in the path */
+#define DEFAULT_LIST_FILE "/.wd_list"
+/** Name of environment variable to read options from */
+#define ENV_VAR_NAME      "WD_OPTS"
+
+static void get_home( config_container_t* const p_config );
+static void show_help( const char* const p_cmd );
+static int process_opts( config_container_t* const p_config, const int argc, char* const argv[], const int p_cmd_line );
 
 static void get_home( config_container_t* const p_config )
 {
@@ -309,6 +313,9 @@ static int process_opts( config_container_t* const p_config, const int argc, cha
     return ret_val;
 }
 
+/** This function works by retrieving the environment string then attempting to
+    break it up into sub-strings, ala argc,argv.  This array of strings is then
+    fed through the same handling process as the command line */
 int process_env( config_container_t* const p_config )
 {
     char *opts = getenv(ENV_VAR_NAME);
@@ -321,6 +328,7 @@ int process_env( config_container_t* const p_config )
            it in at this point */
         const size_t opts_len = strlen( opts ) + 1U;
         char*        opt_copy = (char*) malloc( opts_len );
+        char         quote_type = 0;
         size_t breaks = 0;
         size_t loop = 0;
         char** argv;
@@ -329,29 +337,42 @@ int process_env( config_container_t* const p_config )
 
         DEBUG_OUT(ENV_VAR_NAME ": %s",opts);
 
-        /* TODO: Deal with quotes in strings */
-
         /* Copy the environment string to a fresh memory area so that we can
            maniupulate it.  Replace spaces with null terminators to break string
            into individual arguments and keep a count of the amount we've done
            */
         for( loop = 0, src = opts, dest = opt_copy ;
              loop < opts_len;
-             loop++, src++, dest++ ) 
+             loop++, src++ ) 
         {
-            if( *src == ' ' )
+            /* Simple mechanism to deal with quoting in the string */
+            if(( *src == '\'' ) ||
+               ( *src == '"' )) {
+                if( *src == quote_type ) {
+                    quote_type = 0;
+                } else if( quote_type == 0 ) {
+                    quote_type = *src;
+                }
+            } else if(( *src == ' ' ) &&
+                      ( quote_type == 0))
             {
                 *dest = 0;
+                dest++;
                 breaks++;
             } else {
                 *dest = *src;
+                dest++;
             }
         }
+
+        /* Sanity - source string should have been NULL terminated and this
+           should have been copied over, but better safe .. */
+        *dest = 0;
 
         /* Allocate memory for pointers to the arguments
            +1 to take into account the fact that the first argument has special
            meaning
-           +1 to take into account the final, un-counted element in the loop
+           +1 to take into account any final, un-counted element in the loop
            above */
         argv = malloc( sizeof( char*[ breaks + 2 ] ));
         /* First argument is the name of the program */
@@ -360,9 +381,12 @@ int process_env( config_container_t* const p_config )
         waiting = 1;
 
         /* Loop through the broken up string, populating argv with pointers to
-           the start of each argument */
+           the start of each argument.
+           Characters may have been lost from the original opts_len due to
+           escaping, so calculate a new length based on the amount of characters
+           copied */
         for( loop = 0;
-             loop < opts_len;
+             loop < (dest - opt_copy);
              loop++ )
         {
             /* Are we waiting to find the start of a new string and this is a
