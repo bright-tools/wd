@@ -123,7 +123,7 @@ HRESULT ResolveIt(HWND hwnd, LPCSTR lpszLinkFile, LPSTR lpszPath, int iPathBuffe
                 if (SUCCEEDED(hres)) 
                 { 
                     // Get the path to the link target. 
-                    hres = psl->lpVtbl->GetPath(psl,szGotPath, MAX_PATH, (WIN32_FIND_DATA*)&wfd, SLGP_SHORTPATH); 
+                    hres = psl->lpVtbl->GetPath(psl,szGotPath, MAX_PATH, (WIN32_FIND_DATA*)&wfd, SLGP_RAWPATH); 
 
                     if (SUCCEEDED(hres)) 
                     { 
