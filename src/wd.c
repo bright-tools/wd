@@ -75,6 +75,26 @@ static int do_remove( const config_container_t* const p_config, const char* cmd,
     return ret_val;
 }
 
+static int do_get( const config_container_t* const p_config, const char* cmd, dir_list_t p_dir_list ) {
+
+    unsigned idx;
+    int dir_list_needs_save = 0;
+
+    if( sscanf( p_config->wd_bookmark_name, "%u", &idx ) == 1 ) {
+        dir_list_needs_save = dump_dir_with_index( p_dir_list, idx ) && p_config->wd_store_access;
+    }
+    else if(( dump_dir_with_name( p_dir_list, p_config->wd_bookmark_name ) ||
+              dump_dir_if_exists( p_dir_list, p_config->wd_bookmark_name )) &&
+            p_config->wd_store_access ) {
+        /* We're updating access times, so flag that the list needs
+           saving */
+        dir_list_needs_save = 1;
+    }
+
+    return dir_list_needs_save;
+}
+
+
 int main( int argc, char* argv[] )
 {
     int ret_code = 0;
@@ -112,13 +132,7 @@ int main( int argc, char* argv[] )
                     break;
                 case WD_OPER_GET:
                     DEBUG_OUT("WD_OPER_GET: %s",cfg.wd_bookmark_name);
-
-                    if(( dump_dir_with_name( dir_list, cfg.wd_bookmark_name ) ||
-                         dump_dir_if_exists( dir_list, cfg.wd_bookmark_name )) && cfg.wd_store_access ) {
-                        /* We're updating access times, so flag that the list needs
-                           saving */
-                        dir_list_needs_save = 1;
-                    }
+                    dir_list_needs_save = do_get( &cfg, argv[0], dir_list );
                     break;
                 case WD_OPER_GET_BY_BM_NAME:
                     DEBUG_OUT("WD_OPER_GET_BY_BM_NAME: %s",cfg.wd_bookmark_name);

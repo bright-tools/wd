@@ -64,6 +64,8 @@ int        add_dir( dir_list_t p_list,
                     const time_t      p_t_accessed,
                     const wd_entity_t p_type );
 int        remove_dir( dir_list_t p_list, const char* const p_dir );
+/* \param p_idx 0-based index of the directory to dump */
+int        dump_dir_with_index( const dir_list_t p_list, const unsigned p_idx );
 int        dump_dir_with_name( const dir_list_t p_list, const char* const p_name );
 int        dump_dir_if_exists( const dir_list_t p_list, const char* const p_dir );
 int        remove_dir_by_index( dir_list_t p_list, const size_t p_dir );

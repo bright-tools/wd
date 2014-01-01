@@ -2,19 +2,27 @@
 
 function wd_run()
 {
+    local fmt=w
     # See if the parameter was a bookmark name?
     if [ "$3" = "cygwin" ]; then
         # Ensure paths are cygwin formatted
-        local dir=$(wd -g "$2" -s c)
+        frt=c
     else
         # Ensure paths are windows formatted
-        local dir=$(wd -g "$2" -s w)
+        fmt=w
     fi
-    if [ -d "${dir}" ]; then
-        $1 "${dir}"
+
+    # Try and resolve the bookmark
+    local dir=$(wd -g "$2" -s ${fmt})
+
+    # Any useful result?
+    if [ -d "$2" ]; then
+        $1 "$2"
     else
-        if [ -d "$2" ]; then
-            cd "$2"
+        # Priority is given to a bookmark, but if there's a local directory
+        #  with that name, we give that a whirl
+        if [ -d "${dir}" ]; then
+            $1 "${dir}"
         else
             echo "wcd: Couldn't find a directory or a bookmark for '$2' and there did not seem to be a local directory either";
         fi
@@ -28,11 +36,16 @@ function _wd_complete()
     local cmd="${1##*/}"
     local word=${COMP_WORDS[COMP_CWORD]}
     local line=${COMP_LINE}
+    local extra=""
+    # If there's no current word, request index numbers in the output
+    if [ "x${word}" = "x" ] || [ ${word} -ge 0 2>/dev/null ]; then
+        extra="1"
+    fi
     if [ "${OSTYPE}" = "cygwin" ]; then
         # Ensure paths are cygwin formatted
-        local list=$(wd -l -e d -C -s c)
+        local list=$(wd -l ${extra} -e d -C -s c)
     else
-        local list=$(wd -l -e d -C)
+        local list=$(wd -l ${extra} -e d -C)
     fi
 
     COMPREPLY=($(compgen -W "${list}" -- "${word}"))

@@ -618,6 +618,22 @@ char* format_dir( wd_dir_format_t p_fmt, int p_escape, char* p_dir ) {
     return( ret_val );
 }
 
+static void dump_dir( const dir_list_t p_list, struct dir_list_item* p_item )
+{
+    char* dir_formatted = format_dir( p_list->cfg->wd_dir_form,
+                                      p_list->cfg->wd_escape_output,
+                                      p_item->dir_name );
+    fprintf( stdout, "%s", dir_formatted );
+
+    if( p_item->dir_name != dir_formatted ) {
+        free( dir_formatted );
+    }
+
+    if( p_list->cfg->wd_store_access ) {
+        p_item->time_accessed = p_list->cfg->wd_now_time;
+    }
+}
+
 int        dump_dir_if_exists( const dir_list_t p_list, const char* const p_dir )
 {
     size_t dir_loop;
@@ -632,23 +648,24 @@ int        dump_dir_if_exists( const dir_list_t p_list, const char* const p_dir 
         if(( current_item->bookmark_name != NULL ) &&
            ( 0 == strcmp( p_dir, current_item->dir_name ))) {
 
-            char* dir_formatted = format_dir( p_list->cfg->wd_dir_form,
-                                              p_list->cfg->wd_escape_output,
-                                              current_item->dir_name );
-            fprintf( stdout, "%s", dir_formatted );
-
-            if( current_item->dir_name != dir_formatted ) {
-                free( dir_formatted );
-            }
-
-            if( p_list->cfg->wd_store_access ) {
-                current_item->time_accessed = p_list->cfg->wd_now_time;
-            }
-
+            dump_dir( p_list, current_item );
             found = 1;
             break;
         }
     }
+    return( found );
+}
+
+int dump_dir_with_index( const dir_list_t p_list, const unsigned p_idx )
+{
+    int found = 0;
+
+    if( p_idx < p_list->dir_count ) {
+        struct dir_list_item* current_item = &( p_list->dir_list[ p_idx ] );
+        dump_dir( p_list, current_item );
+        found = 1;
+    }
+
     return( found );
 }
 
@@ -665,19 +682,7 @@ int dump_dir_with_name( const dir_list_t p_list, const char* const p_name )
         if(( current_item->bookmark_name != NULL ) &&
            ( 0 == strcmp( p_name, current_item->bookmark_name ))) {
 
-            char* dir_formatted = format_dir( p_list->cfg->wd_dir_form,
-                                              p_list->cfg->wd_escape_output,
-                                              current_item->dir_name );
-            fprintf( stdout, "%s", dir_formatted );
-
-            if( current_item->dir_name != dir_formatted ) {
-                free( dir_formatted );
-            }
-
-            if( p_list->cfg->wd_store_access ) {
-                current_item->time_accessed = p_list->cfg->wd_now_time;
-            }
-
+            dump_dir( p_list, current_item );
             found = 1;
             break;
         }
@@ -717,9 +722,8 @@ void list_dirs( const dir_list_t p_list )
         size_t dir_loop;
         struct dir_list_item* current_item;
         int valid;
-        size_t counter;
 
-        for( dir_loop = 0, current_item = p_list->dir_list, counter = 1;
+        for( dir_loop = 0, current_item = p_list->dir_list;
              dir_loop < p_list->dir_count;
              dir_loop++, current_item++ )
         {
@@ -749,14 +753,19 @@ void list_dirs( const dir_list_t p_list )
                                                   p_list->cfg->wd_escape_output,
                                                   dir );
                 if( p_list->cfg->wd_dir_list_opt == WD_DIRLIST_NUMBERED ) {
-                    fprintf( stdout, "%u ", counter );
+                    /* Using dir_loop here may mean that we get non-contiguous
+                       numbers on the output, however this is preferable to
+                       having to iterate the list to check for validity of each
+                       item when looking up the index on a subsequent operation
+                       */
+                    fprintf( stdout, "%u ", dir_loop );
                 }
                 fprintf( stdout, "%s\n", dir_formatted );
                 if( current_item->bookmark_name != NULL ) {
                     char* name_escaped = escape_string( p_list->cfg->wd_escape_output,
                                                         current_item->bookmark_name );
                     if( p_list->cfg->wd_dir_list_opt == WD_DIRLIST_NUMBERED ) {
-                        fprintf( stdout, "%u ", counter );
+                        fprintf( stdout, "%u ", dir_loop );
                     }
                     fprintf( stdout, "%s\n", name_escaped );
                     if( name_escaped != current_item->bookmark_name ) {
@@ -766,7 +775,6 @@ void list_dirs( const dir_list_t p_list )
                 if( dir != dir_formatted ) {
                     free( dir_formatted );
                 }
-                counter++;
             }
         }
     }
