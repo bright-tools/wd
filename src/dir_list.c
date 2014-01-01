@@ -717,8 +717,9 @@ void list_dirs( const dir_list_t p_list )
         size_t dir_loop;
         struct dir_list_item* current_item;
         int valid;
+        size_t counter;
 
-        for( dir_loop = 0, current_item = p_list->dir_list;
+        for( dir_loop = 0, current_item = p_list->dir_list, counter = 1;
              dir_loop < p_list->dir_count;
              dir_loop++, current_item++ )
         {
@@ -747,10 +748,16 @@ void list_dirs( const dir_list_t p_list )
                 char* dir_formatted = format_dir( p_list->cfg->wd_dir_form,
                                                   p_list->cfg->wd_escape_output,
                                                   dir );
+                if( p_list->cfg->wd_dir_list_opt == WD_DIRLIST_NUMBERED ) {
+                    fprintf( stdout, "%u ", counter );
+                }
                 fprintf( stdout, "%s\n", dir_formatted );
                 if( current_item->bookmark_name != NULL ) {
                     char* name_escaped = escape_string( p_list->cfg->wd_escape_output,
                                                         current_item->bookmark_name );
+                    if( p_list->cfg->wd_dir_list_opt == WD_DIRLIST_NUMBERED ) {
+                        fprintf( stdout, "%u ", counter );
+                    }
                     fprintf( stdout, "%s\n", name_escaped );
                     if( name_escaped != current_item->bookmark_name ) {
                         free( name_escaped );
@@ -759,6 +766,7 @@ void list_dirs( const dir_list_t p_list )
                 if( dir != dir_formatted ) {
                     free( dir_formatted );
                 }
+                counter++;
             }
         }
     }

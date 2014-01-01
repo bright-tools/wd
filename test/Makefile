@@ -7,10 +7,11 @@ TGT_E   = $(PFX) $(TGT) -f $(LIST_FN) -z $(TIME)
 PASS    = win32
 START   = 1386181003
 OFF     = 0
-CHECK_E = $(PFX) diff list $(PASS)/list.$(STEP) && diff out.log $(PASS)/out.log.$(STEP) && diff err.log $(PASS)/err.log.$(STEP)
+DIFF_OPT= -c -b
+CHECK_E = $(PFX) diff $(DIFF_OPT) list $(PASS)/list.$(STEP) && diff $(DIFF_OPT) out.log $(PASS)/out.log.$(STEP) && diff $(DIFF_OPT) err.log $(PASS)/err.log.$(STEP)
 
 .PHONY: all
-all: test9
+all: test11
 	@echo -e \\nAll tests run OK
 
 .PHONY: clean
@@ -88,4 +89,23 @@ test9: STEP=9
 test9: test8
 	@echo Test $(STEP): Removing a directory with a space in path
 	$(TGT_E) -r 'C:\Sill Directory' $(OUT)
+	$(CHECK_E)
+
+.PHONY: test10
+test10: OFF=45
+test10: STEP=10
+test10: test9
+	@echo Test $(STEP): Testing list output \(vanilla\)
+	$(TGT_E) -a 'C:\' see $(OUT)
+	$(TGT_E) -a 'C:\windows' windows $(OUT)
+	$(TGT_E) -a 'C:\temp' temp $(OUT)
+	$(TGT_E) -l $(OUT)
+	$(CHECK_E)
+
+.PHONY: test11
+test11: OFF=50
+test11: STEP=11
+test11: test10
+	@echo Test $(STEP): Testing list output \(numbered\)
+	$(TGT_E) -l 1 $(OUT)
 	$(CHECK_E)

@@ -51,9 +51,15 @@ typedef enum {
 /** Specify the format of strings to be output */
 typedef enum {
     WD_DIRFORM_NONE,       /**< No specifier - use the default */
-    WD_DIRFORM_CYGWIN,     /** Use /cydrive/c/cygwin/type/paths */
-    WD_DIRFORM_WINDOWS     /** Use C:\windows\style\paths */
+    WD_DIRFORM_CYGWIN,     /**< Use /cydrive/c/cygwin/type/paths */
+    WD_DIRFORM_WINDOWS     /**< Use C:\windows\style\paths */
 } wd_dir_format_t;
+
+/** Specify the formatting for the list */
+typedef enum {
+    WD_DIRLIST_PLAIN,    /**< No formatting requirements */
+    WD_DIRLIST_NUMBERED  /**< Number each list item */
+} wd_dir_list_opt_t;
 
 /** Structure to wrap up all of the options/parameters read by this module.
     Should be initialised using init_cmdln() before use */
@@ -63,6 +69,8 @@ typedef struct {
     wd_oper_t       wd_oper;
     /** Format in which file paths should be output */
     wd_dir_format_t wd_dir_form;
+    /** Options to control the format when displaying a list */
+    wd_dir_list_opt_t wd_dir_list_opt;
     /** Directory containing list of bookmarks */
     char*           list_fn;
     /** Directory read from the command line upon which operations should be

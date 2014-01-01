@@ -93,6 +93,7 @@ void init_cmdln( config_container_t* const p_config ) {
     p_config->wd_store_access = 0;
     p_config->wd_bookmark_name = NULL;
     p_config->wd_dir_form = WD_DIRFORM_NONE;
+    p_config->wd_dir_list_opt = WD_DIRLIST_PLAIN;
     p_config->wd_now_time = time(NULL);
     p_config->wd_entity_type = WD_ENTITY_ANY;
     p_config->list_fn = NULL;
@@ -229,6 +230,23 @@ static int process_opts( config_container_t* const p_config, const int argc, cha
             p_config->wd_oper = WD_OPER_DUMP;
         } else if( p_cmd_line && ( 0 == strcmp( this_arg, "-l" )) ) {
             p_config->wd_oper = WD_OPER_LIST;
+            if((( arg_loop + 1 ) < argc ) &&
+                ( argv[ arg_loop + 1 ][0] != '-' )) {
+                arg_loop++;
+                if( strlen( argv[ arg_loop ] ) > 1 ) {
+                    fprintf( stdout, "%s: %s\n", UNRECOGNISED_PARAM_STRING, this_arg );
+                } else {
+                    switch( argv[ arg_loop ][0] ) {
+                        case '1':
+                            p_config->wd_dir_list_opt = WD_DIRLIST_NUMBERED;
+                            break;
+                        default:
+                            fprintf( stdout, "%s: %s\n", UNRECOGNISED_PARAM_STRING, this_arg );
+                            ret_val = 0;
+                            break;
+                    }
+                }
+            }
         } else if( p_cmd_line && (( 0 == strcmp( this_arg, "-n" )) ||
                                   ( 0 == strcmp( this_arg, "-g" )))) {
             if((( arg_loop + 1 ) < argc ) &&
