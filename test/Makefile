@@ -1,7 +1,13 @@
 PFX     = @
 TGT     = ../src/wd.exe
 LIST_FN = ./list
-OUT     = 2>err.log.tmp 1>out.log && cat err.log.tmp | sed -e 's/.*wd.exe/wd.exe/;' > err.log
+LOG_OUT = out.log
+LOG_ERR = err.log
+LOG_ERR_T = err.log.tmp
+PP_ERR  = sed -e 's/.*wd.exe/wd.exe/;' > $(LOG_ERR)
+MORE_PP_ERR = sed -e 's/.*wd.exe/wd.exe/;' >> $(LOG_ERR)
+OUT     = 2>$(LOG_ERR_T) 1>$(LOG_OUT) && cat $(LOG_ERR_T) | $(PP_ERR)
+MORE_OUT= 2>$(LOG_ERR_T) 1>>$(LOG_OUT) && cat $(LOG_ERR_T) | $(MORE_PP_ERR)
 TIME    = $(shell echo $$[$(START)+$(OFF)])
 TGT_E   = $(PFX) $(TGT) -f $(LIST_FN) -z $(TIME)
 PASS    = win32
@@ -11,7 +17,7 @@ DIFF_OPT= -c -b
 CHECK_E = $(PFX) diff $(DIFF_OPT) list $(PASS)/list.$(STEP) && diff $(DIFF_OPT) out.log $(PASS)/out.log.$(STEP) && diff $(DIFF_OPT) err.log $(PASS)/err.log.$(STEP)
 
 .PHONY: all
-all: test11
+all: test12
 	@echo -e \\nAll tests run OK
 
 .PHONY: clean
@@ -108,4 +114,15 @@ test11: STEP=11
 test11: test10
 	@echo Test $(STEP): Testing list output \(numbered\)
 	$(TGT_E) -l 1 $(OUT)
+	$(CHECK_E)
+
+.PHONY: test12
+test12: OFF=55
+test12: STEP=12
+test12: test11
+	@echo Test $(STEP): Testing index lookups
+	$(TGT_E) -g 0 $(OUT)
+	$(TGT_E) -g 1 $(MORE_OUT)
+	$(TGT_E) -g 2 $(MORE_OUT)
+	$(TGT_E) -g 3 $(MORE_OUT)
 	$(CHECK_E)
