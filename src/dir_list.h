@@ -74,6 +74,7 @@ int        bookmark_in_list( dir_list_t p_list, const char* const p_name );
 int        save_dir_list( const dir_list_t p_list, const char* p_fn );
 void       dump_dir_list( const dir_list_t p_list );
 void       list_dirs( const dir_list_t p_list );
+size_t     dir_list_get_count( const dir_list_t p_list );
 
 
 #endif

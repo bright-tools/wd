@@ -81,8 +81,14 @@ static int do_get( const config_container_t* const p_config, const char* cmd, di
     int dir_list_needs_save = 0;
 
     if( sscanf( p_config->wd_bookmark_name, "%u", &idx ) == 1 ) {
-        dir_list_needs_save = dump_dir_with_index( p_dir_list, idx ) && p_config->wd_store_access;
-        /* TODO: Error if index doesn't exist?? */
+        if( dir_list_get_count( p_dir_list ) > idx )
+        {
+            dir_list_needs_save = dump_dir_with_index( p_dir_list, idx ) && p_config->wd_store_access;
+        } else {
+            fprintf(stderr,
+                    "%s: Error: Index %u doesn't exist\n",
+                    cmd, idx);
+        }
     }
     else if(( dump_dir_with_name( p_dir_list, p_config->wd_bookmark_name ) ||
               dump_dir_if_exists( p_dir_list, p_config->wd_bookmark_name )) &&

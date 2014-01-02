@@ -93,6 +93,11 @@ static void increase_dir_alloc( dir_list_t p_list )
     }
 }
 
+size_t     dir_list_get_count( const dir_list_t p_list )
+{
+    return( p_list->dir_count );
+}
+
 int add_dir( dir_list_t p_list,
              const char* const p_dir,
              const char* const p_name,
