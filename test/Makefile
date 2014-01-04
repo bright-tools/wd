@@ -17,7 +17,7 @@ DIFF_OPT= -c -b
 CHECK_E = $(PFX) diff $(DIFF_OPT) list $(PASS)/list.$(STEP) && diff $(DIFF_OPT) out.log $(PASS)/out.log.$(STEP) && diff $(DIFF_OPT) err.log $(PASS)/err.log.$(STEP)
 
 .PHONY: all
-all: test12
+all: test15
 	@echo -e \\nAll tests run OK
 
 .PHONY: clean
@@ -126,3 +126,37 @@ test12: test11
 	$(TGT_E) -g 2 $(MORE_OUT)
 	$(TGT_E) -g 3 $(MORE_OUT)
 	$(CHECK_E)
+
+.PHONY: test13
+test13: OFF=60
+test13: STEP=13
+test13: test12
+	@echo Test $(STEP): Adding UNC paths
+	$(TGT_E) -a '\\someserver\someshare\somedir' unc1 $(OUT)
+	$(TGT_E) -a '\\someserver\someshare' unc2 $(MORE_OUT)
+	$(TGT_E) -a //someserver/someothershare unc3 $(MORE_OUT)
+	$(CHECK_E)
+
+.PHONY: test14
+test14: OFF=65
+test14: STEP=14
+test14: test13
+	@echo Test $(STEP): Retrieving UNC paths
+	$(TGT_E) -n unc1 -s c $(OUT)
+	$(TGT_E) -n unc1 -s w $(MORE_OUT)
+	$(TGT_E) -n unc2 -s c $(MORE_OUT)
+	$(TGT_E) -n unc2 -s w $(MORE_OUT)
+	$(TGT_E) -n unc3 -s c $(MORE_OUT)
+	$(TGT_E) -n unc3 -s w $(MORE_OUT)
+	$(CHECK_E)
+
+.PHONY: test15
+test15: OFF=60
+test15: STEP=15
+test15: test14
+	@echo Test $(STEP): Removing UNC paths
+	$(TGT_E) -r '\\someserver\someshare\somedir' $(OUT)
+	$(TGT_E) -r '\\someserver\someshare' $(MORE_OUT)
+	$(TGT_E) -r //someserver/someothershare $(MORE_OUT)
+	$(CHECK_E)
+
