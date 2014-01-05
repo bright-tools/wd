@@ -517,7 +517,8 @@ char* escape_string( int p_escape, char* p_str )
         for( dest = ret_val;
              *src != '\0';
              dest++, src++ ) {
-            if( *src == ' ' ) {
+            if(( *src == ' ' ) || 
+               ( *src == '\\' )) {
                 *dest = '\\';
                 dest++;
                 if( p_escape > 1 ) {
