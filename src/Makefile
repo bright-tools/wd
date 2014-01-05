@@ -1,8 +1,12 @@
 C_SRC := cmdln.c dir_list.c wd.c
 ifeq ($(TARGET),win32)
-C_SRC += shrtcut.c
+  C_SRC += shrtcut.c
+else
+  ifeq ($(TARGET),)
+    TARGET=$(shell uname -o)
+  endif
 endif
-CFLAGS  = -O3 -g -Wall 
+CFLAGS  = -O3 -g -Wall -DTARGET=$(TARGET)
 MINGW_LDFLAGS = -L/usr/i686-pc-mingw32/sys-root/mingw/lib/ -lole32 -luuid
 OBJS    = $(C_SRC:.c=.o)
 TGT     = wd
@@ -27,6 +31,9 @@ depend:
 docs:
 	rm -rf html/search html/*.js html/*.css html/*.html html/*.png
 	doxygen ../docs/Doxyfile
+
+mingw:
+	LDFLAGS="$(MINGW_LDFLAGS)" CC="$(MINGW_CC)" TARGET=win32 $(MAKE) clean release
  
 .PHONY: package
 package:
@@ -36,7 +43,7 @@ package:
 	mkdir package/cygwin
 	CC=gcc $(MAKE) clean release
 	cp wd.exe package/cygwin
-	LDFLAGS=$(MINGW_LDFLAGS) CC=$(MINGW_CC) TARGET=win32 $(MAKE) clean release
+	$(MAKE) mingw
 	cp wd.exe package/mingw
 	cp ../README.md package
 	cp ../shell/wd.* ../shell/wcd.bat package

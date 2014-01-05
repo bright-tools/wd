@@ -35,6 +35,9 @@
 #define NEED_PARAMETER_STRING "No parameter specified for argument"
 #define INCOMPATIBLE_OP_STRING "Parameter incompatible with other arguments"
 #define UNRECOGNISED_PARAM_STRING "Parameter to argument not recognised"
+#define STRINGIFY(_x) XSTRINGIFY(_x)
+#define XSTRINGIFY(_x) #_x
+#define TARGET_STRING STRINGIFY(TARGET)
 
 /** Windows is quite happy with a forward slash in the path */
 #define DEFAULT_LIST_FILE "/.wd_list"
@@ -138,7 +141,7 @@ static int process_opts( config_container_t* const p_config, const int argc, cha
         char* this_arg = argv[ arg_loop ];
         DEBUG_OUT("process_opts: %s",this_arg); 
         if( p_cmd_line && ( 0 == strcmp( this_arg, "-v" ) )) {
-            fprintf( stdout, "%s\n", VERSION_STRING );
+            fprintf( stdout, "%s\n Built for: %s\n", VERSION_STRING, TARGET_STRING );
         } else if( p_cmd_line && ( 0 == strcmp( this_arg, "-h" )) ) {
             show_help( argv[0] );
         } else if( p_cmd_line && ( 0 == strcmp( this_arg, "-p" )) ) {

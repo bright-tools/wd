@@ -53,7 +53,7 @@ test3: test2
 test4: OFF=15
 test4: STEP=4
 test4: test3
-	@echo Test $(STEP): Dumping list
+	@echo Test $(STEP): Dumping list \(Command line option -d\)
 	$(TGT_E) -d $(OUT)
 	$(CHECK_E)
 
