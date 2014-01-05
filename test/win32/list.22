@@ -1,0 +1,28 @@
+# WD directory list file
+# File format: version 1
+:C:\
+N:see
+A:2013/12/04 18:17:28
+C:2013/12/04 18:18:03
+T:D
+:C:\Windows
+N:windows
+A:2013/12/04 18:17:28
+T:D
+:C:\temp
+N:temp
+A:2013/12/04 18:17:28
+C:2013/12/04 18:18:03
+T:U
+:C:\some directory\here
+N:bn
+A:2013/12/04 18:18:08
+T:U
+:C:\another directory\here
+N:et
+A:2013/12/04 18:18:08
+T:U
+:C:\usr\bin
+N:ub
+A:2013/12/04 18:18:08
+T:U

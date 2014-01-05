@@ -1,0 +1,15 @@
+C:\Users\catalyst\Documents\coverage\GIT\wd\src\wd.exe [-v] [-h] [-t] [-f <fn>] [-r [dir] [-p]] [-a [dir]] [-d] [-l] [-s <c>]
+ -v       : Show version information
+ -h       : Show usage help
+ -d       : Dump bookmark list
+ -t       : Store access times for bookmarks
+ -l       : List directories & bookmark names (generally for use in tab
+             expansion)
+ -s <c>   : Format paths for cygwin
+ -n <nam> : Get bookmark directory with specified shortcut name
+ -p       : Prompt for input (can be used with -r instead of specifying
+             directory
+ -f <fn>  : Use file <fn> for storing bookmarks
+ -r [dir] : Remove specified directory or current directory if none
+ -a [dir] : Add specified directory or current directory if none
+             specified

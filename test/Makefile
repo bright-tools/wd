@@ -17,7 +17,7 @@ DIFF_OPT= -c -b
 CHECK_E = $(PFX) diff $(DIFF_OPT) list $(PASS)/list.$(STEP) && diff $(DIFF_OPT) out.log $(PASS)/out.log.$(STEP) && diff $(DIFF_OPT) err.log $(PASS)/err.log.$(STEP)
 
 .PHONY: all
-all: test15
+all: test22
 	@echo -e \\nAll tests run OK
 
 .PHONY: clean
@@ -160,3 +160,63 @@ test15: test14
 	$(TGT_E) -r //someserver/someothershare $(MORE_OUT)
 	$(CHECK_E)
 
+.PHONY: test16
+test16: OFF=65
+test16: STEP=16
+test16: test15
+	@echo Test $(STEP): Command Line Options : -v \(version\)
+	$(TGT_E) -v $(OUT)
+	$(CHECK_E)
+
+.PHONY: test17
+test17: OFF=70
+test17: STEP=17
+test17: test16
+	@echo Test $(STEP): Command Line Options : -h \(help\)
+	$(TGT_E) -h $(OUT)
+	$(CHECK_E)
+
+.PHONY: test18
+test18: OFF=75
+test18: STEP=18
+test18: test17
+	@echo Test $(STEP): Command Line Options : Without -t \(no timestamp update\)
+	$(TGT_E) -n see $(OUT)
+	$(TGT_E) -g 2 $(MORE_OUT)
+	$(CHECK_E)
+
+.PHONY: test19
+test19: OFF=80
+test19: STEP=19
+test19: test18
+	@echo Test $(STEP): Command Line Options : With -t \(timestamp update\)
+	$(TGT_E) -t -n see $(OUT)
+	$(TGT_E) -t -g 2 $(MORE_OUT)
+	$(CHECK_E)
+
+.PHONY: test20
+test20: OFF=85
+test20: STEP=20
+test20: test19
+	@echo Test $(STEP): Command Line Options : -c \(escape spaces\)
+	$(TGT_E) -a '/some directory/here' bn
+	$(TGT_E) -a '/another directory/here' et
+	$(TGT_E) -a '/usr/bin' ub
+	$(TGT_E) -c -l $(OUT)
+	$(CHECK_E)
+
+.PHONY: test21
+test21: OFF=90
+test21: STEP=21
+test21: test20
+	@echo Test $(STEP): Command Line Options : -C \(double escape spaces, win form\)
+	$(TGT_E) -C -l -s w $(OUT)
+	$(CHECK_E)
+
+.PHONY: test22
+test22: OFF=95
+test22: STEP=22
+test22: test21
+	@echo Test $(STEP): Command Line Options : -C \(double escape spaces, cygwin form\)
+	$(TGT_E) -C -l -s c $(OUT)
+	$(CHECK_E)
