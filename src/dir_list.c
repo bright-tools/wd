@@ -1,5 +1,5 @@
 /*
-   Copyright 2013 John Bailey
+   Copyright 2013-2014 John Bailey
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -75,8 +75,10 @@ struct dir_list_s
 static wd_entity_t get_type( const char* const p_path );
 static dir_list_t load_dir_list_from_file( const config_container_t* const p_config,
                                            const char* const p_fn );
+#if defined WIN32
 static dir_list_t load_dir_list_from_favourites( const config_container_t* const p_config,
                                                  const char* const p_fn );
+#endif
 
 
 static void increase_dir_alloc( dir_list_t p_list )
@@ -502,6 +504,9 @@ int dir_in_list( dir_list_t p_list, const char* const p_dir )
 }
 
 #define CYGDRIVE_PREFIX "/cygdrive/"
+
+/** String length of CYGDRIVE_PREFIX, here as a constant to save repeated strlen
+    calls */
 #define CYGDRIVE_PREFIX_LEN 10U
 
 char* escape_string( int p_escape, char* p_str )
