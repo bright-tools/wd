@@ -2,7 +2,7 @@
 
 _wd_complete()
 {
-    reply=(`wd -l`)
+    reply=(`wd -l -e d -C`)
 }
 
 wcd()
