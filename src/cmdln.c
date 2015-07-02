@@ -18,6 +18,9 @@
 #include <stdio.h>
 #include <time.h>
 
+/* Just for the define values */
+#include <errno.h>
+
 /* Supporting get_home() */
 #include <unistd.h>
 #if defined _WIN32
@@ -44,12 +47,13 @@
 /** Name of environment variable to read options from */
 #define ENV_VAR_NAME      "WD_OPTS"
 
-static void get_home( config_container_t* const p_config );
+static int get_home( config_container_t* const p_config );
 static void show_help( const char* const p_cmd );
 static int process_opts( config_container_t* const p_config, const int argc, char* const argv[], const int p_cmd_line );
 
-static void get_home( config_container_t* const p_config )
+static int get_home( config_container_t* const p_config )
 {
+    int ret_val = -1;
     int success = 0;
 
 #if defined _WIN32
@@ -82,15 +86,26 @@ static void get_home( config_container_t* const p_config )
                           strlen( DEFAULT_LIST_FILE ) +
                           1U;
         p_config->list_fn = realloc( p_config->list_fn, complete );
-        strcpy( p_config->list_fn, homedir );
-        strcpy( &(p_config->list_fn[ home_size ]), DEFAULT_LIST_FILE);
-        p_config->list_fn[ complete -1 ] = 0;
+
+        if( p_config->list_fn != NULL )  {
+
+            strcpy( p_config->list_fn, homedir );
+            strcpy( &(p_config->list_fn[ home_size ]), DEFAULT_LIST_FILE);
+            p_config->list_fn[ complete -1 ] = 0;
+
+        } else {
+            ret_val = ENOMEM;
+        }
     } else {
-        /* TODO: Deal with not having a home directory */
+        ret_val = ENOENT;
     }
+
+    return ret_val;
 }
 
-void init_cmdln( config_container_t* const p_config ) {
+int init_cmdln( config_container_t* const p_config ) {
+    int ret_val = -1;
+
     p_config->wd_oper = WD_OPER_NONE;
     p_config->wd_prompt = 0;
     p_config->wd_store_access = 0;
@@ -105,7 +120,9 @@ void init_cmdln( config_container_t* const p_config ) {
 
     /* TODO: Consider only doing this if the file has not been specified on the
        command line for efficiency reasons */
-    get_home( p_config );
+    ret_val = get_home( p_config );
+
+    return ret_val;
 }
 
 static void show_help( const char* const p_cmd ) {
@@ -133,7 +150,7 @@ static void show_help( const char* const p_cmd ) {
 
 static int process_opts( config_container_t* const p_config, const int argc, char* const argv[], const int p_cmd_line ) {
     int arg_loop;
-    int ret_val = 1;
+    int ret_val = -1;
 
     /* Start loop at 1 - index 0 is name of executable */
     for( arg_loop = 1; arg_loop < argc; arg_loop++ )
@@ -340,7 +357,7 @@ static int process_opts( config_container_t* const p_config, const int argc, cha
 int process_env( config_container_t* const p_config )
 {
     char *opts = getenv(ENV_VAR_NAME);
-    int ret_val = 1;
+    int ret_val = -1;
 
     /* Retrieved environment string OK? */
     if( opts != NULL ) {
@@ -358,78 +375,91 @@ int process_env( config_container_t* const p_config )
 
         DEBUG_OUT(ENV_VAR_NAME ": %s",opts);
 
-        /* Copy the environment string to a fresh memory area so that we can
-           maniupulate it.  Replace spaces with null terminators to break string
-           into individual arguments and keep a count of the amount we've done
-           */
-        for( loop = 0, src = opts, dest = opt_copy ;
-             loop < opts_len;
-             loop++, src++ ) 
-        {
-            /* Simple mechanism to deal with quoting in the string */
-            if(( *src == '\'' ) ||
-               ( *src == '"' )) {
-                if( *src == quote_type ) {
-                    quote_type = 0;
-                } else if( quote_type == 0 ) {
-                    quote_type = *src;
-                }
-            } else if(( *src == ' ' ) &&
-                      ( quote_type == 0))
+        if( opt_copy != NULL ) {
+            /* Copy the environment string to a fresh memory area so that we can
+               maniupulate it.  Replace spaces with null terminators to break string
+               into individual arguments and keep a count of the amount we've done
+               */
+            for( loop = 0, src = opts, dest = opt_copy ;
+                    loop < opts_len;
+                    loop++, src++ ) 
             {
-                *dest = 0;
-                dest++;
-                breaks++;
-            } else {
-                *dest = *src;
-                dest++;
+                /* Simple mechanism to deal with quoting in the string */
+                if(( *src == '\'' ) ||
+                        ( *src == '"' )) {
+                    if( *src == quote_type ) {
+                        quote_type = 0;
+                    } else if( quote_type == 0 ) {
+                        quote_type = *src;
+                    }
+                } else if(( *src == ' ' ) &&
+                        ( quote_type == 0))
+                {
+                    *dest = 0;
+                    dest++;
+                    breaks++;
+                } else {
+                    *dest = *src;
+                    dest++;
+                }
             }
-        }
 
-        /* Sanity - source string should have been NULL terminated and this
-           should have been copied over, but better safe .. */
-        *dest = 0;
+            /* Sanity - source string should have been NULL terminated and this
+               should have been copied over, but better safe .. */
+            *dest = 0;
 
-        /* Allocate memory for pointers to the arguments
-           +1 to take into account the fact that the first argument has special
-           meaning
-           +1 to take into account any final, un-counted element in the loop
-           above */
-        argv = malloc( sizeof( char*[ breaks + 2 ] ));
-        /* First argument is the name of the program */
-        argv[0] = ENV_VAR_NAME;
-        breaks = 1;
-        waiting = 1;
+            /* Allocate memory for pointers to the arguments
+               +1 to take into account the fact that the first argument has special
+               meaning
+               +1 to take into account any final, un-counted element in the loop
+               above */
+            argv = malloc( sizeof( char*[ breaks + 2 ] ));
 
-        /* Loop through the broken up string, populating argv with pointers to
-           the start of each argument.
-           Characters may have been lost from the original opts_len due to
-           escaping, so calculate a new length based on the amount of characters
-           copied */
-        for( loop = 0;
-             loop < (dest - opt_copy);
-             loop++ )
-        {
-            /* Are we waiting to find the start of a new string and this is a
-               non-null character?
-               Using this mechanism deals with multiple consecutive spaces/NULLs
-               in the string and prevents argv having entries pointing to NULL
-               strings */
-            if( waiting && ( opt_copy[ loop ] != '0' )) {
-                argv[breaks++] = &(opt_copy[loop]);
-                DEBUG_OUT(ENV_VAR_NAME ": opt - %s",argv[breaks-1]);
-                waiting = 0;
-            } else if( opt_copy[loop ] == 0 ) {
+            if( argv != NULL ) {
+                /* First argument is the name of the program */
+                argv[0] = ENV_VAR_NAME;
+                breaks = 1;
                 waiting = 1;
+
+                /* Loop through the broken up string, populating argv with pointers to
+                   the start of each argument.
+                   Characters may have been lost from the original opts_len due to
+                   escaping, so calculate a new length based on the amount of characters
+                   copied */
+                for( loop = 0;
+                        loop < (dest - opt_copy);
+                        loop++ )
+                {
+                    /* Are we waiting to find the start of a new string and this is a
+                       non-null character?
+                       Using this mechanism deals with multiple consecutive spaces/NULLs
+                       in the string and prevents argv having entries pointing to NULL
+                       strings */
+                    if( waiting && ( opt_copy[ loop ] != '0' )) {
+                        argv[breaks++] = &(opt_copy[loop]);
+                        DEBUG_OUT(ENV_VAR_NAME ": opt - %s",argv[breaks-1]);
+                        waiting = 0;
+                    } else if( opt_copy[loop ] == 0 ) {
+                        waiting = 1;
+                    }
+                }
+
+                DEBUG_OUT(ENV_VAR_NAME ": opt count - %d",breaks);
+                /* Finally, process the array of options */
+                ret_val = process_opts( p_config, breaks, argv, 0 );
+
+                free( opt_copy );
+                free( argv );
+            }
+            else
+            {
+                ret_val = ENOMEM;
             }
         }
-
-        DEBUG_OUT(ENV_VAR_NAME ": opt count - %d",breaks);
-        /* Finally, process the array of options */
-        ret_val = process_opts( p_config, breaks, argv, 0 );
-
-        free( opt_copy );
-        free( argv );
+        else
+        {
+            ret_val = ENOMEM;
+        }
     }
 
     return ret_val;

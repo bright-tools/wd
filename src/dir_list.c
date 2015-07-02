@@ -982,6 +982,7 @@ int save_dir_list( const dir_list_t p_list, const char* p_fn ) {
                     type_string = "F";
                     break;
                 default:
+                    /* Unknown */
                     type_string = "U";
                     break;
             }
