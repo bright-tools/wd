@@ -6,7 +6,8 @@ else
     TARGET=$(shell uname -o)
   endif
 endif
-CFLAGS  = -O3 -g -Wall -DTARGET=$(TARGET)
+CDEFS   = -DTARGET=$(TARGET)
+CFLAGS  = -O3 -g -Wall $(CDEFS)
 MINGW_LDFLAGS = -L/usr/i686-pc-mingw32/sys-root/mingw/lib/ -lole32 -luuid
 OBJS    = $(C_SRC:.c=.o)
 TGT     = wd
@@ -20,7 +21,11 @@ $(TGT): $(OBJS)
 clean:
 	rm -rf $(OBJS) $(TGT)
 
-release: $(TGT)
+splint:
+	# -preproc used because splint doesn't seem to like varadic macros
+	splint $(C_SRC) $(CDEFS) -preproc +posix-lib
+
+release: splint $(TGT)
 	strip -s $(TGT)
 	ldd $(TGT)
 	ls -la $(TGT)
