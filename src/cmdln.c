@@ -14,6 +14,7 @@
    limitations under the License.
 */
 
+#include "wd.h"
 #include "cmdln.h"
 #include <stdio.h>
 #include <time.h>
@@ -135,6 +136,7 @@ static void show_help( const char* const p_cmd ) {
             " -l       : List directories & bookmark names (generally for use in tab\n"
             "             expansion)\n"
             " -s <c>   : Format paths for cygwin\n"
+            " -g <id>  : Get bookmark directory.  ID can be index, name or directory\n"
             " -n <nam> : Get bookmark directory with specified shortcut name\n"
             " -p       : Prompt for input (can be used with -r instead of specifying\n"
             "             directory\n"

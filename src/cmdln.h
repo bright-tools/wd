@@ -102,7 +102,7 @@ typedef struct {
 
     \param[out] p_config The configuration to initialise
 */
-int init_cmdln( config_container_t* const p_config );
+int init_cmdln( /*@out@*/ config_container_t* const p_config );
 
 /** Process command line options
 

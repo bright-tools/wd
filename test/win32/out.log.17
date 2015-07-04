@@ -1,4 +1,4 @@
-C:\Users\catalyst\Documents\coverage\GIT\wd\src\wd.exe [-v] [-h] [-t] [-f <fn>] [-r [dir] [-p]] [-a [dir]] [-d] [-l] [-s <c>]
+F:\WORK\GIT\wd\src\wd.exe [-v] [-h] [-t] [-f <fn>] [-r [dir] [-p]] [-a [dir]] [-d] [-l] [-s <c>]
  -v       : Show version information
  -h       : Show usage help
  -d       : Dump bookmark list
@@ -6,6 +6,7 @@ C:\Users\catalyst\Documents\coverage\GIT\wd\src\wd.exe [-v] [-h] [-t] [-f <fn>] 
  -l       : List directories & bookmark names (generally for use in tab
              expansion)
  -s <c>   : Format paths for cygwin
+ -g <id>  : Get bookmark directory.  ID can be index, name or directory
  -n <nam> : Get bookmark directory with specified shortcut name
  -p       : Prompt for input (can be used with -r instead of specifying
              directory

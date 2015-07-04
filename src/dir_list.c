@@ -14,6 +14,7 @@
    limitations under the License.
 */
 
+#include "wd.h"
 #include "dir_list.h"
 #include "cmdln.h"
 #if defined WIN32
@@ -108,7 +109,7 @@ int add_dir( dir_list_t p_list,
              const wd_entity_t p_type )
 {
     /* TODO: Check that item is of type p_list->cfg->wd_entity_type? */
-    int ret_val = 0;
+    int ret_val = WD_GENERIC_FAIL;
     char* dest = NULL;
     const size_t idx = p_list->dir_count;
 
@@ -134,16 +135,17 @@ int add_dir( dir_list_t p_list,
                 if( dest != NULL ) {
                     strcpy( dest, p_name );
                     p_list->dir_list[ idx ].bookmark_name = dest;
-                    ret_val = 1;
+                    ret_val = WD_SUCCESS;
                 } else {
+                    fprintf(stderr,"MALLOC FAILED\n");
                     p_list->dir_list[ idx ].bookmark_name = NULL;
                 }
             } else {
                 p_list->dir_list[ idx ].bookmark_name = NULL;
-                ret_val = 1;
+                ret_val = WD_SUCCESS;
             }
 
-            if( ret_val ) {
+            if( WD_SUCCEEDED( ret_val )) {
                 p_list->dir_list[ idx ].time_added = p_t_added;
                 p_list->dir_list[ idx ].time_accessed = p_t_accessed;
                 if( p_type == WD_ENTITY_UNKNOWN ) {
@@ -155,6 +157,14 @@ int add_dir( dir_list_t p_list,
                 p_list->dir_count++;
             }
         }
+        else
+        {
+            fprintf(stderr,"MALLOC FAILED\n");
+        }
+    }
+    else
+    {
+        fprintf(stderr,"DIRLIST not big enough\n");
     }
 
     return( ret_val );
@@ -242,7 +252,7 @@ static dir_list_t load_dir_list_from_favourites( const config_container_t* const
     TCHAR path[MAX_PATH];
     HRESULT hr = SHGetFolderPath(0, CSIDL_FAVORITES, 0, 0, path);
  
-    if (SUCCEEDED(hr)) {
+    if (WD_SUCCEEDED(hr)) {
         DIR* FD;
         DEBUG_OUT("got favourites drectory: %s", path);
         /* TODO: recurse sub-directories */
@@ -432,7 +442,7 @@ static dir_list_t load_dir_list_from_file( const config_container_t* const p_con
 
 int bookmark_in_list( dir_list_t p_list, const char* const p_name )
 {
-    int ret_val = 0;
+    int ret_val = WD_GENERIC_FAIL;
     size_t dir_loop;
     struct dir_list_item* current_item = p_list->dir_list;
 
@@ -450,7 +460,7 @@ int bookmark_in_list( dir_list_t p_list, const char* const p_name )
 
 static int find_dir_location( dir_list_t p_list, const char* const p_dir, size_t* p_loc )
 {
-    int ret_val = 0;
+    int ret_val = WD_GENERIC_FAIL;
     size_t dir_loop;
     struct dir_list_item* current_item = p_list->dir_list;
 
@@ -470,7 +480,7 @@ static int find_dir_location( dir_list_t p_list, const char* const p_dir, size_t
 
 int remove_dir_by_index( dir_list_t p_list, const size_t p_dir )
 {
-    int ret_val = 0;
+    int ret_val = WD_GENERIC_FAIL;
 
     if( p_dir < p_list->dir_count ) {
         p_list->dir_count--;
@@ -480,7 +490,7 @@ int remove_dir_by_index( dir_list_t p_list, const size_t p_dir )
                 &(p_list->dir_list[p_dir+1]),
                 (p_list->dir_count - p_dir) * DLI_SIZE );
 
-        ret_val = 1;
+        ret_val = WD_SUCCESS;
     }
 
     return( ret_val );
@@ -488,7 +498,7 @@ int remove_dir_by_index( dir_list_t p_list, const size_t p_dir )
 
 int remove_dir( dir_list_t p_list, const char* const p_dir )
 {
-    int ret_val = 0;
+    int ret_val = WD_GENERIC_FAIL;
     size_t location;
 
     if( find_dir_location( p_list, p_dir, &location )) {
@@ -509,7 +519,7 @@ int dir_in_list( dir_list_t p_list, const char* const p_dir )
     calls */
 #define CYGDRIVE_PREFIX_LEN 10U
 
-char* escape_string( int p_escape, char* p_str )
+static char* escape_string( int p_escape, char* p_str )
 {
     char* ret_val;
     char* dest;
@@ -519,21 +529,25 @@ char* escape_string( int p_escape, char* p_str )
         ret_val = p_str;
     } else {
         ret_val = (char*)malloc( (strlen( p_str )*3) + 1 );
-        for( dest = ret_val;
-             *src != '\0';
-             dest++, src++ ) {
-            if(( *src == ' ' ) || 
-               ( *src == '\\' )) {
-                *dest = '\\';
-                dest++;
-                if( p_escape > 1 ) {
+
+        if( ret_val != NULL ) {
+
+            for( dest = ret_val;
+                 *src != '\0';
+                 dest++, src++ ) {
+                if(( *src == ' ' ) || 
+                   ( *src == '\\' )) {
                     *dest = '\\';
                     dest++;
+                    if( p_escape > 1 ) {
+                        *dest = '\\';
+                        dest++;
+                    }
                 }
+                *dest = *src;
             }
-            *dest = *src;
+            *dest = 0;
         }
-        *dest = 0;
     }
 
     return ret_val;
@@ -550,56 +564,60 @@ char* format_dir( wd_dir_format_t p_fmt, int p_escape, char* p_dir ) {
             char* dest;
             char* src = p_dir;
             ret_val = (char*)malloc( (strlen( p_dir )*2) + CYGDRIVE_PREFIX_LEN + 4 );
-            dest = ret_val;
-            if(((( src[0] >= 'a' ) && (src[0] <= 'z' )) ||
-                (( src[0] >= 'A' ) && (src[0] <= 'Z' ))) &&
-               ( src[1] == ':' ) &&
-               (( src[2] == '\\') ||
-                ( src[2] == '/' )))
-            {
-                strcpy( ret_val, CYGDRIVE_PREFIX );
-                dest += CYGDRIVE_PREFIX_LEN;
-                *dest = *src;
-                dest++;
-                src += 2;
-            }
-            for( ;
-                 *src != '\0';
-                 dest++, src++ ) {
-                if( *src == '\\' ) {
-                    *dest = '/';
-                } else {
+            if( ret_val != NULL ) {
+                dest = ret_val;
+                if(((( src[0] >= 'a' ) && (src[0] <= 'z' )) ||
+                    (( src[0] >= 'A' ) && (src[0] <= 'Z' ))) &&
+                   ( src[1] == ':' ) &&
+                   (( src[2] == '\\') ||
+                    ( src[2] == '/' )))
+                {
+                    strcpy( ret_val, CYGDRIVE_PREFIX );
+                    dest += CYGDRIVE_PREFIX_LEN;
                     *dest = *src;
+                    dest++;
+                    src += 2;
                 }
+                for( ;
+                     *src != '\0';
+                     dest++, src++ ) {
+                    if( *src == '\\' ) {
+                        *dest = '/';
+                    } else {
+                        *dest = *src;
+                    }
+                }
+                *dest = 0;
             }
-            *dest = 0;
                                 }
             break;
        case WD_DIRFORM_WINDOWS: {
             char* dest;
             char* src;
             ret_val = (char*)malloc( (strlen( p_dir )*2) + 1 );
-            src = p_dir;
-            dest = ret_val;
-            if( strncmp( src, CYGDRIVE_PREFIX, CYGDRIVE_PREFIX_LEN ) == 0 )
-            {
-                src += CYGDRIVE_PREFIX_LEN;
-                *dest = *src;
-                dest++;
-                *dest = ':';
-                dest++;
-                src += 1;
-            }
-            for( ;
-                 *src != '\0';
-                 dest++, src++ ) {
-                if( *src == '/' ) {
-                    *dest = '\\';
-                } else {
+            if( ret_val != NULL ) {
+                src = p_dir;
+                dest = ret_val;
+                if( strncmp( src, CYGDRIVE_PREFIX, CYGDRIVE_PREFIX_LEN ) == 0 )
+                {
+                    src += CYGDRIVE_PREFIX_LEN;
                     *dest = *src;
+                    dest++;
+                    *dest = ':';
+                    dest++;
+                    src += 1;
                 }
+                for( ;
+                     *src != '\0';
+                     dest++, src++ ) {
+                    if( *src == '/' ) {
+                        *dest = '\\';
+                    } else {
+                        *dest = *src;
+                    }
+                }
+                *dest = 0;
             }
-            *dest = 0;
                                 }
             break;
 
@@ -609,7 +627,7 @@ char* format_dir( wd_dir_format_t p_fmt, int p_escape, char* p_dir ) {
             break;
     }
     
-    if( p_escape ) {
+    if( p_escape && (ret_val != NULL )) {
         char* src;
         char* f = NULL;
         if( ret_val == p_dir ) {
@@ -634,14 +652,18 @@ static void dump_dir( const dir_list_t p_list, struct dir_list_item* p_item )
     char* dir_formatted = format_dir( p_list->cfg->wd_dir_form,
                                       p_list->cfg->wd_escape_output,
                                       p_item->dir_name );
-    fprintf( stdout, "%s", dir_formatted );
+    if( dir_formatted != NULL ) {
+        fprintf( stdout, "%s", dir_formatted );
 
-    if( p_item->dir_name != dir_formatted ) {
-        free( dir_formatted );
-    }
+        if( p_item->dir_name != dir_formatted ) {
+            free( dir_formatted );
+        }
 
-    if( p_list->cfg->wd_store_access ) {
-        p_item->time_accessed = p_list->cfg->wd_now_time;
+        if( p_list->cfg->wd_store_access ) {
+            p_item->time_accessed = p_list->cfg->wd_now_time;
+        }
+    } else {
+        /* TODO: What do do? */
     }
 }
 
@@ -763,28 +785,34 @@ void list_dirs( const dir_list_t p_list )
                 char* dir_formatted = format_dir( p_list->cfg->wd_dir_form,
                                                   p_list->cfg->wd_escape_output,
                                                   dir );
-                if( p_list->cfg->wd_dir_list_opt == WD_DIRLIST_NUMBERED ) {
-                    /* Using dir_loop here may mean that we get non-contiguous
-                       numbers on the output, however this is preferable to
-                       having to iterate the list to check for validity of each
-                       item when looking up the index on a subsequent operation
-                       */
-                    fprintf( stdout, "%u ", dir_loop );
-                }
-                fprintf( stdout, "%s\n", dir_formatted );
-                if( current_item->bookmark_name != NULL ) {
-                    char* name_escaped = escape_string( p_list->cfg->wd_escape_output,
-                                                        current_item->bookmark_name );
+                if( dir_formatted != NULL ) {
                     if( p_list->cfg->wd_dir_list_opt == WD_DIRLIST_NUMBERED ) {
+                        /* Using dir_loop here may mean that we get non-contiguous
+                           numbers on the output, however this is preferable to
+                           having to iterate the list to check for validity of each
+                           item when looking up the index on a subsequent operation
+                           */
                         fprintf( stdout, "%u ", dir_loop );
                     }
-                    fprintf( stdout, "%s\n", name_escaped );
-                    if( name_escaped != current_item->bookmark_name ) {
-                        free( name_escaped );
+                    fprintf( stdout, "%s\n", dir_formatted );
+                    if( current_item->bookmark_name != NULL ) {
+                        char* name_escaped = escape_string( p_list->cfg->wd_escape_output,
+                                current_item->bookmark_name );
+                        if( name_escaped != NULL ) {
+                            if( p_list->cfg->wd_dir_list_opt == WD_DIRLIST_NUMBERED ) {
+                                fprintf( stdout, "%u ", dir_loop );
+                            }
+                            fprintf( stdout, "%s\n", name_escaped );
+                            if( name_escaped != current_item->bookmark_name ) {
+                                free( name_escaped );
+                            }
+                        } else {
+                            /* TODO: What to do? */
+                        }
                     }
-                }
-                if( dir != dir_formatted ) {
-                    free( dir_formatted );
+                    if( dir != dir_formatted ) {
+                        free( dir_formatted );
+                    }
                 }
             }
         }
@@ -927,11 +955,13 @@ void dump_dir_list( const dir_list_t p_list )
 }
 
 int save_dir_list( const dir_list_t p_list, const char* p_fn ) {
-    int ret_val = 0;
+    int ret_val = WD_GENERIC_FAIL;
     FILE* file;
 
     assert( p_fn != NULL );
     assert( p_list != NULL );
+    
+    DEBUG_OUT("saving dir list to %s",p_fn);
 
     file = fopen( p_fn, "wt" );
     /* TODO: File locking here?  flock?  lockf? */
@@ -990,7 +1020,7 @@ int save_dir_list( const dir_list_t p_list, const char* p_fn ) {
         }
 
         fclose( file );
-        ret_val = 1;
+        ret_val = WD_SUCCESS;
     }
 
     return( ret_val );
