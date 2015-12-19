@@ -72,11 +72,11 @@ Using Within BASH
 
 Source the support file:
 
-    source md.bash
+    source wd.bash
 
 To ensure that this is done automatically you could add it to .bash_rc, e.g.
 
-    echo "source /path/to/md.bash" >> ~/.bash_rc
+    echo "source /path/to/wd.bash" >> ~/.bash_rc
 
 Then use the 'wcd' command to change directory with tab completion support, e.g.:
 
@@ -102,9 +102,9 @@ In The Release Package
   * wd.zsh : Support for using wd in Z Shell
   * wd.bash : Support for using wd in BASH
   * mingw/wd.exe : WD build using mingw.  No Cygwin dependency, uses "C:\xxx\yyy" style directories
-  * cygwin/md.exe : WD build using Cygwin.  Requires Cygwin to be installed, uses "/cygpath/c/xxx/yyy" style directories
+  * cygwin/wd.exe : WD build using Cygwin.  Requires Cygwin to be installed, uses "/cygpath/c/xxx/yyy" style directories
 
-Currently binary distribution of md is for Windows platforms only, however it
+Currently binary distribution of wd is for Windows platforms only, however it
 should be relatively simple to build on other platforms due to the minimal
 dependencies.
 
