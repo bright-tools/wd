@@ -10,7 +10,7 @@ and then quickly jumping back to those bookmarks
 wd is intended to be very light-weight with a minimum of dependencies - that's
 why it's implemented in C as opposed to (for example) Python.  It's also
 intended to be independent of the shell (so, for example, it could be used on
-the Windows command prompt as well as BASH).
+the Windows command prompt as well as BASH or ZSH).
 
 Usage
 =====
@@ -74,7 +74,7 @@ Source the support file:
 
     source wd.bash
 
-To ensure that this is done automatically you could add it to .bash_rc, e.g.
+To ensure that this is done automatically you could add it to `.bash_rc`, e.g.
 
     echo "source /path/to/wd.bash" >> ~/.bash_rc
 
@@ -82,7 +82,18 @@ Then use the 'wcd' command to change directory with tab completion support, e.g.
 
     wcd /pa[TAB][TAB]
 
-Tab complete should work for both directory paths and aliases
+Tab complete should work for both directory paths and aliases.
+
+If you have "[Pick](https://github.com/calleerlandsson/pick)" installed and would like to use this, set the environment variable `WD_USE_PICK`, e.g. by adding:
+
+    export WD_USE_PICK=1
+
+to your `.bash_rc`
+
+Using Within ZSH
+----------------
+
+See instructions for using with BASH, except include `wd.zsh` into your `.zshrc`
 
 Using Within Windows CMD
 ------------------------
