@@ -4,9 +4,9 @@ function wd_run()
 {
     local fmt=w
     # See if the parameter was a bookmark name?
-    if [ "$3" = "cygwin" ]; then
+    if [ "$3" = "cygwin" ] || [ "$3" = "linux-gnu" ]; then
         # Ensure paths are cygwin formatted
-        frt=c
+        fmt=c
     else
         # Ensure paths are windows formatted
         fmt=w
@@ -40,6 +40,7 @@ function _wd_complete()
     local PICK=""
     local WD_PICK_CMD=""
     local WD_PICK=""
+    local ESCAPE="-C"
 
     # Is WD_USE_PICK set?
     if [ ! -z ${WD_USE_PICK+x} ];
@@ -49,6 +50,7 @@ function _wd_complete()
         if [ ! -z ${WD_PICK+x} ];
         then 
             WD_PICK_CMD="${WD_PICK}"
+            ESCAPE="-c"
         fi
     fi
 
@@ -68,9 +70,9 @@ function _wd_complete()
     if [ "${OSTYPE}" = "cygwin" ]; 
     then
         # -s c : Cygwin formatted paths
-        local list=$(wd -l b${extra} -e d -C -s c)
+        local list=$(wd -l b${extra} -e d ${ESCAPE} -s c)
     else
-        local list=$(wd -l b${extra} -e d -C)
+        local list=$(wd -l b${extra} -e d ${ESCAPE})
     fi
 
     # Are we using pick?
