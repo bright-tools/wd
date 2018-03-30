@@ -57,9 +57,13 @@ typedef enum {
 
 /** Specify the formatting for the list */
 typedef enum {
-    WD_DIRLIST_PLAIN,    /**< No formatting requirements */
-    WD_DIRLIST_NUMBERED  /**< Number each list item */
+    WD_DIRLIST_PLAIN = 0x0,    /**< No formatting requirements */
+    WD_DIRLIST_NUMBERED = 0x1, /**< Number each list item */
+    WD_DIRLIST_PATHS = 0x2,    /**< Show the path information */
+    WD_DIRLIST_BOOKMARKS = 0x4 /**< Show the bookmark name */
 } wd_dir_list_opt_t;
+
+#define IS_BIT_SET( _val, _bit ) (((_val)&(_bit))==(_bit))
 
 /** Structure to wrap up all of the options/parameters read by this module.
     Should be initialised using init_cmdln() before use */

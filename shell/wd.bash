@@ -37,29 +37,61 @@ function _wd_complete()
     local word=${COMP_WORDS[COMP_CWORD]}
     local line=${COMP_LINE}
     local extra=""
-    # If there's no current word, request index numbers in the output
-    if [ "x${word}" = "x" ] || [ ${word} -ge 0 2>/dev/null ]; then
-        extra="1"
-    fi
-    if [ "${OSTYPE}" = "cygwin" ]; then
-        # Ensure paths are cygwin formatted
-        local list=$(wd -l ${extra} -e d -C -s c)
-    else
-        local list=$(wd -l ${extra} -e d -C)
+    local PICK=""
+    local WD_PICK_CMD=""
+    local WD_PICK=""
+
+    # Is WD_USE_PICK set?
+    if [ ! -z ${WD_USE_PICK+x} ];
+    then
+        # Check that Pick is installed
+        WD_PICK=$(command -v pick)
+        if [ ! -z ${WD_PICK+x} ];
+        then 
+            WD_PICK_CMD="${WD_PICK}"
+        fi
     fi
 
-    COMPREPLY=($(compgen -W "${list}" -- "${word}"))
+    # Not using Pick?
+    if [ "x${WD_PICK_CMD}" = "x" ];
+    then
+        # If there's no current word, or there is one, but it's numberic, 
+        #  request index numbers in the output
+        if [ "x${word}" = "x" ] || [ ${word} -ge 0 2>/dev/null ]; then
+            extra="1"
+        fi
+    fi
+
+    # -l b : Output bookmark names
+    # -e d : Only list directories, not files
+    # -C   : Double-escape paths
+    if [ "${OSTYPE}" = "cygwin" ]; 
+    then
+        # -s c : Cygwin formatted paths
+        local list=$(wd -l b${extra} -e d -C -s c)
+    else
+        local list=$(wd -l b${extra} -e d -C)
+    fi
+
+    # Are we using pick?
+    if [ "x${WD_PICK_CMD}" != "x" ];
+    then
+        COMPREPLY=($(echo "${list}" | pick -q "${word}"))
+    else
+        COMPREPLY=($(compgen -W "${list}" -- "${word}"))
+    fi
     unset IFS
 }
 
-EXPLORER=$(which explorer 2>/dev/null)
-if [ -x ${EXPLORER} ]; then
+WD_EXPLORER=$(command -v explorer)
+if [ -x "${WD_EXPLORER}" ]; then
     function wed()
     {
         wd_run explorer "$1"
     }
     complete -F _wd_complete wed
 fi
+unset WD_EXPLORER
 
 # Function to change directory using wd for favourites
 function wcd()

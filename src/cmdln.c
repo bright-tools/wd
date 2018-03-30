@@ -16,25 +16,16 @@
 
 #include "wd.h"
 #include "cmdln.h"
+#include "os_if.h"
+
 #include <stdio.h>
 #include <time.h>
-
-/* Just for the define values */
 #include <errno.h>
-
-/* Supporting get_home() */
-#include <unistd.h>
-#if defined _WIN32
-#include <shlobj.h>
-#else
-#include <stdlib.h>
-#include <pwd.h>
-#include <sys/types.h>
 #include <string.h>
-#endif
-/* !Supporting get_home() */
+#include <stdlib.h>
+#include <unistd.h>
 
-#define VERSION_STRING "wd v1.1 by dev@brightsilence.com\n https://github.com/bright-tools/wd"
+#define VERSION_STRING "wd v1.2 by dev@brightsilence.com\n https://github.com/bright-tools/wd"
 #define UNRECOGNISED_ARG_STRING "Unrecognised command line argument"
 #define NEED_PARAMETER_STRING "No parameter specified for argument"
 #define INCOMPATIBLE_OP_STRING "Parameter incompatible with other arguments"
@@ -48,39 +39,17 @@
 /** Name of environment variable to read options from */
 #define ENV_VAR_NAME      "WD_OPTS"
 
-static int get_home( config_container_t* const p_config );
+static int populate_default_list_fn( config_container_t* const p_config );
 static void show_help( const char* const p_cmd );
 static int process_opts( config_container_t* const p_config, const int argc, char* const argv[], const int p_cmd_line );
 
-static int get_home( config_container_t* const p_config )
+static int populate_default_list_fn( config_container_t* const p_config )
 {
     int ret_val = -1;
-    int success = 0;
+    char* homedir = get_home_dir();
 
-#if defined _WIN32
-    char homedir[MAX_PATH];
-    success = SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PROFILE, NULL, 0, homedir));
-#else
-    /* Try and retrieve the home from the environment first */
-    char *homedir = getenv("HOME");
-
-    if( homedir == NULL ) {
-        /* Couldn't get user's home directory from the environment so
-           try the user database */
-        uid_t uid = getuid();
-        struct passwd *pw = getpwuid(uid);
-        if (pw != NULL) {
-            homedir = pw->pw_dir;
-        }
-    }
     if( homedir != NULL ) {
-        success = 1;
-    }
-#endif
-
-    if( success ) {
-        /* Stitch the home directory and default filename together into list_fn
-           */
+        /* Stitch the home directory and default filename together into list_fn */
 
         size_t home_size = strlen( homedir );
         size_t complete = home_size +
@@ -97,6 +66,8 @@ static int get_home( config_container_t* const p_config )
         } else {
             ret_val = ENOMEM;
         }
+
+        release_home_dir( homedir );
     } else {
         ret_val = ENOENT;
     }
@@ -112,7 +83,7 @@ int init_cmdln( config_container_t* const p_config ) {
     p_config->wd_store_access = 0;
     p_config->wd_bookmark_name = NULL;
     p_config->wd_dir_form = WD_DIRFORM_NONE;
-    p_config->wd_dir_list_opt = WD_DIRLIST_PLAIN;
+    p_config->wd_dir_list_opt = WD_DIRLIST_PATHS;
     p_config->wd_now_time = time(NULL);
     p_config->wd_entity_type = WD_ENTITY_ANY;
     p_config->list_fn = NULL;
@@ -121,7 +92,7 @@ int init_cmdln( config_container_t* const p_config ) {
 
     /* TODO: Consider only doing this if the file has not been specified on the
        command line for efficiency reasons */
-    ret_val = get_home( p_config );
+    ret_val = populate_default_list_fn( p_config );
 
     return ret_val;
 }
@@ -132,17 +103,28 @@ static void show_help( const char* const p_cmd ) {
             " -v       : Show version information\n"
             " -h       : Show usage help\n"
             " -d       : Dump bookmark list\n"
+            " -c       : Escape output\n"
+            " -C       : Double escape output\n"
             " -t       : Store access times for bookmarks\n"
-            " -l       : List directories & bookmark names (generally for use in tab\n"
+            " -l <f>   : List paths & bookmark names (generally for use in tab\n"
             "             expansion)\n"
+            "             f=l : Output paths and bookmarks each on separate lines\n"
+            "             f=p : Output paths only\n"
+            "             f=b : Output bookmarks only\n"
+            " -e <t>   : Filter output by entity type\n"
+            "             t=a : All types\n"
+            "             t=f : Files only\n"
+            "             t=d : Directories only\n"
+            "             t=F : Files and unknowns\n"
+            "             t=D : Directories and unknowns\n"
             " -s <c>   : Format paths for cygwin\n"
-            " -g <id>  : Get bookmark directory.  ID can be index, name or directory\n"
-            " -n <nam> : Get bookmark directory with specified shortcut name\n"
+            " -g <id>  : Get bookmark path.  ID can be index, name or path\n"
+            " -n <nam> : Get bookmark path with specified shortcut name\n"
             " -p       : Prompt for input (can be used with -r instead of specifying\n"
-            "             directory\n"
+            "             path\n"
             " -f <fn>  : Use file <fn> for storing bookmarks\n"
-            " -r [dir] : Remove specified directory or current directory if none\n"
-            " -a [dir] : Add specified directory or current directory if none\n"
+            " -r [dir] : Remove specified path or current directory if none\n"
+            " -a [dir] : Add specified path or current directory if none\n"
             "             specified\n",
             p_cmd );
     /* TODO: Complete the description */
@@ -254,20 +236,38 @@ static int process_opts( config_container_t* const p_config, const int argc, cha
             p_config->wd_oper = WD_OPER_LIST;
             if((( arg_loop + 1 ) < argc ) &&
                 ( argv[ arg_loop + 1 ][0] != '-' )) {
+                size_t arglen;
                 arg_loop++;
-                if( strlen( argv[ arg_loop ] ) > 1 ) {
+                arglen = strlen( argv[ arg_loop ] );
+                if( arglen > 2 ) {
                     fprintf( stdout, "%s: %s\n", UNRECOGNISED_PARAM_STRING, this_arg );
                 } else {
-                    switch( argv[ arg_loop ][0] ) {
+                    size_t j;
+                    for( j = 0; j < arglen; j++ )
+                    switch( argv[ arg_loop ][j] ) {
                         case '1':
-                            p_config->wd_dir_list_opt = WD_DIRLIST_NUMBERED;
+                            p_config->wd_dir_list_opt |= WD_DIRLIST_NUMBERED;
+                            break;
+                        case 'l':
+                            p_config->wd_dir_list_opt |= WD_DIRLIST_PATHS | WD_DIRLIST_BOOKMARKS;
+                            break;
+                        case 'p':
+                            p_config->wd_dir_list_opt |= WD_DIRLIST_PATHS;
+                            break;
+                        case 'b':
+                            p_config->wd_dir_list_opt |= WD_DIRLIST_BOOKMARKS;
                             break;
                         default:
-                            fprintf( stdout, "%s: %s\n", UNRECOGNISED_PARAM_STRING, this_arg );
+                            fprintf( stdout, "%s: %s '%c'\n", UNRECOGNISED_PARAM_STRING, this_arg, argv[ arg_loop ][j] );
                             ret_val = 0;
                             break;
                     }
                 }
+            }
+            else
+            {
+                fprintf( stdout, "%s: %s\n", NEED_PARAMETER_STRING, this_arg );
+                ret_val = 0;                
             }
         } else if( p_cmd_line && (( 0 == strcmp( this_arg, "-n" )) ||
                                   ( 0 == strcmp( this_arg, "-g" )))) {
@@ -304,14 +304,8 @@ static int process_opts( config_container_t* const p_config, const int argc, cha
 
                     /* TODO: Add a switch to prevent the path being made
                        absolute? */
-#if defined _WIN32
-                    GetFullPathName( argv[ arg_loop ],
-                                     MAXPATHLEN,
-                                     p_config->wd_oper_dir,
-                                     NULL );
-#else
-                    realpath( argv[ arg_loop ], p_config->wd_oper_dir );
-#endif
+                    canonicalize_dir( argv[ arg_loop ],
+                                      p_config->wd_oper_dir );
 
                     /* TODO: This only really makes sense for an add operation
                     */

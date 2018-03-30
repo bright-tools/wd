@@ -1,5 +1,5 @@
 /*
-   Copyright 2013-2014 John Bailey
+   Copyright 2013-2018 John Bailey
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -40,13 +40,12 @@
 #include <assert.h>
 #include <string.h>
 #include <errno.h>
-#include <sys/param.h>
 #include <sys/stat.h>
 #include <time.h>
 
 #define MIN_DIR_SIZE 100
 
-/* TODO: Since chage #6, we support files as well as directories, so all of the
+/* TODO: Since change #6, we support files as well as directories, so all of the
    "dir" references in this file are a little misleading */
 
 struct dir_list_item
@@ -230,19 +229,19 @@ static time_t sscan_time( const char* const p_str )
 dir_list_t load_dir_list( const config_container_t* const p_config, const char* const p_fn )
 {
     dir_list_t ret_val = NULL;
-#if defined _WIN32
+#if defined WIN32
     if( 0 == strcmp( p_fn, USE_FAVOURITES_FILE_STR )) {
         ret_val = load_dir_list_from_favourites( p_config, p_fn );
     } else {
 #endif
         ret_val = load_dir_list_from_file( p_config, p_fn );
-#if defined _WIN32
+#if defined WIN32
     }
 #endif
     return ret_val;
 }
 
-#if defined _WIN32
+#if defined WIN32
 #include "shrtcut.h"
 #include <shlobj.h>
 #include <dirent.h>
@@ -553,7 +552,7 @@ static char* escape_string( int p_escape, char* p_str )
     return ret_val;
 }
 
-char* format_dir( wd_dir_format_t p_fmt, int p_escape, char* p_dir ) {
+char* format_dir( wd_dir_format_t p_fmt, int p_escape, char* const p_dir ) {
     char* ret_val = NULL;
 
     switch( p_fmt ) {
@@ -746,6 +745,83 @@ static wd_entity_t get_type( const char* const p_path )
     return ret_val;
 }
 
+int dir_should_be_listed( const struct dir_list_item* p_dir_item,
+                           const config_container_t* p_cfg )
+{
+    int valid = 1;
+    /* TODO: Update current_item->type here? */
+    wd_entity_t type = get_type( p_dir_item->dir_name );
+
+    /* Check to see if this item matches the filter */
+    if((p_cfg->wd_entity_type != WD_ENTITY_ANY) &&
+        (p_cfg->wd_entity_type != type )) {
+        /* No, don't output */
+        valid = 0;
+    } else if( 0 == p_cfg->wd_output_all ) {
+
+        /* Check to see if it's other than a file or directory (ie. an
+            invalid entity */
+        if(( type != WD_ENTITY_DIR ) &&
+            ( type != WD_ENTITY_FILE ))
+        {
+            valid = 0;
+        }
+    }
+    return valid; 
+}
+
+void list_dir(const struct dir_list_item* p_dir_item,
+              const size_t p_count,
+              const config_container_t* p_cfg )
+{
+
+    if( dir_should_be_listed( p_dir_item, p_cfg )) 
+    {
+        char* const dir = p_dir_item->dir_name;
+
+        char* dir_formatted = format_dir( p_cfg->wd_dir_form,
+                                            p_cfg->wd_escape_output,
+                                            dir );
+        if( dir_formatted != NULL ) {
+            if( IS_BIT_SET( p_cfg->wd_dir_list_opt, WD_DIRLIST_NUMBERED ) & 
+                !(IS_BIT_SET( p_cfg->wd_dir_list_opt, WD_DIRLIST_PATHS ) || 
+                  IS_BIT_SET( p_cfg->wd_dir_list_opt, WD_DIRLIST_BOOKMARKS )) ) {
+                fprintf( stdout, "%u\n", p_count );
+            }
+            if( IS_BIT_SET( p_cfg->wd_dir_list_opt, WD_DIRLIST_PATHS )) {
+                if( IS_BIT_SET( p_cfg->wd_dir_list_opt, WD_DIRLIST_NUMBERED )) {
+                    /* Using p_count here may mean that we get non-contiguous
+                        numbers on the output, however this is preferable to
+                        having to iterate the list to check for validity of each
+                        item when looking up the index on a subsequent operation
+                        */
+                    fprintf( stdout, "%u ", p_count );
+                }
+                fprintf( stdout, "%s\n", dir_formatted );
+            }
+            if( IS_BIT_SET( p_cfg->wd_dir_list_opt, WD_DIRLIST_BOOKMARKS ) &&
+                ( p_dir_item->bookmark_name != NULL )) {
+                char* name_escaped = escape_string( p_cfg->wd_escape_output,
+                        p_dir_item->bookmark_name );
+                if( name_escaped != NULL ) {
+                    if( IS_BIT_SET( p_cfg->wd_dir_list_opt, WD_DIRLIST_NUMBERED ) ) {
+                        fprintf( stdout, "%u ", p_count );
+                    }
+                    fprintf( stdout, "%s\n", name_escaped );
+                    if( name_escaped != p_dir_item->bookmark_name ) {
+                        free( name_escaped );
+                    }
+                } else {
+                    /* TODO: What to do? */
+                }
+            }
+            if( dir != dir_formatted ) {
+                free( dir_formatted );
+            }
+        }
+    }
+}
+
 void list_dirs( const dir_list_t p_list )
 {
     if( p_list == NULL )
@@ -754,67 +830,12 @@ void list_dirs( const dir_list_t p_list )
     } else {
         size_t dir_loop;
         struct dir_list_item* current_item;
-        int valid;
 
         for( dir_loop = 0, current_item = p_list->dir_list;
              dir_loop < p_list->dir_count;
              dir_loop++, current_item++ )
         {
-            char* dir = current_item->dir_name;
-            valid = 1;
-            /* TODO: Update current_item->type here? */
-            wd_entity_t type = get_type( dir );
-
-            /* Check to see if this item matches the filter */
-            if((p_list->cfg->wd_entity_type != WD_ENTITY_ANY) &&
-               (p_list->cfg->wd_entity_type != type )) {
-                /* No, don't output */
-                valid = 0;
-            } else if( 0 == p_list->cfg->wd_output_all ) {
-
-                /* Check to see if it's other than a file or directory (ie. an
-                   invalid entity */
-                if(( type != WD_ENTITY_DIR ) &&
-                   ( type != WD_ENTITY_FILE ))
-                {
-                    valid = 0;
-                }
-            }
-
-            if( valid ) {
-                char* dir_formatted = format_dir( p_list->cfg->wd_dir_form,
-                                                  p_list->cfg->wd_escape_output,
-                                                  dir );
-                if( dir_formatted != NULL ) {
-                    if( p_list->cfg->wd_dir_list_opt == WD_DIRLIST_NUMBERED ) {
-                        /* Using dir_loop here may mean that we get non-contiguous
-                           numbers on the output, however this is preferable to
-                           having to iterate the list to check for validity of each
-                           item when looking up the index on a subsequent operation
-                           */
-                        fprintf( stdout, "%u ", dir_loop );
-                    }
-                    fprintf( stdout, "%s\n", dir_formatted );
-                    if( current_item->bookmark_name != NULL ) {
-                        char* name_escaped = escape_string( p_list->cfg->wd_escape_output,
-                                current_item->bookmark_name );
-                        if( name_escaped != NULL ) {
-                            if( p_list->cfg->wd_dir_list_opt == WD_DIRLIST_NUMBERED ) {
-                                fprintf( stdout, "%u ", dir_loop );
-                            }
-                            fprintf( stdout, "%s\n", name_escaped );
-                            if( name_escaped != current_item->bookmark_name ) {
-                                free( name_escaped );
-                            }
-                        } else {
-                            /* TODO: What to do? */
-                        }
-                    }
-                    if( dir != dir_formatted ) {
-                        free( dir_formatted );
-                    }
-                }
-            }
+            list_dir( current_item, dir_loop, p_list->cfg);
         }
     }
 }

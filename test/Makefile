@@ -105,15 +105,15 @@ test10: test9
 	$(TGT_E) -a 'C:\' see $(OUT)
 	$(TGT_E) -a 'C:\windows' windows $(OUT)
 	$(TGT_E) -a 'C:\temp' temp $(OUT)
-	$(TGT_E) -l $(OUT)
 	$(CHECK_E)
+	$(TGT_E) -l l $(OUT)
 
 .PHONY: test11
 test11: OFF=50
 test11: STEP=11
 test11: test10
 	@echo Test $(STEP): Testing list output \(numbered\)
-	$(TGT_E) -l 1 $(OUT)
+	$(TGT_E) -l 1l $(OUT)
 	$(CHECK_E)
 
 .PHONY: test12
@@ -202,7 +202,7 @@ test20: test19
 	$(TGT_E) -a '/some directory/here' bn
 	$(TGT_E) -a '/another directory/here' et
 	$(TGT_E) -a '/usr/bin' ub
-	$(TGT_E) -c -l $(OUT)
+	$(TGT_E) -c -l l $(OUT)
 	$(CHECK_E)
 
 .PHONY: test21
@@ -210,7 +210,7 @@ test21: OFF=90
 test21: STEP=21
 test21: test20
 	@echo Test $(STEP): Command Line Options : -C \(double escape spaces, win form\)
-	$(TGT_E) -C -l -s w $(OUT)
+	$(TGT_E) -C -l l -s w $(OUT)
 	$(CHECK_E)
 
 .PHONY: test22
@@ -218,5 +218,5 @@ test22: OFF=95
 test22: STEP=22
 test22: test21
 	@echo Test $(STEP): Command Line Options : -C \(double escape spaces, cygwin form\)
-	$(TGT_E) -C -l -s c $(OUT)
+	$(TGT_E) -C -l l -s c $(OUT)
 	$(CHECK_E)

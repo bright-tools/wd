@@ -24,7 +24,7 @@
 /* Just for the define values */
 #include <errno.h>
 
-#if defined _WIN32
+#if defined WIN32
 #include <io.h>
 #include <fcntl.h>
 #endif
@@ -358,7 +358,7 @@ static void perform_op( const config_container_t* cfg,
             dump_dir_list( dir_list );
             break;
         case WD_OPER_LIST:
-#if defined _WIN32
+#if defined WIN32
             _setmode(1,_O_BINARY);
 #endif
             /* TODO: This won't update the access time - don't

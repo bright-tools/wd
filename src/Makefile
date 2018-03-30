@@ -1,7 +1,8 @@
 C_SRC := cmdln.c dir_list.c wd.c
 ifeq ($(TARGET),win32)
-  C_SRC += shrtcut.c
+  C_SRC += shrtcut.c win32.c
 else
+  C_SRC += posix.c
   ifeq ($(TARGET),)
     TARGET=$(shell uname -o)
   endif
@@ -18,14 +19,22 @@ MINGW_CC= i686-pc-mingw32-gcc.exe
 $(TGT): $(OBJS)
 	$(CC) -o $@ $^ $(LDFLAGS) 
 
+# Rule to install all the packages needed to develop this
+#  under Cygwin
+cyg_install:
+	setup-x86.exe -q -P ctags,mingw-gcc-g++,make,splint,doxygen
+
 clean:
 	rm -rf $(OBJS) $(TGT)
+
+tags:
+	ctags --tag-relative --extra=f -R .
 
 splint:
 	# -preproc used because splint doesn't seem to like varadic macros
 	splint $(C_SRC) $(CDEFS) -preproc +posix-lib
 
-release: splint $(TGT)
+release: $(TGT)
 	strip -s $(TGT)
 	ldd $(TGT)
 	ls -la $(TGT)
