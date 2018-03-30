@@ -171,13 +171,15 @@ static int do_get( const config_container_t* const p_config,
                     cmd, idx);
         }
     }
-    else if(( dump_dir_with_name( p_dir_list, p_config->wd_bookmark_name ) ||
-              dump_dir_if_exists( p_dir_list, p_config->wd_bookmark_name )) &&
-            p_config->wd_store_access ) 
+    else if( dump_dir_with_name( p_dir_list, p_config->wd_bookmark_name ) ||
+             dump_dir_if_exists( p_dir_list, p_config->wd_bookmark_name ) ) 
     {
-        /* We're updating access times, so flag that the list needs
-           saving */
-        dir_list_needs_save = 1;
+        if( p_config->wd_store_access )
+        {
+            /* We're updating access times, so flag that the list needs
+            saving */
+            dir_list_needs_save = 1;
+        }
     }
     else
     {
