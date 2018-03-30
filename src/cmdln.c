@@ -243,6 +243,8 @@ static int process_opts( config_container_t* const p_config, const int argc, cha
                     fprintf( stdout, "%s: %s\n", UNRECOGNISED_PARAM_STRING, this_arg );
                 } else {
                     size_t j;
+                    /* Reset from the default */
+                    p_config->wd_dir_list_opt = 0;
                     for( j = 0; j < arglen; j++ )
                     switch( argv[ arg_loop ][j] ) {
                         case '1':
