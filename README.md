@@ -105,6 +105,22 @@ Then use the 'wcd' command to change directory using bookmark aliases, e.g.:
     C:\Users\fred\Documents> wcd wd_git_repo
     C:\Users\fred\Documents\wd\working\git> 
 
+By default, bookmarks will be stored in a file called `.wd_list` in the user's
+home directory
+
+Installation
+============
+
+  * Download the latest [release](https://github.com/bright-tools/wd/releases)
+  * Unzip the file
+  * Choose which whether you're using the Cygwin or MinGW build & place the `.exe` in a directory which is on your path
+  * Set-up support within your shell (see above)
+
+wd can be used in Windows CMD environment, Cygwin or MINGW.  If you are
+going to use more than one of these environments and want to share the same
+bookmark file then you will need to supply the name of the shared file via
+the `-f` command-line parameter or within the `WD_OPTS` environment variable
+
 In The Release Package
 ======================
 
@@ -119,7 +135,7 @@ Currently binary distribution of wd is for Windows platforms only, however it
 should be relatively simple to build on other platforms due to the minimal
 dependencies.
 
-I'd suggest using the "mingw" version of md unless you hae a preference for
+I'd suggest using the "mingw" version of wd unless you have a preference for
 Cygwin style paths.
 
 Project Doxygen
