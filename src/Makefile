@@ -1,6 +1,10 @@
 C_SRC := cmdln.c dir_list.c wd.c
 ifeq ($(TARGET),win32)
-  C_SRC += shrtcut.c win32.c
+  C_SRC += shrtcut.c  win32.c
+  MINGW_CC= i686-pc-mingw32-gcc.exe
+  MINGW_LDFLAGS = -L/usr/i686-pc-mingw32/sys-root/mingw/lib/ -lole32 -luuid
+  LDFLAGS = $(MINGW_LDFLAGS)
+  CC = $(MINGW_CC)
 else
   C_SRC += posix.c
   ifeq ($(TARGET),)
@@ -9,12 +13,8 @@ else
 endif
 CDEFS   = -DTARGET=$(TARGET)
 CFLAGS  = -O3 -g -Wall $(CDEFS)
-MINGW_LDFLAGS = -L/usr/i686-pc-mingw32/sys-root/mingw/lib/ -lole32 -luuid
 OBJS    = $(C_SRC:.c=.o)
 TGT     = wd
-MINGW_CC= i686-pc-mingw32-gcc.exe
-#LDFLAGS = $(MINGW_LDFLAGS)
-#CC = $(MINGW_CC)
 
 $(TGT): $(OBJS)
 	$(CC) -o $@ $^ $(LDFLAGS) 
@@ -32,7 +32,7 @@ tags:
 
 splint:
 	# -preproc used because splint doesn't seem to like varadic macros
-	splint $(C_SRC) $(CDEFS) -preproc +posix-lib
+	splint $(C_SRC) $(CDEFS) -preproc +posix-lib +bool-int
 
 release: $(TGT)
 	strip -s $(TGT)
