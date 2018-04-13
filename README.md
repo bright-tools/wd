@@ -1,6 +1,8 @@
 wd
 ==
 
+[![Build Status](https://travis-ci.org/bright-tools/wd.svg?branch=master)](https://travis-ci.org/bright-tools/wd)
+
 Utility to store and set the current working directory (cwd) in a command-line
 shell.
 
