@@ -1,7 +1,7 @@
 language: C
 
 install:
-  - vagrant/bootstrap.sh 
+  - ./vagrant/bootstrap.sh 
 
 script:
   - make -C src
