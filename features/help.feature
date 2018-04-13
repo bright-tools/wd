@@ -1,7 +1,7 @@
 Feature: help
 
   Scenario: User invokes -v parameter to get the version information
-    When I run `src/package/mingw/wd -v`
+    When I run `src/wd -v`
     Then the exit status should be 0
     And the output should match:
     """
@@ -11,7 +11,7 @@ wd v1.2 by dev@brightsilence.com[\r]
     """
 
   Scenario: User invokes -h parameter to get the help information
-    When I run `src/package/mingw/wd -h`
+    When I run `src/wd -h`
     Then the exit status should be 0
     And the output should match:
     """
