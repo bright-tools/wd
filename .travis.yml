@@ -1,9 +1,12 @@
 language: C
 sudo: required
 
+rvm:
+  - 2.2
+
 install:
   - ./vagrant/bootstrap.sh 
 
 script:
   - make -C src
-  - cucumber
+  - bundle exec cucumber
