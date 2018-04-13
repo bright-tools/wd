@@ -65,7 +65,7 @@ struct dir_list_s
 {
     size_t                dir_count;
     struct dir_list_item* dir_list;
-    int                   dir_size;
+    size_t                dir_size;
 
     /* TODO: Is it the best thing to store the config here?  config contains
        things that this class doesn't care about */
@@ -84,6 +84,8 @@ static dir_list_t load_dir_list_from_favourites( const config_container_t* const
 static void increase_dir_alloc( dir_list_t p_list )
 {
     struct dir_list_item* new_mem;
+
+    /* TODO: check for wrap */
     p_list->dir_size += MIN_DIR_SIZE;
 
     new_mem = 
@@ -786,7 +788,7 @@ void list_dir(const struct dir_list_item* p_dir_item,
             if( IS_BIT_SET( p_cfg->wd_dir_list_opt, WD_DIRLIST_NUMBERED ) & 
                 !(IS_BIT_SET( p_cfg->wd_dir_list_opt, WD_DIRLIST_PATHS ) || 
                   IS_BIT_SET( p_cfg->wd_dir_list_opt, WD_DIRLIST_BOOKMARKS )) ) {
-                fprintf( stdout, "%u\n", p_count );
+                fprintf( stdout, "%zu\n", p_count );
             }
             if( IS_BIT_SET( p_cfg->wd_dir_list_opt, WD_DIRLIST_PATHS )) {
                 if( IS_BIT_SET( p_cfg->wd_dir_list_opt, WD_DIRLIST_NUMBERED )) {
@@ -795,7 +797,7 @@ void list_dir(const struct dir_list_item* p_dir_item,
                         having to iterate the list to check for validity of each
                         item when looking up the index on a subsequent operation
                         */
-                    fprintf( stdout, "%u ", p_count );
+                    fprintf( stdout, "%zu ", p_count );
                 }
                 fprintf( stdout, "%s\n", dir_formatted );
             }
@@ -805,7 +807,7 @@ void list_dir(const struct dir_list_item* p_dir_item,
                         p_dir_item->bookmark_name );
                 if( name_escaped != NULL ) {
                     if( IS_BIT_SET( p_cfg->wd_dir_list_opt, WD_DIRLIST_NUMBERED ) ) {
-                        fprintf( stdout, "%u ", p_count );
+                        fprintf( stdout, "%zu ", p_count );
                     }
                     fprintf( stdout, "%s\n", name_escaped );
                     if( name_escaped != p_dir_item->bookmark_name ) {
@@ -895,7 +897,7 @@ void dump_dir_list( const dir_list_t p_list )
         struct dir_list_item* current_item;
         int term_is_ansi = determine_if_term_is_ansi();
 
-        fprintf( stdout, "Dirlist has %d entries of %d used\n",
+        fprintf( stdout, "Dirlist has %zu entries of %zu used\n",
                  p_list->dir_count, p_list->dir_size );
 
         for( dir_loop = 0, current_item = p_list->dir_list;
@@ -930,7 +932,7 @@ void dump_dir_list( const dir_list_t p_list )
                 col = ANSI_COLOUR_GREEN;
             }
 
-            fprintf( stdout, "[%3d] ", dir_loop);
+            fprintf( stdout, "[%3zu] ", dir_loop);
 #if defined WIN32
             if( wcol != -1 ) {
                 wOldColorAttrs = TextColour(wcol);
