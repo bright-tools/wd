@@ -1,0 +1,8 @@
+language: C
+
+install:
+  - vagrant/bootstrap.sh 
+
+script:
+  - make -C src
+  - cucumber
