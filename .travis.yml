@@ -1,9 +1,6 @@
 language: C
 sudo: required
 
-before_install:
-  - rvm install 2.1.5
-
 install:
   - ./vagrant/bootstrap.sh 
 
