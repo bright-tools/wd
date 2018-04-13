@@ -3,7 +3,7 @@
 sudo apt-get update
 sudo apt-get install -y gcc make tmux zsh
 
-if [ -z "$TRAVIS"]; then
+if [ -z "$TRAVIS" ]; then
     sudo apt-get install -y ruby2.3 ruby2.3-dev
 fi
 
