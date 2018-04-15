@@ -4,42 +4,42 @@ Feature: help
     When I run `src/wd -v`
     Then the exit status should be 0
     And the output should match:
-    """
+"""
 wd v1.2 by dev@brightsilence.com\r*
-\shttps://github.com/bright-tools/wd\r*
-\sBuilt for: 
-    """
+ https://github.com/bright-tools/wd\r*
+ Built for: 
+"""
 
   Scenario: User invokes -h parameter to get the help information
     When I run `src/wd -h`
     Then the exit status should be 0
     And the output should match:
-    """
+"""
 wd(.exe)? \[-v\] \[-h\] \[-t\] \[-f <fn>\] \[-r \[dir\] \[-p\]\] \[-a \[dir\]\] \[-d\] \[-l\] \[-s <c>\]\r*
-\s-v       : Show version information\r*
-\s-h       : Show usage help\r*
-\s-d       : Dump bookmark list\r*
-\s-c       : Escape output\r*
-\s-C       : Double escape output\r*
-\s-t       : Store access times for bookmarks\r*
-\s-l <f>   : List paths & bookmark names \(generally for use in tab\r*
-\s            expansion\)\r*
-\s            f=l : Output paths and bookmarks each on separate lines\r*
-\s            f=p : Output paths only\r*
-\s            f=b : Output bookmarks only\r*
-\s-e <t>   : Filter output by entity type\r*
-\s            t=a : All types\r*
-\s            t=f : Files only\r*
-\s            t=d : Directories only\r*
-\s            t=F : Files and unknowns\r*
-\s            t=D : Directories and unknowns\r*
-\s-s <c>   : Format paths for cygwin\r*
-\s-g <id>  : Get bookmark path.  ID can be index, name or path\r*
-\s-n <nam> : Get bookmark path with specified shortcut name\r*
-\s-p       : Prompt for input \(can be used with -r instead of specifying\r*
-\s            path\r*
-\s-f <fn>  : Use file <fn> for storing bookmarks\r*
-\s-r \[dir\] : Remove specified path or current directory if none\r*
-\s-a \[dir\] : Add specified path or current directory if none\r*
-\s            specified
-    """
+ -v       : Show version information\r*
+ -h       : Show usage help\r*
+ -d       : Dump bookmark list\r*
+ -c       : Escape output\r*
+ -C       : Double escape output\r*
+ -t       : Store access times for bookmarks\r*
+ -l <f>   : List paths & bookmark names \(generally for use in tab\r*
+             expansion\)\r*
+             f=l : Output paths and bookmarks each on separate lines\r*
+             f=p : Output paths only\r*
+             f=b : Output bookmarks only\r*
+ -e <t>   : Filter output by entity type\r*
+             t=a : All types\r*
+             t=f : Files only\r*
+             t=d : Directories only\r*
+             t=F : Files and unknowns\r*
+             t=D : Directories and unknowns\r*
+ -s <c>   : Format paths for cygwin\r*
+ -g <id>  : Get bookmark path.  ID can be index, name or path\r*
+ -n <nam> : Get bookmark path with specified shortcut name\r*
+ -p       : Prompt for input \(can be used with -r instead of specifying\r*
+             path\r*
+ -f <fn>  : Use file <fn> for storing bookmarks\r*
+ -r \[dir\] : Remove specified path or current directory if none\r*
+ -a \[dir\] : Add specified path or current directory if none\r*
+             specified
+"""
