@@ -32,6 +32,44 @@ Then(/the default list file should (not )?exist$/i) do |expect_match|
     end
 end
 
+Then(/the default list file should contain a header$/) do
+    file = get_default_file_list()
+    expected = "# WD directory list file\n" +
+               "# File format: version 1\n"
+    expect(file).to have_file_content file_content_including(expected.chomp)
+end
+
+Then(/the default list file should contain a shortcut to(?: (unknown|directory|file)?)? '([^"]*)'( named "([^"]*)")?( with timestamp "(.+?)")?$/) do |file_or_directory, shortcut, named, timestamp|
+    expected = ":"+shortcut+"\n"
+
+    if named
+        expected += "N:#{named}\n"
+    else
+        expected += "(N:.*)?"
+    end
+
+    if timestamp
+        expected += "A:#{timestamp}\n"
+    else
+        expected += "(A:.*)?"
+    end
+
+    if file_or_directory == 'file'
+        expected += "T:F"
+    elsif file_or_directory == 'directory'
+        expected += "T:D"
+    elsif file_or_directory == 'unknown'
+        expected += "T:U"
+    else
+        expected += "(T:.*)"
+    end
+
+#    print "XX: '#{shortcut}'\nYY: '#{file_or_directory}'\nII: '#{named}'\nTT: '#{timestamp}'\nOO: '#{expected}'"
+
+    file = get_default_file_list()
+    expect(file).to have_file_content file_content_matching(expected)
+end
+
 Then(/the default list file should contain:$/) do |expected|
     file = get_default_file_list()
     expect(file).to have_file_content file_content_including(expected.chomp)
