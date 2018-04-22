@@ -7,7 +7,9 @@ def get_default_file_list()
 end
 
 Given(/^the default list file does not exist$/) do
-    remove(get_default_file_list(), :force => true)
+    file = get_default_file_list()
+    remove(file, :force => true)
+    step "a file named \"#{file}\" should not exist"
 end
 
 Given(/^the default list file is empty$/) do
@@ -20,6 +22,7 @@ end
 
 When(/I run wd with arguments "(.+?)"$/i) do |args|
     cmd = sanitize_text("src/wd -f "+get_default_file_list()+" " +args)
+#    print "Running: #{cmd}\n" 
     run_simple(cmd, :fail_on_error => false)
 end
 
@@ -57,7 +60,7 @@ Then(/the default list file should contain ([0-9]+?) shortcut(?:s)?/) do |expect
 end
 
 Then(/the default list file should contain a shortcut to(?: (unknown|directory|file)?)? '([^"]*)'( named "([^"]*)")?( with timestamp "(.+?)")?$/) do |file_or_directory, shortcut, named, timestamp|
-    expected = ":"+shortcut+"\n"
+    expected = ":"+Shellwords.escape(shortcut)+"\n"
 
     if named
         expected += "N:#{named}\n"
@@ -82,6 +85,12 @@ Then(/the default list file should contain a shortcut to(?: (unknown|directory|f
     end
 
 #    print "XX: '#{shortcut}'\nYY: '#{file_or_directory}'\nII: '#{named}'\nTT: '#{timestamp}'\nOO: '#{expected}'"
+#    print "---\n"
+#    file = File.open(get_default_file_list(), "r")
+#    contents = file.read
+#    file.close
+#    print contents
+#    print "---\n"
 
     file = get_default_file_list()
     expect(file).to have_file_content file_content_matching(expected)
