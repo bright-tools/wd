@@ -37,28 +37,52 @@ Creating empty list
       | dir   | bookmark |
       | c:\\a | see      |
 
-  @onlywindows
-  Scenario: User attempts to add adds a bookmark with a duplicate name
+  Scenario Outline: User attempts to add adds a bookmark with a duplicate name
     Given the default list file does not exist
-    When I run wd with arguments "-z 1386181003 -a 'C:\\a' see"
-    Then the default list file should contain a shortcut to 'C:\a' named "see" with timestamp "2013/12/04 18:16:43"
-    And I run wd with arguments "-z 1386181009 -a 'C:\\b' see"
+    When I run wd with arguments "-z 1386181003 -a '<dir1>' see"
+    Then the default list file should contain a shortcut to '<dir1>' named "see" with timestamp "2013/12/04 18:16:43"
+    And I run wd with arguments "-z 1386181009 -a '<dir2>' see"
     Then the default list file should contain 1 shortcut
-    And the default list file should contain a shortcut to 'C:\a' named "see" with timestamp "2013/12/04 18:16:43"
+    And the default list file should contain a shortcut to '<dir1>' named "see" with timestamp "2013/12/04 18:16:43"
 
-  @onlywindows
-  Scenario: User attempts to add adds a bookmark with a duplicate directory
+    @notwindows
+    Examples:
+      | dir1           | dir2                 |
+      | /doesnt_exist  | /doesnt_exist_either |
+    @onlywindows
+    Examples:
+      | dir1             | dir2                   |
+      | c:\\doesnt_exist | c:\doesnt_exist_either |
+
+  Scenario Outline: User attempts to add adds a bookmark with a duplicate directory
     Given the default list file does not exist
-    When I run wd with arguments "-z 1386181003 -a 'C:\\a' see"
-    And I run wd with arguments "-z 1386181009 -a 'C:\\a' vee"
+    When I run wd with arguments "-z 1386181003 -a '<dir1>' see"
+    And I run wd with arguments "-z 1386181009 -a '<dir1>' vee"
     Then the default list file should contain 1 shortcut
-    And the default list file should contain a shortcut to 'C:\a' named "see" with timestamp "2013/12/04 18:16:43"
+    And the default list file should contain a shortcut to '<dir1>' named "see" with timestamp "2013/12/04 18:16:43"
 
-  @onlywindows
-  Scenario: User attempts to add adds a second bookmark
+    @notwindows
+    Examples:
+      | dir1           |
+      | /doesnt_exist  |
+    @onlywindows
+    Examples:
+      | dir1             |
+      | c:\\doesnt_exist |
+
+  Scenario Outline: User attempts to add adds a second bookmark
     Given the default list file does not exist
-    When I run wd with arguments "-z 1386181003 -a 'C:\\a' see"
-    And I run wd with arguments "-z 1386181009 -a 'C:\\b' bee"
+    When I run wd with arguments "-z 1386181003 -a '<dir1>' see"
+    And I run wd with arguments "-z 1386181009 -a '<dir2>' bee"
     Then the default list file should contain 2 shortcut
-    And the default list file should contain a shortcut to 'C:\a' named "see" with timestamp "2013/12/04 18:16:43"
-    And the default list file should contain a shortcut to 'C:\b' named "bee" with timestamp "2013/12/04 18:16:49"
+    And the default list file should contain a shortcut to '<dir1>' named "see" with timestamp "2013/12/04 18:16:43"
+    And the default list file should contain a shortcut to '<dir2>' named "bee" with timestamp "2013/12/04 18:16:49"
+
+    @notwindows
+    Examples:
+      | dir1           | dir2                 |
+      | /doesnt_exist  | /doesnt_exist_either |
+    @onlywindows
+    Examples:
+      | dir1             | dir2                   |
+      | c:\\doesnt_exist | c:\doesnt_exist_either |
