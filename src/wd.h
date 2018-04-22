@@ -21,4 +21,11 @@
 #define WD_GENERIC_FAIL 0
 #define WD_SUCCEEDED( _x ) (( _x ) == WD_SUCCESS )
 
+#if defined WIN32
+/** Printf format string for size_t */
+#define PFFST "%Iu"
+#else
+#define PFFST "%zu"
+#endif
+
 #endif
