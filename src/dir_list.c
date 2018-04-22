@@ -84,16 +84,23 @@ static dir_list_t load_dir_list_from_favourites( const config_container_t* const
 static void increase_dir_alloc( dir_list_t p_list )
 {
     struct dir_list_item* new_mem;
+    size_t new_size;
 
     /* TODO: check for wrap */
-    p_list->dir_size += MIN_DIR_SIZE;
+    new_size = p_list->dir_size + MIN_DIR_SIZE;
 
     new_mem = 
         (struct dir_list_item*) realloc( p_list->dir_list,
-                                         p_list->dir_size * DLI_SIZE );
+                                         new_size * DLI_SIZE );
     if( new_mem != NULL )
     {
+        DEBUG_OUT("Dir list now size " PFFST " (" PFFST " bytes per entry)",new_size,DLI_SIZE);
         p_list->dir_list = new_mem;
+        p_list->dir_size = new_size;
+    }
+    else
+    {
+        DEBUG_OUT("realloc of dir allocation failed");
     }
 }
 
@@ -121,38 +128,51 @@ int add_dir( dir_list_t p_list,
         DEBUG_OUT("increased allocation"); 
     }
 
+    DEBUG_OUT("Adding dir entry " PFFST,idx);
+
     /* Check to see if there's space now - it's possible that an attempt to
        increase the allocation (above) actually failed */
     if( idx < p_list->dir_size )
     {
-        dest = (char*)malloc( strlen( p_dir ) + 1);
+        struct dir_list_item* const dir_item = &( p_list->dir_list[ idx ] );
+
+        size_t dest_len = strlen( p_dir );
+
+        DEBUG_OUT("Destination length: " PFFST,dest_len);
+        dest = (char*)malloc(dest_len + 1);
         if( dest != NULL ) {
             strcpy( dest, p_dir );
-            p_list->dir_list[ idx ].dir_name = dest;
+            dir_item->dir_name = dest;
 
             if( p_name != NULL )
             {
-                dest = (char*)malloc( strlen( p_name ) + 1);
+                size_t name_len = strlen( p_name );
+                DEBUG_OUT("Name length: " PFFST,name_len);
+                dest = (char*)malloc( name_len + 1 );
                 if( dest != NULL ) {
                     strcpy( dest, p_name );
-                    p_list->dir_list[ idx ].bookmark_name = dest;
+                    dir_item->bookmark_name = dest;
                     ret_val = WD_SUCCESS;
                 } else {
                     fprintf(stderr,"MALLOC FAILED\n");
-                    p_list->dir_list[ idx ].bookmark_name = NULL;
+                    dir_item->bookmark_name = NULL;
                 }
             } else {
-                p_list->dir_list[ idx ].bookmark_name = NULL;
+                dir_item->bookmark_name = NULL;
                 ret_val = WD_SUCCESS;
             }
 
             if( WD_SUCCEEDED( ret_val )) {
-                p_list->dir_list[ idx ].time_added = p_t_added;
-                p_list->dir_list[ idx ].time_accessed = p_t_accessed;
+                #if 1
+                dir_item->time_added = p_t_added;
+                #endif
+                #if 1
+                dir_item->time_accessed = p_t_accessed;
+                #endif
                 if( p_type == WD_ENTITY_UNKNOWN ) {
-                    p_list->dir_list[ idx ].type = get_type( dest );
+                    dir_item->type = get_type( dir_item->dir_name );
                 } else {
-                    p_list->dir_list[ idx ].type = p_type;
+                    dir_item->type = p_type;
                 }
 
                 p_list->dir_count++;
@@ -371,6 +391,8 @@ static dir_list_t load_dir_list_from_file( const config_container_t* const p_con
                 /* Check that it wasn't a comment line */
                 if( read[0] != '#' ) {
                     size_t len = strlen( read );
+
+                    DEBUG_OUT("Content length: " PFFST,len);
 
                     /* Trim off line endings */
                     size_t trimmer;
@@ -788,7 +810,7 @@ void list_dir(const struct dir_list_item* p_dir_item,
             if( IS_BIT_SET( p_cfg->wd_dir_list_opt, WD_DIRLIST_NUMBERED ) & 
                 !(IS_BIT_SET( p_cfg->wd_dir_list_opt, WD_DIRLIST_PATHS ) || 
                   IS_BIT_SET( p_cfg->wd_dir_list_opt, WD_DIRLIST_BOOKMARKS )) ) {
-                fprintf( stdout, "%zu\n", p_count );
+                fprintf( stdout, PFFST "\n", p_count );
             }
             if( IS_BIT_SET( p_cfg->wd_dir_list_opt, WD_DIRLIST_PATHS )) {
                 if( IS_BIT_SET( p_cfg->wd_dir_list_opt, WD_DIRLIST_NUMBERED )) {
@@ -797,7 +819,7 @@ void list_dir(const struct dir_list_item* p_dir_item,
                         having to iterate the list to check for validity of each
                         item when looking up the index on a subsequent operation
                         */
-                    fprintf( stdout, "%zu ", p_count );
+                    fprintf( stdout, PFFST " ", p_count );
                 }
                 fprintf( stdout, "%s\n", dir_formatted );
             }
@@ -897,7 +919,7 @@ void dump_dir_list( const dir_list_t p_list )
         struct dir_list_item* current_item;
         int term_is_ansi = determine_if_term_is_ansi();
 
-        fprintf( stdout, "Dirlist has %zu entries of %zu used\n",
+        fprintf( stdout, "Dirlist has " PFFST " entries of " PFFST " used\n",
                  p_list->dir_count, p_list->dir_size );
 
         for( dir_loop = 0, current_item = p_list->dir_list;
@@ -998,6 +1020,9 @@ int save_dir_list( const dir_list_t p_list, const char* p_fn ) {
         {
             struct dir_list_item* this_item = &(p_list->dir_list[ dir_loop ]);
             char*  type_string;
+
+            DEBUG_OUT("saving bookmark " PFFST,dir_loop);
+
             fprintf( file, ":%s\n",
                            this_item->dir_name );
             if(( this_item->bookmark_name != NULL ) &&
