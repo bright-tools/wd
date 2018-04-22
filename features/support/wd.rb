@@ -39,6 +39,23 @@ Then(/the default list file should contain a header$/) do
     expect(file).to have_file_content file_content_including(expected.chomp)
 end
 
+Then(/the default list file should contain ([0-9]+?) shortcut(?:s)?/) do |expect_count|
+    # TODO: Bit of a long-winded, high-overhead way of achieving this instead of counting the matches
+
+    # Create a match string based on the expected number of shortcuts
+    shortcut_match = "^:.*\n.*"
+    expected = shortcut_match * Integer(expect_count)
+
+    # Check to see that the file content includes the number of shortcuts that we expect
+    file = get_default_file_list()
+    expect(file).to have_file_content file_content_matching(expected)
+
+    # Add an additional shortcut matcher & check that this no longer matches
+    # i.e. we match expected_count, but not expected_count+1 times
+    expected += shortcut_match
+    expect(file).not_to have_file_content file_content_matching(expected)
+end
+
 Then(/the default list file should contain a shortcut to(?: (unknown|directory|file)?)? '([^"]*)'( named "([^"]*)")?( with timestamp "(.+?)")?$/) do |file_or_directory, shortcut, named, timestamp|
     expected = ":"+shortcut+"\n"
 
