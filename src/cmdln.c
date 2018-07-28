@@ -160,7 +160,7 @@ static int process_opts( config_container_t* const p_config, const int argc, cha
                 arg_loop++;
                 sscanf(argv[arg_loop],"%ld",(long int*)(&p_config->wd_now_time));
             } else {
-                fprintf( stdout, "%s: %s\n", NEED_PARAMETER_STRING, this_arg );
+                fprintf( stderr, "%s: %s\n", NEED_PARAMETER_STRING, this_arg );
                 ret_val = 0;
             }
         } else if( 0 == strcmp( this_arg, "-e" ) ) {
@@ -168,7 +168,7 @@ static int process_opts( config_container_t* const p_config, const int argc, cha
                 arg_loop++;
 
                 if( strlen( argv[ arg_loop ] ) > 1 ) {
-                    fprintf( stdout, "%s: %s\n", UNRECOGNISED_PARAM_STRING, this_arg );
+                    fprintf( stderr, "%s: %s\n", UNRECOGNISED_PARAM_STRING, this_arg );
                 } else {
                     switch( argv[ arg_loop ][0] ) {
                         case 'a':
@@ -184,7 +184,7 @@ static int process_opts( config_container_t* const p_config, const int argc, cha
                             p_config->wd_entity_type = WD_ENTITY_FILE;
                             break;
                         default:
-                            fprintf( stdout, "%s: %s\n", UNRECOGNISED_PARAM_STRING, this_arg );
+                            fprintf( stderr, "%s: %s\n", UNRECOGNISED_PARAM_STRING, this_arg );
                             ret_val = 0;
                             break;
                     }
@@ -206,14 +206,14 @@ static int process_opts( config_container_t* const p_config, const int argc, cha
                     }
                 }
             } else {
-                fprintf( stdout, "%s: %s\n", NEED_PARAMETER_STRING, this_arg );
+                fprintf( stderr, "%s: %s\n", NEED_PARAMETER_STRING, this_arg );
                 ret_val = 0;
             }
         } else if( 0 == strcmp( this_arg, "-s" ) ) {
             if(( arg_loop + 1 ) < argc ) {
                 arg_loop++;
                 if( strlen( argv[ arg_loop ] ) > 1 ) {
-                    fprintf( stdout, "%s: %s\n", UNRECOGNISED_PARAM_STRING, this_arg );
+                    fprintf( stderr, "%s: %s\n", UNRECOGNISED_PARAM_STRING, this_arg );
                 } else {
                     switch( argv[ arg_loop ][0] ) {
                         case 'c':
@@ -223,13 +223,13 @@ static int process_opts( config_container_t* const p_config, const int argc, cha
                             p_config->wd_dir_form = WD_DIRFORM_WINDOWS;
                             break;
                         default:
-                            fprintf( stdout, "%s: %s\n", UNRECOGNISED_PARAM_STRING, this_arg );
+                            fprintf( stderr, "%s: %s\n", UNRECOGNISED_PARAM_STRING, this_arg );
                             ret_val = 0;
                             break;
                     }
                 }
             } else {
-                fprintf( stdout, "%s: %s\n", NEED_PARAMETER_STRING, this_arg );
+                fprintf( stderr, "%s: %s\n", NEED_PARAMETER_STRING, this_arg );
                 ret_val = 0;
             }
         } else if( p_cmd_line && ( 0 == strcmp( this_arg, "-d" )) ) {
@@ -241,7 +241,7 @@ static int process_opts( config_container_t* const p_config, const int argc, cha
                 arg_loop++;
                 arglen = strlen( argv[ arg_loop ] );
                 if( arglen > 2 ) {
-                    fprintf( stdout, "%s: %s\n", UNRECOGNISED_PARAM_STRING, this_arg );
+                    fprintf( stderr, "%s: %s\n", UNRECOGNISED_PARAM_STRING, this_arg );
                 } else {
                     size_t j;
                     /* Reset from the default */
@@ -261,7 +261,7 @@ static int process_opts( config_container_t* const p_config, const int argc, cha
                             p_config->wd_dir_list_opt |= WD_DIRLIST_BOOKMARKS;
                             break;
                         default:
-                            fprintf( stdout, "%s: %s '%c'\n", UNRECOGNISED_PARAM_STRING, this_arg, argv[ arg_loop ][j] );
+                            fprintf( stderr, "%s: %s '%c'\n", UNRECOGNISED_PARAM_STRING, this_arg, argv[ arg_loop ][j] );
                             ret_val = 0;
                             break;
                     }
@@ -269,7 +269,7 @@ static int process_opts( config_container_t* const p_config, const int argc, cha
             }
             else
             {
-                fprintf( stdout, "%s: %s\n", NEED_PARAMETER_STRING, this_arg );
+                fprintf( stderr, "%s: %s\n", NEED_PARAMETER_STRING, this_arg );
                 ret_val = 0;                
             }
         } else if( p_cmd_line && (( 0 == strcmp( this_arg, "-n" )) ||
@@ -283,7 +283,7 @@ static int process_opts( config_container_t* const p_config, const int argc, cha
                 }
                 p_config->wd_bookmark_name = argv[ arg_loop ];
             } else {
-                fprintf( stdout, "%s: %s\n", NEED_PARAMETER_STRING, this_arg );
+                fprintf( stderr, "%s: %s\n", NEED_PARAMETER_STRING, this_arg );
                 ret_val = 0;
             }
         } else if( p_cmd_line && 
@@ -332,11 +332,11 @@ static int process_opts( config_container_t* const p_config, const int argc, cha
                 p_config->list_fn = realloc( p_config->list_fn, strlen( argv[ arg_loop ] ));
                 strcpy( p_config->list_fn, argv[ arg_loop ] );
             } else {
-                fprintf( stdout, "%s: %s\n", NEED_PARAMETER_STRING, this_arg );
+                fprintf( stderr, "%s: %s\n", NEED_PARAMETER_STRING, this_arg );
                 ret_val = 0;
             }
         } else {
-            fprintf( stdout, "%s:\n  %s\n", UNRECOGNISED_ARG_STRING, this_arg );
+            fprintf( stderr, "%s:\n  %s\n", UNRECOGNISED_ARG_STRING, this_arg );
             ret_val = 0;
         }
     }
