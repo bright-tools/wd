@@ -6,6 +6,13 @@ def get_default_file_list()
     return File.join(ENV['HOME'],".wb_list")
 end
 
+Given(/^the default list file exists$/) do
+    step "the default list file does not exist"
+    file = get_default_file_list()
+    FileUtils.touch(file)
+    step "a file named \"#{file}\" should exist"
+end
+
 Given(/^the default list file does not exist$/) do
     file = get_default_file_list()
     remove(file, :force => true)
@@ -18,6 +25,41 @@ end
 
 Given(/^the default list file is not readable$/) do
     FileUtils.chmod_R(0000, get_default_file_list())
+end
+
+Given(/the default list file contains a shortcut to(?: (unknown|directory|file)?)? '([^"]*)'( named "([^"]*)")?( with timestamp "(.+?)")?$/) do |file_or_directory, shortcut, named, timestamp|
+    bookmark = ":"+shortcut+"\n"
+
+    if named
+        bookmark += "N:#{named}\n"
+    end
+
+    if timestamp
+        bookmark += "A:#{timestamp}\n"
+    end
+
+    if file_or_directory == 'file'
+        bookmark += "T:F\n"
+    elsif file_or_directory == 'directory'
+        bookmark += "T:D\n"
+    elsif file_or_directory == 'unknown'
+        bookmark += "T:U\n"
+    end
+
+#    print bookmark
+
+    filename = get_default_file_list()
+    file = File.open(filename, 'ab' )
+    file.write bookmark
+    file.close
+
+#    print "XX ---\n"
+#    file = File.open(get_default_file_list(), "r")
+#    contents = file.read
+#    file.close
+#    print contents
+#    print "YY ---\n"
+
 end
 
 When(/I run wd with arguments "(.+?)"$/i) do |args|
@@ -57,6 +99,36 @@ Then(/the default list file should contain ([0-9]+?) shortcut(?:s)?/) do |expect
     # i.e. we match expected_count, but not expected_count+1 times
     expected += shortcut_match
     expect(file).not_to have_file_content file_content_matching(expected)
+end
+
+Then(/the output should contain a dumped shortcut to '([^"]*)'( numbered ([^"]*))?( named "([^"]*)")?( with timestamp "(.+?)")?$/) do |shortcut, numbered, named, timestamp|
+
+    nform = "..."
+
+    if numbered
+        nform = sprintf("% 3d",numbered)
+    end
+
+    expected = "\\["+nform+"\\] "+Shellwords.escape(shortcut) + "\r*\n"
+
+    expected += "      - Shorthand: "
+    if named
+        expected += "#{named}"
+    else
+        expected += "(.*)?"
+    end
+    expected += "\r*\n"
+
+    expected += "      - Added: "
+    if timestamp
+        expected += "#{timestamp}"
+    else
+        expected += "(.*)?"
+    end
+
+#    print "EXPECTED: " + expected
+
+    expect(all_commands).to include_an_object have_output_on_stdout an_output_string_matching(expected)
 end
 
 Then(/the default list file should contain a shortcut to(?: (unknown|directory|file)?)? '([^"]*)'( named "([^"]*)")?( with timestamp "(.+?)")?$/) do |file_or_directory, shortcut, named, timestamp|
