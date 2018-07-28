@@ -672,6 +672,11 @@ char* format_dir( wd_dir_format_t p_fmt, int p_escape, char* const p_dir ) {
 
 static void dump_dir( const config_container_t* const p_cfg, struct dir_list_item* p_item )
 {
+    /* Precondition check */
+    assert( p_cfg != NULL );
+    assert( p_item != NULL );
+    /* !Precondition check */
+
     char* dir_formatted = format_dir( p_cfg->wd_dir_form,
                                       p_cfg->wd_escape_output,
                                       p_item->dir_name );
