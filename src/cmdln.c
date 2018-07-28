@@ -321,13 +321,15 @@ static int process_opts( config_container_t* const p_config, const int argc, cha
                     getcwd( p_config->wd_oper_dir, MAXPATHLEN );
                 }
             } else {
-                fprintf( stdout, "%s: %s\n", INCOMPATIBLE_OP_STRING, this_arg );
+                fprintf( stderr, "%s: %s\n", INCOMPATIBLE_OP_STRING, this_arg );
                 
                 /* Check to see if there's an argument to this command */
                 if((( arg_loop + 1 ) < argc ) &&
                     ( argv[ arg_loop + 1 ][0] != '-' )) {
                     arg_loop++;
                 }
+
+                ret_val = 0;
             }
         } else if( 0 == strcmp( this_arg, "-f" ) ) {
             arg_loop++;
