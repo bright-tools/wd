@@ -35,7 +35,8 @@ Given(/the default list file contains a shortcut to(?: (unknown|directory|file)?
     end
 
     if timestamp
-        bookmark += "A:#{timestamp}\n"
+        time = Time.at(timestamp.to_i)
+        bookmark += "A:" + time.strftime("%Y/%m/%d %H:%M:%S") + "\n"
     end
 
     if file_or_directory == 'file'
@@ -121,7 +122,8 @@ Then(/the output should contain a dumped shortcut to '([^"]*)'( numbered ([^"]*)
 
     expected += "      - Added: "
     if timestamp
-        expected += "#{timestamp}"
+        time = Time.at(timestamp.to_i)
+        expected += time.strftime("%c %Z")
     else
         expected += "(.*)?"
     end
