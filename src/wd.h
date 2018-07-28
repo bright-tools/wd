@@ -24,8 +24,10 @@
 #if defined WIN32
 /** Printf format string for size_t */
 #define PFFST "%Iu"
+#define PFF3ST "%3Iu"
 #else
 #define PFFST "%zu"
+#define PFF3ST "%3zu"
 #endif
 
 #endif

@@ -57,7 +57,7 @@ static int do_remove_interactive( const char* const               p_cmd,
        version of this app within MinTTy on Cygwin */
     (void)fflush(stdout);
 
-    success = fscanf(stdin,"%zu",&index);
+    success = fscanf(stdin,PFFST,&index);
 
     if( success )
     {
@@ -68,7 +68,7 @@ static int do_remove_interactive( const char* const               p_cmd,
         }
         else
         {
-            fprintf(stderr, "%s: Error: Invalid index '%zu'\n",
+            fprintf(stderr, "%s: Error: Invalid index '"PFFST"'\n",
                     p_cmd, index);
         }
     }
@@ -157,7 +157,7 @@ static int do_get( const config_container_t* const p_config,
     /* !Precondition check */
 
     /* Try to convert the string representing the entry's index to integer */
-    if( sscanf( p_config->wd_bookmark_name, "%zu", &idx ) == 1 ) 
+    if( sscanf( p_config->wd_bookmark_name, PFFST, &idx ) == 1 )
     {
         /* Bounds check */
         if( dir_list_get_count( p_dir_list ) > idx )
@@ -167,7 +167,7 @@ static int do_get( const config_container_t* const p_config,
         } 
         else 
         {
-            fprintf(stderr, "%s: Error: Index %zu doesn't exist\n",
+            fprintf(stderr, "%s: Error: Index "PFFST" doesn't exist\n",
                     cmd, idx);
         }
     }

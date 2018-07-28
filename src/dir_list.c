@@ -670,10 +670,10 @@ char* format_dir( wd_dir_format_t p_fmt, int p_escape, char* const p_dir ) {
     return( ret_val );
 }
 
-static void dump_dir( const dir_list_t p_list, struct dir_list_item* p_item )
+static void dump_dir( const config_container_t* const p_cfg, struct dir_list_item* p_item )
 {
-    char* dir_formatted = format_dir( p_list->cfg->wd_dir_form,
-                                      p_list->cfg->wd_escape_output,
+    char* dir_formatted = format_dir( p_cfg->wd_dir_form,
+                                      p_cfg->wd_escape_output,
                                       p_item->dir_name );
     if( dir_formatted != NULL ) {
         fprintf( stdout, "%s", dir_formatted );
@@ -682,12 +682,13 @@ static void dump_dir( const dir_list_t p_list, struct dir_list_item* p_item )
             free( dir_formatted );
         }
 
-        if( p_list->cfg->wd_store_access ) {
-            p_item->time_accessed = p_list->cfg->wd_now_time;
+        if( p_cfg->wd_store_access ) {
+            p_item->time_accessed = p_cfg->wd_now_time;
         }
     } else {
         /* TODO: What do do? */
     }
+
 }
 
 int        dump_dir_if_exists( const dir_list_t p_list, const char* const p_dir )
@@ -704,7 +705,7 @@ int        dump_dir_if_exists( const dir_list_t p_list, const char* const p_dir 
         if(( current_item->bookmark_name != NULL ) &&
            ( 0 == strcmp( p_dir, current_item->dir_name ))) {
 
-            dump_dir( p_list, current_item );
+            dump_dir( p_list->cfg, current_item );
             found = 1;
             break;
         }
@@ -718,7 +719,7 @@ int dump_dir_with_index( const dir_list_t p_list, const unsigned p_idx )
 
     if( p_idx < p_list->dir_count ) {
         struct dir_list_item* current_item = &( p_list->dir_list[ p_idx ] );
-        dump_dir( p_list, current_item );
+        dump_dir( p_list->cfg, current_item );
         found = 1;
     }
 
@@ -738,7 +739,7 @@ int dump_dir_with_name( const dir_list_t p_list, const char* const p_name )
         if(( current_item->bookmark_name != NULL ) &&
            ( 0 == strcmp( p_name, current_item->bookmark_name ))) {
 
-            dump_dir( p_list, current_item );
+            dump_dir( p_list->cfg, current_item );
             found = 1;
             break;
         }
@@ -794,9 +795,9 @@ int dir_should_be_listed( const struct dir_list_item* p_dir_item,
     return valid; 
 }
 
-void list_dir(const struct dir_list_item* p_dir_item,
+void list_dir(struct dir_list_item* p_dir_item,
               const size_t p_count,
-              const config_container_t* p_cfg )
+              const config_container_t* const p_cfg )
 {
 
     if( dir_should_be_listed( p_dir_item, p_cfg )) 
@@ -807,8 +808,8 @@ void list_dir(const struct dir_list_item* p_dir_item,
                                             p_cfg->wd_escape_output,
                                             dir );
         if( dir_formatted != NULL ) {
-            if( IS_BIT_SET( p_cfg->wd_dir_list_opt, WD_DIRLIST_NUMBERED ) & 
-                !(IS_BIT_SET( p_cfg->wd_dir_list_opt, WD_DIRLIST_PATHS ) || 
+            if( IS_BIT_SET( p_cfg->wd_dir_list_opt, WD_DIRLIST_NUMBERED ) &&
+                !(IS_BIT_SET( p_cfg->wd_dir_list_opt, WD_DIRLIST_PATHS ) ||
                   IS_BIT_SET( p_cfg->wd_dir_list_opt, WD_DIRLIST_BOOKMARKS )) ) {
                 fprintf( stdout, PFFST "\n", p_count );
             }
@@ -827,11 +828,20 @@ void list_dir(const struct dir_list_item* p_dir_item,
                 ( p_dir_item->bookmark_name != NULL )) {
                 char* name_escaped = escape_string( p_cfg->wd_escape_output,
                         p_dir_item->bookmark_name );
-                if( name_escaped != NULL ) {
+
+                if( name_escaped != NULL  ) {
                     if( IS_BIT_SET( p_cfg->wd_dir_list_opt, WD_DIRLIST_NUMBERED ) ) {
-                        fprintf( stdout, "%zu ", p_count );
+                        fprintf( stdout, PFFST " ", p_count );
                     }
-                    fprintf( stdout, "%s\n", name_escaped );
+                    if( strlen( name_escaped ) == 0 )
+                    {
+                        dump_dir( p_cfg, p_dir_item );
+                    }
+                    else
+                    {
+                        fprintf( stdout, "%s", name_escaped );
+                    }
+                    fprintf( stdout, "\n" );
                     if( name_escaped != p_dir_item->bookmark_name ) {
                         free( name_escaped );
                     }
@@ -954,7 +964,7 @@ void dump_dir_list( const dir_list_t p_list )
                 col = ANSI_COLOUR_GREEN;
             }
 
-            fprintf( stdout, "[%3zu] ", dir_loop);
+            fprintf( stdout, "["PFF3ST"] ", dir_loop);
 #if defined WIN32
             if( wcol != -1 ) {
                 wOldColorAttrs = TextColour(wcol);
