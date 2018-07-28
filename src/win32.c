@@ -20,10 +20,14 @@
 #include <shlobj.h>
 #include <sys/param.h>
 #include <time.h>
+#include <locale.h>
 
 void platform_init( void )
 {
     char* osType = getenv("OSTYPE");
+
+    /* Set the locale to the user's locale */
+    setlocale(LC_ALL, "");
 
     /* If we're running within Cygwin, unset the TZ environment variable
        as Windows doesn't understand the format.  When unset, Windows should
