@@ -132,12 +132,14 @@ static void show_help( const char* const p_cmd ) {
              by date added */
 }
 
+#define ARG_HAS_PARAMETER( arg_loop, argc, argv ) ((( arg_loop + 1 ) < argc ) && ( argv[ arg_loop + 1 ][0] != '-' ))
+
 static int process_opts( config_container_t* const p_config, const int argc, char* const argv[], const int p_cmd_line ) {
     int arg_loop;
     int ret_val = -1;
 
     /* Start loop at 1 - index 0 is name of executable */
-    for( arg_loop = 1; arg_loop < argc; arg_loop++ )
+    for( arg_loop = 1; (arg_loop < argc) && (ret_val < 0); arg_loop++ )
     {
         char* this_arg = argv[ arg_loop ];
         DEBUG_OUT("process_opts: %s",this_arg); 
@@ -234,8 +236,7 @@ static int process_opts( config_container_t* const p_config, const int argc, cha
             p_config->wd_oper = WD_OPER_DUMP;
         } else if( p_cmd_line && ( 0 == strcmp( this_arg, "-l" )) ) {
             p_config->wd_oper = WD_OPER_LIST;
-            if((( arg_loop + 1 ) < argc ) &&
-                ( argv[ arg_loop + 1 ][0] != '-' )) {
+            if( ARG_HAS_PARAMETER( arg_loop, argc, argv )) {
                 size_t arglen;
                 arg_loop++;
                 arglen = strlen( argv[ arg_loop ] );
@@ -273,8 +274,7 @@ static int process_opts( config_container_t* const p_config, const int argc, cha
             }
         } else if( p_cmd_line && (( 0 == strcmp( this_arg, "-n" )) ||
                                   ( 0 == strcmp( this_arg, "-g" )))) {
-            if((( arg_loop + 1 ) < argc ) &&
-                ( argv[ arg_loop + 1 ][0] != '-' )) {
+            if( ARG_HAS_PARAMETER( arg_loop, argc, argv )) {
                 arg_loop++;
                 if( 0 == strcmp( this_arg, "-n" ) ) {
                     p_config->wd_oper = WD_OPER_GET_BY_BM_NAME;
@@ -300,8 +300,7 @@ static int process_opts( config_container_t* const p_config, const int argc, cha
                 }
 
                 /* Check to see if there's an argument to this command */
-                if((( arg_loop + 1 ) < argc ) &&
-                    ( argv[ arg_loop + 1 ][0] != '-' )) {
+                if( ARG_HAS_PARAMETER( arg_loop, argc, argv )) {
                     arg_loop++;
 
                     /* TODO: Add a switch to prevent the path being made
@@ -311,8 +310,7 @@ static int process_opts( config_container_t* const p_config, const int argc, cha
 
                     /* TODO: This only really makes sense for an add operation
                     */
-                    if((( arg_loop + 1 ) < argc ) &&
-                        ( argv[ arg_loop + 1 ][0] != '-' )) {
+                    if( ARG_HAS_PARAMETER( arg_loop, argc, argv )) {
                         arg_loop++;
                         p_config->wd_bookmark_name = argv[ arg_loop ];
                     }
@@ -324,11 +322,6 @@ static int process_opts( config_container_t* const p_config, const int argc, cha
                 fprintf( stderr, "%s: %s\n", INCOMPATIBLE_OP_STRING, this_arg );
                 
                 /* Check to see if there's an argument to this command */
-                if((( arg_loop + 1 ) < argc ) &&
-                    ( argv[ arg_loop + 1 ][0] != '-' )) {
-                    arg_loop++;
-                }
-
                 ret_val = 0;
             }
         } else if( 0 == strcmp( this_arg, "-f" ) ) {
