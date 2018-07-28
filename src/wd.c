@@ -17,6 +17,7 @@
 #include "wd.h"
 #include "cmdln.h"
 #include "dir_list.h"
+#include "os_if.h"
 
 #include <assert.h>
 #include <stdlib.h>
@@ -441,6 +442,8 @@ int main( int argc, char* argv[] )
 
     /* Initialise configuration */
     fn_result = init_cmdln( &cfg );
+
+    platform_init();
 
     if( WD_SUCCEEDED( fn_result )) 
     {

@@ -21,6 +21,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+void platform_init( void )
+{
+}
+
 char* get_home_dir( void )
 {
     /* Try and retrieve the home from the environment first */

@@ -28,7 +28,7 @@
 
 #define TIME_FORMAT_STRING "%Y/%m/%d %H:%M:%S"
 #define TIME_SSCAN_STRING  "%04u/%02u/%02u %02u:%02u:%02u"
-#define TIME_STRING_BUFFER_SIZE (30U)
+#define TIME_STRING_BUFFER_SIZE (50U)
 
 #define ANSI_COLOUR_RED     "\x1b[31m"
 #define ANSI_COLOUR_GREEN   "\x1b[32m"
@@ -696,7 +696,7 @@ static void dump_dir( const config_container_t* const p_cfg, struct dir_list_ite
 
 }
 
-int        dump_dir_if_exists( const dir_list_t p_list, const char* const p_dir )
+int dump_dir_if_exists( const dir_list_t p_list, const char* const p_dir )
 {
     size_t dir_loop;
     struct dir_list_item* current_item;
@@ -917,7 +917,7 @@ static void dump_time( const char* const p_header, const time_t* const p_time )
     char buffer[ TIME_STRING_BUFFER_SIZE ];
 
     strftime( buffer, sizeof( buffer ), "%c %Z",
-              gmtime( p_time ));
+              localtime( p_time ));
 
     fprintf( stdout, "\n      - %s: %s",
                      p_header,

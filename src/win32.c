@@ -19,6 +19,21 @@
 #if defined WIN32
 #include <shlobj.h>
 #include <sys/param.h>
+#include <time.h>
+
+void platform_init( void )
+{
+    char* osType = getenv("OSTYPE");
+
+    /* If we're running within Cygwin, unset the TZ environment variable
+       as Windows doesn't understand the format.  When unset, Windows should
+       fall back on the registry to get the machine's time settings */
+    if(( osType != NULL ) && (strcmp( osType, "cygwin" ) == 0 ))
+    {
+        putenv( "TZ=" );
+        tzset();
+    }
+}
 
 char* get_home_dir( void )
 {

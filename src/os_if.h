@@ -17,6 +17,7 @@
 #if !defined OS_IF_H
 #define      OS_IF_H
 
+void platform_init( void );
 char* get_home_dir( void );
 void  release_home_dir( char* p_dir );
 void  canonicalize_dir( const char* const p_dir, char* const p_target );
