@@ -1,4 +1,4 @@
-PFX     = @
+PFX     = 
 TGT     = ../src/wd.exe
 LIST_FN = ./list
 LOG_OUT = out.log
@@ -13,8 +13,8 @@ TGT_E   = $(PFX) $(TGT) -f $(LIST_FN) -z $(TIME)
 PASS    = win32
 START   = 1386181003
 OFF     = 0
-DIFF_OPT= -c -b
-CHECK_E = $(PFX) diff $(DIFF_OPT) list $(PASS)/list.$(STEP) && diff $(DIFF_OPT) out.log $(PASS)/out.log.$(STEP) && diff $(DIFF_OPT) err.log $(PASS)/err.log.$(STEP)
+DIFF_OPT= -c -b --ignore-case
+CHECK_E = $(PFX) diff $(DIFF_OPT) $(PASS)/list.$(STEP) list && diff $(DIFF_OPT) $(PASS)/out.log.$(STEP) out.log && diff $(DIFF_OPT) $(PASS)/err.log.$(STEP) err.log
 
 .PHONY: all
 all: test22
@@ -29,6 +29,7 @@ clean:
 test1: OFF=0
 test1: STEP=1
 test1: clean
+test1: $(TGT)
 	@echo Test $(STEP): Adding a directory
 	$(TGT_E) -a 'C:\' see $(OUT)
 	$(CHECK_E)

@@ -8,10 +8,10 @@ T:D
 N:windows
 A:2013/12/04 18:17:28
 T:D
-:C:\temp
+:C:\TEMP
 N:temp
 A:2013/12/04 18:17:28
-T:U
+T:D
 :\\someserver\someshare\somedir
 N:unc1
 A:2013/12/04 18:17:43
