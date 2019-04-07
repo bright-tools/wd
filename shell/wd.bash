@@ -16,13 +16,13 @@ function wd_run()
     local dir=$(wd -g "$2" -s ${fmt})
 
     # Any useful result?
-    if [ -d "$2" ]; then
-        $1 "$2"
+    if [ -d "${dir}" ]; then
+        $1 "${dir}"
     else
         # Priority is given to a bookmark, but if there's a local directory
         #  with that name, we give that a whirl
-        if [ -d "${dir}" ]; then
-            $1 "${dir}"
+        if [ -d "$2" ]; then
+            $1 "$2"
         else
             echo "wcd: Couldn't find a directory or a bookmark for '$2' and there did not seem to be a local directory either";
         fi
